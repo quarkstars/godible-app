@@ -1,5 +1,5 @@
 {
-  "name": "nextjs-tailwind-capacitor",
+  "name": "godible-app",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^4.0.0",
+    "@types/react": "^18.0.28",
     "eslint": "^7.28.0",
     "eslint-config-next": "^11.0.0",
     "ionicons": "^6.0.3",

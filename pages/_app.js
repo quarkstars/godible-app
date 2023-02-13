@@ -3,6 +3,7 @@ import Script from 'next/script';
 import { setupIonicReact } from '@ionic/react';
 
 import 'tailwindcss/tailwind.css';
+
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
