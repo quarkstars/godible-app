@@ -1,11 +1,12 @@
 import NotFoundPage from "components/pages/NotFoundPage";
-import { book, bookOutline, mic, micOutline, radio, radioOutline, search, searchOutline, square, sunny, sunnyOutline, triangle } from "ionicons/icons";
+import { book, bookOutline, bulb, bulbOutline, mic, micOutline, radio, radioOutline, search, searchOutline, square, } from "ionicons/icons";
 import { FC } from "react";
 
 interface IPage {
     label: string,
     path: string,
     component: FC,
+    variable?: string,
     icon?: string,
     iosIcon?: string,
     isNav?: boolean,
@@ -28,6 +29,7 @@ export const pages:IPage[] = [
     {
         label: "Books",
         path: "/books",
+        variable: "slug", //slug
         component: NotFoundPage, //BooksPage
         icon: book,
         iosIcon: bookOutline,
@@ -47,7 +49,8 @@ export const pages:IPage[] = [
     }, 
     {   //TODO: Page Path goes to literally search/:term learn to do this right
         label: "Search",
-        path: "/search/:term", //terms should be 4 letters or more
+        path: "/search", 
+        variable: "query", //query should be 4 letters or more
         component: NotFoundPage, //SearchPage
         icon: search,
         iosIcon: searchOutline,
@@ -59,24 +62,30 @@ export const pages:IPage[] = [
         label: "Inspirations",
         path: "/inspirations", //InspirationsPage
         component: NotFoundPage,
-        icon: sunny,
-        iosIcon: sunnyOutline,
+        icon: bulb,
+        iosIcon: bulbOutline,
         isNav: true,
         isExact: true,
         isRedirect: false,
     }, 
     {
         label: "Profile",
-        path: "/profile/:id", //ProfilePage
+        path: "/profile", //ProfilePage
+        variable: "username", //unique alphanumeric username - lowercase!
         component: NotFoundPage,
         icon: square,
         isNav: false,
         isExact: false,
         isRedirect: false,
     }, 
+    //TODO: Add Transactions (Billing History)
+    //TODO: Add Payments
+    //TODO: Add Subscription
+    //TODO: Add Notifications
     {
         label: "Playlists",
-        path: "/playlists/:id",
+        path: "/playlists",
+        variable: "id", 
         component: NotFoundPage, //PlaylistsPage
         icon: square,
         isNav: false,
@@ -85,7 +94,8 @@ export const pages:IPage[] = [
     }, 
     {
         label: "Book",
-        path: "/book/:slug",
+        path: "/book",
+        variable: "slug", 
         component: NotFoundPage, //BookPage
         icon: square,
         isNav: false,
@@ -94,7 +104,8 @@ export const pages:IPage[] = [
     }, 
     {
         label: "Episode",
-        path: "/episode/:number",
+        path: "/episode",
+        variable: "slug",  //Book name slug plus episode number
         component: NotFoundPage, //EpisodePage
         icon: square,
         isNav: false,
@@ -103,7 +114,7 @@ export const pages:IPage[] = [
     }, 
     {
         label: "Not Found",
-        path: "/*",
+        path: "/*", //TODO: Does this work?
         component: NotFoundPage, 
         isNav: false,
         isExact: false,

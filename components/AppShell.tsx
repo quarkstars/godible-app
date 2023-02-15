@@ -1,3 +1,5 @@
+
+import React, { createContext } from "react";
 import { IonApp, IonLabel, IonRouterOutlet, setupIonicReact, IonTabs, IonTabBar, IonTabButton, IonIcon, IonSplitPane  } from '@ionic/react';
 import { StatusBar, Style } from '@capacitor/status-bar';
 
@@ -9,49 +11,49 @@ import Menu from './ui/Menu';
 
 import Parse from 'parse';
 import { pages } from 'data/pageData';
+import { IUser } from "data/types";
+import useTheme, { ITheme } from "hooks/useTheme";
+import { IPlayer } from "hooks/usePlayer";
+import Routes from "./Routes";
 
 setupIonicReact({});
 
-window.matchMedia("(prefers-color-scheme: dark)").addListener(async (status) => {
-  try {
-    await StatusBar.setStyle({
-      style: status.matches ? Style.Dark : Style.Light,
-    });
-  } catch {}
-});
+//Setup Contexts
+export const User = createContext<IUser>({
+  language: "English",
+})
+export const Theme = createContext<ITheme>({
+  isDark: false,
+  setIsDark: () => null,
+})
+export const Player = createContext<IPlayer>({
+  
+})
+
 
 const AppShell: React.FC = () => {
   
+  //Initialize Parse
+  //TODO: move to .env
   const PARSE_APPLICATION_ID = 'LmmiwtKIw2qLgkgPnoooMyXbfViwlBC00He9Szp3';
   const PARSE_HOST_URL = 'https://parseapi.back4app.com/';
   const PARSE_JAVASCRIPT_KEY = 'u1xDTMsGODAoEHyUY04ozHPHPrXpWwvfGDHJa80V';
   Parse.initialize(PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY);
   Parse.serverURL = PARSE_HOST_URL;
 
+  const theme = useTheme();
+
   return (
-    <IonApp>
-      <IonReactRouter>
-        <IonSplitPane contentId="main">
-          <Menu />
-          <IonRouterOutlet id="main">
-            {
-              pages.map((page) => {
-                return (
-                  <Route 
-                    path={page.path}
-                    exact={page.isExact}
-                    component={page.component}
-                    key={page.label}
-                  >
-                    {page.isRedirect && <Redirect to={page.path} />}
-                  </Route>
-                )
-              })
-            }
-          </IonRouterOutlet>
-        </IonSplitPane>
-      </IonReactRouter>
-    </IonApp>
+    <Theme.Provider value={theme}>
+      <IonApp>
+        <IonReactRouter>
+          <IonSplitPane contentId="main">
+            <Menu />
+            <Routes />
+          </IonSplitPane>
+        </IonReactRouter>
+      </IonApp>
+    </Theme.Provider>
   );
 };
 

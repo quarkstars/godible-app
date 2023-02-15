@@ -12,10 +12,11 @@ import {
     IonNote,
     IonToggle,
   } from '@ionic/react';
+  import { useContext } from 'react';
   import { useLocation } from 'react-router-dom';
   import { archiveOutline, archiveSharp, bookmarkOutline, heartOutline, heartSharp, list, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
   import { pages } from 'data/pageData';
-  import { useState } from 'react';
+  import { Theme } from 'components/AppShell';
   
   interface AppPage {
     url: string;
@@ -28,20 +29,9 @@ import {
   
   const Menu: React.FC = () => {
     const location = useLocation();
-    //TODO: Make a Prefernce Context Save this to a storage
-    const [isDark, setIsDark] = useState(false);
-    const toggleDarkModeHandler = () => {
-      if(isDark) {
-        setIsDark(false);
-        document.body.classList.remove("dark");
-      }
-      else {
-        setIsDark(true);
-        document.body.classList.add("dark");
-      }
-    };
 
-    console.log('location.pathname',location.pathname)
+    const theme = useContext(Theme);
+    console.log(theme)
   
     return (
       <IonMenu contentId="main" type="overlay" >
@@ -56,6 +46,7 @@ import {
                     <IonMenuToggle key={index} autoHide={false}>
                       <IonItem 
                         className={location.pathname === page.path ? 'selected' : ''} 
+                        //Search Query is empty to start
                         routerLink={page.path} 
                         routerDirection="none" 
                         lines="none" 
@@ -86,9 +77,9 @@ import {
                 <IonToggle
                   slot="start"
                   name="darkMode"
-                  onIonChange={toggleDarkModeHandler}
+                  onIonChange={() => {theme.setIsDark(!theme.isDark)}}
                 />
-              <IonLabel>{isDark ? 'Dark' : 'Light'}</IonLabel>
+              <IonLabel>{theme.isDark ? 'Dark' : 'Light'}</IonLabel>
               <IonButton color={"primary"} slot="end">English</IonButton>
               </IonItem>
             </div>
