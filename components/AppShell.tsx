@@ -41,6 +41,7 @@ const AppShell: React.FC = () => {
                     path={page.path}
                     exact={page.isExact}
                     component={page.component}
+                    key={page.label}
                   >
                     {page.isRedirect && <Redirect to={page.path} />}
                   </Route>
