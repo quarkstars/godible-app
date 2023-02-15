@@ -1,3 +1,3 @@
-export const pages = {
-    
+export interface IBook {
+
 }

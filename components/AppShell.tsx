@@ -8,6 +8,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import Menu from './ui/Menu';
 
 import Parse from 'parse';
+import { pages } from 'data/pageData';
 
 setupIonicReact({});
 
@@ -33,12 +34,19 @@ const AppShell: React.FC = () => {
         <IonSplitPane contentId="main">
           <Menu />
           <IonRouterOutlet id="main">
-            <Route path="/" exact={true}>
-              <Redirect to="/page/Inbox" />
-            </Route>
-            <Route path="/page/:name" exact={true}>
-              <NotFoundPage />
-            </Route>
+            {
+              pages.map((page) => {
+                return (
+                  <Route 
+                    path={page.path}
+                    exact={page.isExact}
+                    component={page.component}
+                  >
+                    {page.isRedirect && <Redirect to={page.path} />}
+                  </Route>
+                )
+              })
+            }
           </IonRouterOutlet>
         </IonSplitPane>
       </IonReactRouter>
