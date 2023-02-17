@@ -1,6 +1,5 @@
 import { IonBackButton, IonButton, IonButtons, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRouterLink, IonRow, IonText, IonTitle, IonToolbar } from '@ionic/react';
 import { Theme } from 'components/AppShell';
-import { Player } from 'components/ui/Player';
 import TextDivider from 'components/ui/TextDivider';
 // import styles from './Signup.module.scss';
 
@@ -68,9 +67,6 @@ const SignInPage: React.FC = () => {
         </div>
       </div>
       </IonContent>
-      <IonFooter>
-        <Player />
-      </IonFooter>
 		</IonPage>
 	);
 };

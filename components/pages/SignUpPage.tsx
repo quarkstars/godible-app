@@ -1,5 +1,5 @@
 import { IonBackButton, IonButton, IonButtons, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRouterLink, IonRow, IonText, IonTitle, IonToolbar } from '@ionic/react';
-import { Theme } from 'components/AppShell';
+import { Theme, UserState } from 'components/AppShell';
 import TextDivider from 'components/ui/TextDivider';
 // import styles from './Signup.module.scss';
 
@@ -10,7 +10,16 @@ import { useParams } from 'react-router';
 const SignUpPage: React.FC = () => {
   
 
-  const [showPass, setShowPass] = useState<boolean>(false)
+  const [showPass, setShowPass] = useState<boolean>(false);
+  const [first, setFirst] = useState('');
+  const [last, setLast] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const {
+    signUp,
+  } = useContext(UserState);
+
 
   //TODO: Programmatically check what platform and then show floating only on android
   //TODO: Check if logged in, and if so go home
@@ -46,36 +55,36 @@ const SignUpPage: React.FC = () => {
               <div className="mb-6 form-group">
                   <IonItem>
                     <IonLabel position='floating'>First name</IonLabel>
-                    <IonInput placeholder="First"></IonInput>
+                    <IonInput placeholder="First" onIonChange={(event) => setFirst(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                   </IonItem>
               </div>
               <div className="mb-6 form-group">
                   <IonItem>
                     <IonLabel position='floating'>Last name</IonLabel>
-                    <IonInput placeholder="Last"></IonInput>
+                    <IonInput placeholder="Last" onIonChange={(event) => setLast(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                   </IonItem>
               </div>
             </div>
             <div className="mb-6 form-group">
                   <IonItem>
                     <IonLabel position='floating'>Email Address</IonLabel>
-                    <IonInput placeholder="Email"></IonInput>
+                    <IonInput placeholder="Email" onIonChange={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                   </IonItem>
             </div>
             <div className="mb-6 form-group">
                   <IonItem>
                     <IonLabel position='floating'>Create Password</IonLabel>
-                    <IonInput type={showPass ? "text" : "password"}></IonInput>
+                    <IonInput type={showPass ? "text" : "password"} onIonChange={(event) => setPassword(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                     <IonButton slot="end" fill='clear' size="large" color="light" onClick={()=>{setShowPass(!showPass)}}>
                       <IonIcon icon={!showPass ? eyeOff : eye } />
                     </IonButton>
                   </IonItem>
             </div>
-            <IonButton color="primary" expand="block">
+            <IonButton color="primary" expand="block" onClick={() => signUp(email, password, first, last)}>
               Create Account
             </IonButton>
             <div className='flex flex-col items-center justify-center w-full'>
-              
+              {/* TODO: Link */}
               <span className="h-0.5 w-full border-t border-gray-400 block border-opacity-10 mt-4"></span>
               <span className='text-xs'>Already have an account?</span>
               <div className='flex-grow' />

@@ -14,17 +14,30 @@ import { IUser } from "data/types";
 import useTheme, { ITheme } from "hooks/useTheme";
 import { IPlayer } from "hooks/usePlayer";
 import Routes from "./Routes";
+import useUser, { IUserState } from "hooks/useUser";
 
 setupIonicReact({});
 
 //Setup Contexts
-export const User = createContext<IUser>({
-  language: "English",
+export const UserState = createContext<IUserState>({
+  user: undefined,
+  isLoading: false,
+  reroutePath: "",
+  setReroutePath: () => null,
+  notice: undefined,
+  setNotice: () => null,
+
+  //SIGN UP
+  signUpError: () => null,
+  signUp: async () => null,
+  language: "",
+  setLanguage: () => null,
 })
 export const Theme = createContext<ITheme>({
   isDark: false,
   setIsDark: () => null,
-})
+});
+
 export const Player = createContext<IPlayer>({
   
 })
@@ -41,18 +54,21 @@ const AppShell: React.FC = () => {
   Parse.serverURL = PARSE_HOST_URL;
 
   const theme = useTheme();
+  const userState = useUser();
 
   return (
-    <Theme.Provider value={theme}>
-      <IonApp>
-        <IonReactRouter>
-          <IonSplitPane contentId="main">
-            <Menu />
-            <Routes />
-          </IonSplitPane>
-        </IonReactRouter>
-      </IonApp>
-    </Theme.Provider>
+    <UserState.Provider value={userState}>
+      <Theme.Provider value={theme}>
+        <IonApp>
+          <IonReactRouter>
+            <IonSplitPane contentId="main">
+              <Menu />
+              <Routes />
+            </IonSplitPane>
+          </IonReactRouter>
+        </IonApp>
+      </Theme.Provider>
+    </UserState.Provider>
   );
 };
 

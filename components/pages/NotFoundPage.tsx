@@ -1,5 +1,6 @@
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButtons, IonContent, IonFooter, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import { useParams } from 'react-router';
+import { Player } from 'components/ui/Player';
 import { useEffect } from 'react';
 import Parse from "parse";
 
@@ -48,6 +49,10 @@ const NotFoundPage: React.FC = () => {
         </div>
       </main>
       </IonContent>
+      
+      <IonFooter>
+        <Player />
+      </IonFooter>
     </IonPage>
   );
 };
