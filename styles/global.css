@@ -15,6 +15,13 @@ body.dark .title-default, body.dark ion-list-header {
   color: #d0d0d0;
 }
 
+.hide {
+  display: none;
+}
+
+
+
+
 /**
  * Styles for the Icon UI component.
  *
@@ -209,6 +216,11 @@ body.dark .title-default, body.dark ion-list-header {
   box-sizing: border-box;
   color: #44585d;
 }
+.dark * {
+  
+  color: #a2a4ab;
+}
+
 body {
   height: 100vh;
   background-color: #ecf0f1;
@@ -254,6 +266,16 @@ body.dark ::-webkit-scrollbar-thumb {
   background-color: #a8bbbf;
 }
 
+
+/* tweaks to platforms */
+.dark .sc-ion-input-md-h {
+  color: #FFFFFF
+}
+
+
+.md ion-title {
+  text-align:center;
+}
 
 /* Menu.tsx */
 ion-menu ion-content {

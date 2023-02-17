@@ -10,7 +10,6 @@ import NotFoundPage from './pages/NotFoundPage';
 import Menu from './ui/Menu';
 
 import Parse from 'parse';
-import { pages } from 'data/pageData';
 import { IUser } from "data/types";
 import useTheme, { ITheme } from "hooks/useTheme";
 import { IPlayer } from "hooks/usePlayer";

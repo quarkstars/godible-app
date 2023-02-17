@@ -12,11 +12,11 @@ import {
     IonNote,
     IonToggle,
   } from '@ionic/react';
-  import { useContext } from 'react';
-  import { useLocation } from 'react-router-dom';
-  import { archiveOutline, archiveSharp, bookmarkOutline, heartOutline, heartSharp, list, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
-  import { pages } from 'data/pageData';
-  import { Theme } from 'components/AppShell';
+import { useContext } from 'react';
+import { useLocation } from 'react-router-dom';
+import { archiveOutline, archiveSharp, bookmarkOutline, heartOutline, heartSharp, list, mailOutline, mailSharp, moonOutline, paperPlaneOutline, paperPlaneSharp, sunnyOutline, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
+import { Theme } from 'components/AppShell';
+import { pages } from 'components/Routes';
   
   interface AppPage {
     url: string;
@@ -30,62 +30,70 @@ import {
   const Menu: React.FC = () => {
     const location = useLocation();
 
+    let hideClass:string|undefined;
+    if (location.pathname === "/signup" || location.pathname === "/signin") {
+      hideClass = "hide"
+    }
+    console.log(location.pathname, hideClass)
+
     const theme = useContext(Theme);
-    console.log(theme)
   
     return (
-      <IonMenu contentId="main" type="overlay" >
-        <IonContent>
-          <div className="h-full w-full max-h-screen flex flex-col overflow-y-scroll items-start justify-start border-r-2 border-gray-400 border-opacity-10" id="menu">
-            <div className="w-full items-center justify-center">
-              <IonList id="inbox-list" >
-                <IonListHeader>Godible</IonListHeader>
-                {pages.map((page, index) => {
-                  if (!page.isNav) return;
-                  return (
-                    <IonMenuToggle key={index} autoHide={false}>
-                      <IonItem 
-                        className={location.pathname === page.path ? 'selected' : ''} 
-                        //Search Query is empty to start
-                        routerLink={page.path} 
-                        routerDirection="none" 
-                        lines="none" 
-                        detail={false}
-                        ion-padding={false}
-                      >
-                        <IonIcon slot="start" ios={page.iosIcon} md={page.icon} />
-                        <IonLabel>{page.label}</IonLabel>
-                      </IonItem>
-                    </IonMenuToggle>
-                  );
-                })}
-              </IonList>
+        <IonMenu contentId="main" type="overlay" className={hideClass}>
+          <IonContent>
+            <div className="flex flex-col items-start justify-start w-full h-full max-h-screen overflow-y-scroll border-r-2 border-gray-400 border-opacity-10" id="menu">
+              <div className="items-center justify-center w-full">
+                <IonList id="inbox-list" >
+                  <IonListHeader>
+                    <img src='/logo/godible-logo.png' className='w-32 mb-4'/>
+                  </IonListHeader>
+                  {pages.map((page, index) => {
+                    if (!page.isNav) return;
+                    return (
+                      <IonMenuToggle key={index} autoHide={false}>
+                        <IonItem 
+                          className={location.pathname === page.path ? 'selected' : ''} 
+                          //Search Query is empty to start
+                          routerLink={page.path} 
+                          routerDirection="none" 
+                          lines="none" 
+                          detail={false}
+                          ion-padding={false}
+                        >
+                          <IonIcon slot="start" ios={page.iosIcon} md={page.icon} />
+                          <IonLabel>{page.label}</IonLabel>
+                        </IonItem>
+                      </IonMenuToggle>
+                    );
+                  })}
+                </IonList>
+              </div>
+              <div className="items-start justify-start flex-grow w-full overflow-y-scroll">
+                <IonList id="labels-list">
+                  {titles.map((listTitle, index) => (
+                    <IonItem lines="none" key={index} >
+                      <IonIcon slot="start" icon={listTitle==="Saved" ? bookmarkOutline : list} />
+                      <IonLabel>{listTitle}</IonLabel>
+                    </IonItem>
+                  ))}
+                </IonList>
+              </div>
+              <span className="h-0.5 w-full border-t border-gray-400 block border-opacity-10"></span>
+              <div className="items-center justify-center w-full">
+                <IonItem>
+                  <IonToggle
+                    slot="start"
+                    name="darkMode"
+                    checked={theme.isDark}
+                    onClick={() => {theme.setIsDark(!theme.isDark)}}
+                  />
+                <IonIcon slot={'start'} icon={theme.isDark ?  moonOutline : sunnyOutline} />
+                <IonButton color={"primary"} slot="end">English</IonButton>
+                </IonItem>
+              </div>
             </div>
-            <div className="w-full flex-grow overflow-y-scroll items-start justify-start">
-              <IonList id="labels-list">
-                {titles.map((listTitle, index) => (
-                  <IonItem lines="none" key={index} >
-                    <IonIcon slot="start" icon={listTitle==="Saved" ? bookmarkOutline : list} />
-                    <IonLabel>{listTitle}</IonLabel>
-                  </IonItem>
-                ))}
-              </IonList>
-            </div>
-            <span className="h-0.5 w-full border-t border-gray-400 block border-opacity-30"></span>
-            <div className="w-full items-center justify-center">
-              <IonItem>
-                <IonToggle
-                  slot="start"
-                  name="darkMode"
-                  onIonChange={() => {theme.setIsDark(!theme.isDark)}}
-                />
-              <IonLabel>{theme.isDark ? 'Dark' : 'Light'}</IonLabel>
-              <IonButton color={"primary"} slot="end">English</IonButton>
-              </IonItem>
-            </div>
-          </div>
-        </IonContent>
-      </IonMenu>
+          </IonContent>
+        </IonMenu>
     );
   };
   
