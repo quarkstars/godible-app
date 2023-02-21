@@ -25,7 +25,7 @@ import { pages } from 'components/Routes';
     title: string;
   }
 
-  const titles = ['Saved',  ];
+  const titles = ['Saved', 'Saved','Saved', ];
   
   const Menu: React.FC = () => {
     const location = useLocation();
@@ -68,7 +68,8 @@ import { pages } from 'components/Routes';
                   })}
                 </IonList>
               </div>
-              <div className="items-start justify-start flex-grow w-full overflow-y-scroll">
+              {/* TODO: MIN HEIGHT DOESN"T WORK */}
+              <div className="items-start justify-start flex-grow w-full overflow-y-scroll min-h-[100px]">
                 <IonList id="labels-list">
                   {titles.map((listTitle, index) => (
                     <IonItem lines="none" key={index} >
