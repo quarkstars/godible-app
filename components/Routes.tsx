@@ -3,7 +3,7 @@ import React from 'react'
 import { Redirect, Route } from 'react-router'
 
 import NotFoundPage from "components/pages/NotFoundPage";
-import { book, bookOutline, bulb, bulbOutline, mic, micOutline, radio, radioOutline, search, searchOutline, square, } from "ionicons/icons";
+import { book, bookOutline, bulb, bulbOutline, cafe, cafeOutline, library, mic, micOutline, radio, radioOutline, search, searchOutline, square, } from "ionicons/icons";
 import { FC } from "react";
 import SignUpPage from './pages/SignUpPage';
 import SignInPage from './pages/SignInPage';
@@ -28,30 +28,14 @@ interface IPage {
 
 export const pages:IPage[] = [
     {
-        label: "SignUp",
-        path: "/signup",
-        component: SignUpPage, 
-        isNav: false,
-        isExact: true,
-        isRedirect: false,
-    },
-    {
-        label: "SignIn",
-        path: "/signin",
-        component: SignInPage, 
-        isNav: false,
-        isExact: true,
-        isRedirect: false,
-    },
-    {
         label: "Home",
         path: "/",
         component: NotFoundPage, //HomePage
-        icon: radio,
-        iosIcon: radioOutline,
+        icon: cafe,
+        iosIcon: cafeOutline,
         isNav: true,
         isExact: true,
-        isRedirect: true,
+        isRedirect: false,
     },
     {
         label: "Books",
@@ -147,6 +131,22 @@ export const pages:IPage[] = [
     //     isExact: false,
     //     isRedirect: false,
     // },
+    {
+        label: "SignUp",
+        path: "/signup",
+        component: SignUpPage, 
+        isNav: false,
+        isExact: true,
+        isRedirect: false,
+    },
+    {
+        label: "SignIn",
+        path: "/signin",
+        component: SignInPage, 
+        isNav: false,
+        isExact: true,
+        isRedirect: false,
+    },
 
 ]
 
@@ -157,12 +157,12 @@ const Routes = () => {
             pages.map((page) => {
             return (
                 <Route 
-                path={page.variable? page.path+"/:"+page.variable : page.path}
-                exact={page.isExact}
-                component={page.component}
-                key={page.label}
+                    path={page.variable? page.path+"/:"+page.variable : page.path}
+                    exact={page.isExact}
+                    component={page.isRedirect ? undefined :  page.component}
+                    key={page.label}
                 >
-                {page.isRedirect && <Redirect to={page.path} />}
+                    {page.isRedirect && <Redirect to={page.path} />}
                 </Route>
             )
             })

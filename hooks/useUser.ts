@@ -4,7 +4,7 @@ import { checkmarkCircle } from 'ionicons/icons';
 import Parse, { Error } from 'parse';
 import React, { SetStateAction, useState } from "react";
 
-// This is also where a non logged in user will store Language Preference and logically resolve when logging in 
+// This is also where a non logged in user will store Language Preference, Volume and logically resolve when logging in 
 // where existing user language takes precedemce
 
 interface INotice {
@@ -35,8 +35,8 @@ const useUser = () => {
     const [user, setUser] = useState<Parse.User|undefined>();
     console.log(user)
 
-    //Loading State, waiting for server response
-    const [language, setLanguage] = useState<string>("English");
+    //lnagueage preference. Should be lowercase
+    const [language, setLanguage] = useState<string>("english");
 
     //When logging in, reroute to a specific path
     const [reroutePath, setReroutePath] = useState<string>('/profile');

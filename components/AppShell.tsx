@@ -12,7 +12,7 @@ import Menu from './ui/Menu';
 import Parse from 'parse';
 import { IUser } from "data/types";
 import useTheme, { ITheme } from "hooks/useTheme";
-import { IPlayer } from "hooks/usePlayer";
+import usePlayer, { IPlayer } from "hooks/usePlayer";
 import Routes from "./Routes";
 import useUser, { IUserState } from "hooks/useUser";
 
@@ -39,7 +39,29 @@ export const Theme = createContext<ITheme>({
 });
 
 export const Player = createContext<IPlayer>({
-  
+    isPlaying: false,
+    duration: 0,
+    audio: undefined,
+    togglePlayPause: () => null,
+    episodes: undefined,
+    setEpisodes:  () => null,
+    volume: .75,
+    setVolume: () => null,
+    index: 0,
+    setIndex:  () => null,
+    currentSeconds: 0,
+    setCurrentSeconds: () => null,
+    seekTime: () => null,
+    isSeeking: false,
+    setIsSeeking:  () => null,
+    setDuration: () => null,
+    jump: () => null,
+    switchEpisode: () => null,
+    isVisible: true, 
+    setIsVisible: () => null,
+    message: undefined,
+    setMessage: () => null,
+    isReady: false,
 })
 
 
@@ -55,18 +77,21 @@ const AppShell: React.FC = () => {
 
   const theme = useTheme();
   const userState = useUser();
+  const player = usePlayer();
 
   return (
     <UserState.Provider value={userState}>
       <Theme.Provider value={theme}>
-        <IonApp>
-          <IonReactRouter>
-            <IonSplitPane contentId="main">
-              <Menu />
-              <Routes />
-            </IonSplitPane>
-          </IonReactRouter>
-        </IonApp>
+        <Player.Provider value={player}>
+          <IonApp>
+            <IonReactRouter>
+              <IonSplitPane contentId="main">
+                <Menu />
+                <Routes />
+              </IonSplitPane>
+            </IonReactRouter>
+          </IonApp>
+        </Player.Provider>
       </Theme.Provider>
     </UserState.Provider>
   );
