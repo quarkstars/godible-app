@@ -19,6 +19,8 @@ export interface IPlayer {
         index: number,
         setIndex: React.Dispatch<React.SetStateAction<number>>,
         setCurrentSeconds: React.Dispatch<React.SetStateAction<number>>,
+        setTimeTilNext: React.Dispatch<React.SetStateAction<number | undefined>>,
+        timeTilNext?: number,
         currentSeconds: number,
         seekTime: Function,
         isSeeking: boolean,
@@ -33,6 +35,8 @@ export interface IPlayer {
         message?: string,
         setMessage: React.Dispatch<React.SetStateAction<string | undefined>>,
         switchEpisode: Function,
+        rewind: Function,
+        next: Function,
 }
 
 export const calculateTime = (secs: number) => {
@@ -55,62 +59,90 @@ const usePlayer = ():IPlayer => {
     
     const [episodes, setEpisodes] = useState<IEpisode[]|undefined>();
     const [index, setIndex] = useState<number>(0);
-    const [audio, setAudio] = useState<HTMLAudioElement|undefined>();  
+    const _audio = useRef(new Audio()) 
+    const [isAutoPlay, setIsAutoPlay] = useState<boolean>(false);
 
     const {language,} = useContext(UserState);
 
     //Update audio element everytime the episode list changes, the index, or the userState (which indicates language)
     useEffect(() => {
-        if (!episodes || typeof index !== "number") return setAudio(undefined);
+        const audio = _audio.current;
+        if (!audio) return;
+        if (!episodes || typeof index !== "number") return;
         const episode = episodes[index];
+        if (!episode) return;
 
         let audioPath = episode.audioPath?.[language];
         if (!audioPath) audioPath = episode.audioPath?.[episode.audioPath.defaultLanguage];
         if (!audioPath) return setMessage("No audio")
 
         //Found Audio, set it
-        setAudio(new Audio(audioPath));
+        audio.src = audioPath;
+        audio?.load();
+        let timer:NodeJS.Timeout;
+        if (isPlaying || isAutoPlay) timer = setTimeout(() => {
+            setIsPlaying(true);
+            audio.play();
+        }, 500);
+        setIsAutoPlay(false);
 
         //Remove message and make sure player is visible again
         setMessage(undefined);
         setIsVisible(true);
 
-    }, [episodes, index, language]);
+        return () => {if (timer) clearTimeout(timer);}
+
+    }, [_audio.current, episodes, index, language]);
+    //Start Audio when audio loads if autoplay is on
+
 
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [timeTilNext, setTimeTilNext] = useState<number|undefined>();
     const [currentSeconds, setCurrentSeconds] = useState(0);
     
     //Keep duration updated when available
     const [duration, setDuration] = useState<number|undefined>();
     useEffect(() => {
+        const audio = _audio.current;
         if (!audio?.duration) return setDuration(undefined);
         if (audio?.duration) setDuration(audio.duration);
-    }, [audio?.duration])
+    }, [_audio.current?.duration]);
     
     
     //Keep volume updated
-    //TODO: Add volume to player controls
     const [volume, setVolume] = useState<number>(.75);
     useEffect(() => {
+        const audio = _audio.current;
         if (!audio) return;
         audio.volume = volume;
-    }, [volume, audio]);
+    }, [volume]);
 
 
     // grabs the loaded metadata
     useEffect(() => {
+        const audio = _audio.current;
         if (!audio) return;
         const seconds = Math.floor(audio.duration);
         setDuration(seconds);
-    }, [audio?.onloadedmetadata, audio?.readyState]);
+    }, [_audio.current?.onloadedmetadata, _audio.current?.readyState]);
 
     const [isReady, setIsReady] = useState(false);
     // Check when ready
     useEffect(() => {
-        if (!audio?.readyState) return setIsReady(false);
-        setIsReady(true);
-    }, [audio?.readyState]);
-
+        const audio = _audio.current;
+        if (!audio?.readyState) {
+            if (audio) {
+                audio.preload = "metadata";
+                audio.load();
+            }
+            return setIsReady(false);
+        }
+        if (audio.readyState < 3) {
+            if (isReady) setIsReady(false);
+            return;
+        }
+        if (!isReady) setIsReady(true);
+    }, [_audio, _audio.current?.readyState, currentSeconds]);
 
     //Check every time updating
     //The duration last passed to server
@@ -124,55 +156,74 @@ const usePlayer = ():IPlayer => {
         // when you get to the end
         if ((duration && !isNaN(duration)) && duration > 1 && currentSeconds >= duration) {
             togglePlayPause(false);
-            //TODO: Check next episode is available
-            //TODO: Trigger message counter
+            if (index+1 < (episodes?.length||0)) {
+                setTimeTilNext(5);
+                setIsAutoPlay(true);
+            }
+            
         }
     }, [currentSeconds, duration]);
 
 
+
     const togglePlayPause = (setIsPlay?: boolean) => {
+        const audio = _audio.current;
         if (!audio) return;
-        if (setIsPlay) return  audio.play();
-        if (!isPlaying || setIsPlay === false) {
-            audio.play();
-            setIsPlaying(true);
-        } else {
+        if (setIsPlay) return audio.play();
+        if (isPlaying || setIsPlay === false) {
             audio.pause();
             setIsPlaying(false)
+        } else {
+            audio.play();
+            setIsPlaying(true);
         }
     }
-
 
     //Update progress bar every 1 second
     const [ticked, setTicked] = useState<number>(0);
     const [isSeeking, setIsSeeking] = useState<boolean>(false);
     useEffect(() => {
+        const audio = _audio.current;
         //Automatically move value only if playing and the user is not seeking
         if (audio && isPlaying && !isSeeking) {
             setCurrentSeconds(audio.currentTime);
         }
+        //Handle end of episode
+        if (typeof timeTilNext === "number") {
+            if (timeTilNext > 0) {
+                setMessage(`Continuing (${timeTilNext})`);
+                setTimeTilNext(prev => prev! - 1);
+            }
+            else {
+                next();
+            }
+        }
+
         //Loop every 1 second
-        const timer = setTimeout(() => setTicked((prevTicked) => prevTicked + 1), 1000);
+        const timer = setTimeout(() => {
+            if (isPlaying || typeof timeTilNext === "number") setTicked((prevTicked) => prevTicked + 1)
+        }, 1000);
         return () => clearTimeout(timer);
     }, [ticked, isPlaying]);
 
 
     const seekTime = (seconds) => {
+        const audio = _audio.current;
         if (!audio) return;
         if (!duration) return;
         audio.currentTime = seconds;
-        // setCurrentSeconds(seconds);
+        setCurrentSeconds(seconds);
         if (isPlaying) togglePlayPause(true);
     }
-    console.log(audio?.currentTime, isPlaying, isSeeking)
 
     const jump = (seconds: number) => {
+        const audio = _audio.current;
         if (!audio) return;
         if ((duration && !isNaN(duration)) && currentSeconds + seconds >= duration) {
             //Jumping to end?
             return seekTime (duration);
         }
-        if ((duration && !isNaN(duration))  && currentSeconds + seconds <= 0) {
+        if ((duration && !isNaN(duration)) && currentSeconds + seconds <= 0) {
             //Jumping to start?
             return seekTime (0);
         }
@@ -180,8 +231,37 @@ const usePlayer = ():IPlayer => {
     }
 
 
+    const rewind = () => {
+        if (currentSeconds < 10 && index > 0) {
+            switchEpisode(index-1)
+        }
+        seekTime(0);
+    }
+
+    const next = () => {
+        const isEnding = duration && currentSeconds >= duration -10;
+        if (isEnding || index+1 < (episodes?.length||0)) {
+            setMessage(undefined);
+            setTimeTilNext(undefined);
+            switchEpisode(index+1);
+            return;
+        }
+        if (duration && !isNaN(duration)) seekTime(duration);
+    }
+
     const switchEpisode = (index: number) => {
-        
+        const audio = _audio.current;
+        //Check conditions for next audio autoplay
+        const isComplete = duration && currentSeconds >= duration;
+        const wasPlaying = isPlaying;
+        if (wasPlaying || isComplete) {
+            setIsAutoPlay(true);
+        }
+        //Cancel current audio
+        audio?.pause();
+        //Switch
+        setIndex(index);
+        setCurrentSeconds(0);
     }
 
 
@@ -190,12 +270,14 @@ const usePlayer = ():IPlayer => {
     return {
         isPlaying,
         duration,
-        audio,
+        audio: _audio.current,
         togglePlayPause,
         episodes,
         setEpisodes,
         volume,
         setVolume,
+        setTimeTilNext,
+        timeTilNext,
         index,
         setIndex,
         setCurrentSeconds,
@@ -211,6 +293,8 @@ const usePlayer = ():IPlayer => {
         setMessage,
         switchEpisode,
         isReady,
+        rewind,
+        next,
     }
 }
 

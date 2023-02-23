@@ -47,6 +47,8 @@ export const Player = createContext<IPlayer>({
     setEpisodes:  () => null,
     volume: .75,
     setVolume: () => null,
+    setTimeTilNext: () => null,
+    timeTilNext: undefined,
     index: 0,
     setIndex:  () => null,
     currentSeconds: 0,
@@ -62,6 +64,8 @@ export const Player = createContext<IPlayer>({
     message: undefined,
     setMessage: () => null,
     isReady: false,
+    rewind: () => null,
+    next: () => null,
 })
 
 

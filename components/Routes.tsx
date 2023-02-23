@@ -7,6 +7,15 @@ import { book, bookOutline, bulb, bulbOutline, cafe, cafeOutline, library, mic, 
 import { FC } from "react";
 import SignUpPage from './pages/SignUpPage';
 import SignInPage from './pages/SignInPage';
+import EpisodePage from './pages/EpisodePage';
+import HomePage from './pages/HomePage';
+import BooksPage from './pages/BooksPage';
+import SpeechesPage from './pages/SpeechesPage';
+import SearchPage from './pages/SearchPage';
+import InspirationsPage from './pages/InspirationsPage';
+import ProfilePage from './pages/ProfilePage';
+import PlaylistPage from './pages/PlaylistPage';
+import BookPage from './pages/BookPage';
 
 interface ILocalLizedLabels {
   japanese?: string,
@@ -30,7 +39,7 @@ export const pages:IPage[] = [
     {
         label: "Home",
         path: "/",
-        component: NotFoundPage, //HomePage
+        component: HomePage, //HomePage
         icon: cafe,
         iosIcon: cafeOutline,
         isNav: true,
@@ -40,18 +49,17 @@ export const pages:IPage[] = [
     {
         label: "Books",
         path: "/books",
-        variable: "slug", //slug
-        component: SignUpPage, //BooksPage
+        component: BooksPage, //BooksPage
         icon: book,
         iosIcon: bookOutline,
         isNav: true,
-        isExact: true,
+        isExact: false,
         isRedirect: false,
     }, 
     {
         label: "Speeches",
         path: "/speeches",
-        component: NotFoundPage, //SpeechesPage
+        component: SpeechesPage, //SpeechesPage
         icon: mic,
         iosIcon: micOutline,
         isNav: true,
@@ -62,7 +70,7 @@ export const pages:IPage[] = [
         label: "Search",
         path: "/search", 
         variable: "query", //query should be 4 letters or more
-        component: NotFoundPage, //SearchPage
+        component: SearchPage, //SearchPage
         icon: search,
         iosIcon: searchOutline,
         isNav: true,
@@ -72,7 +80,7 @@ export const pages:IPage[] = [
     {
         label: "Inspirations",
         path: "/inspirations", //InspirationsPage
-        component: NotFoundPage,
+        component: InspirationsPage,
         icon: bulb,
         iosIcon: bulbOutline,
         isNav: true,
@@ -83,7 +91,7 @@ export const pages:IPage[] = [
         label: "Profile",
         path: "/profile", //ProfilePage
         variable: "username", //unique alphanumeric username - lowercase!
-        component: NotFoundPage,
+        component: ProfilePage,
         icon: square,
         isNav: false,
         isExact: false,
@@ -94,10 +102,10 @@ export const pages:IPage[] = [
     //TODO: Add Subscription
     //TODO: Add Notifications
     {
-        label: "Playlists",
-        path: "/playlists",
+        label: "Playlist",
+        path: "/playlist",
         variable: "id", 
-        component: NotFoundPage, //PlaylistsPage
+        component: PlaylistPage, //PlaylistsPage
         icon: square,
         isNav: false,
         isExact: false,
@@ -107,7 +115,7 @@ export const pages:IPage[] = [
         label: "Book",
         path: "/book",
         variable: "slug", 
-        component: NotFoundPage, //BookPage
+        component: BookPage, //BookPage
         icon: square,
         isNav: false,
         isExact: false,
@@ -117,7 +125,7 @@ export const pages:IPage[] = [
         label: "Episode",
         path: "/episode",
         variable: "slug",  //Book name slug plus episode number
-        component: NotFoundPage, //EpisodePage
+        component: EpisodePage, //EpisodePage
         icon: square,
         isNav: false,
         isExact: false,
@@ -155,16 +163,32 @@ const Routes = () => {
     <IonRouterOutlet id="main">
         {
             pages.map((page) => {
-            return (
-                <Route 
-                    path={page.variable? page.path+"/:"+page.variable : page.path}
-                    exact={page.isExact}
-                    component={page.isRedirect ? undefined :  page.component}
-                    key={page.label}
-                >
-                    {page.isRedirect && <Redirect to={page.path} />}
-                </Route>
-            )
+                return (
+                    <Route 
+                        path={page.path}
+                        exact={page.isExact}
+                        component={page.isRedirect ? undefined :  page.component}
+                        key={page.label}
+                    >
+                        {page.isRedirect && <Redirect to={page.path} />}
+                    </Route>
+                )
+            })
+        }    
+        {
+            pages.map((page) => {
+
+                if (page.variable) return (
+                    <Route 
+                        path={page.path+"/:"+page.variable}
+                        exact={page.isExact}
+                        component={page.isRedirect ? undefined :  page.component}
+                        key={page.label}
+                    >
+                        {page.isRedirect && <Redirect to={page.path+"/:"+page.variable} />}
+                    </Route>
+                )
+                return <></>
             })
         }    
     </IonRouterOutlet>
