@@ -1,6 +1,6 @@
 {
 	"appId": "com.example.app",
-	"appName": "nextjs-tailwind-capacitor",
+	"appName": "godible-app",
 	"bundledWebRuntime": false,
 	"npmClient": "npm",
 	"webDir": "out",

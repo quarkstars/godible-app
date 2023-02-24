@@ -11,4 +11,8 @@ module.exports = withTM({
     domains: ['images.unsplash.com'],
   },
   swcMinify: true,
+  //TODO: Possibly need this if you are exporting
+  // images: {
+  //   unoptimized: true,
+  // },
 });

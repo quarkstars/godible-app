@@ -191,10 +191,9 @@ const Routes = () => {
                     <Route 
                         path={page.path+"/:"+page.variable}
                         // exact={page.isExact}
-                        component={page.isRedirect ? undefined :  page.component}
+                        component={page.component}
                         key={page.path+"/:"+page.variable}
                     >
-                        {page.isRedirect && <Redirect to={page.path+"/:"+page.variable} />}
                     </Route>
                 )
                 return <></>

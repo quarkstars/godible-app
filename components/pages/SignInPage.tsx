@@ -40,7 +40,7 @@ const SignInPage: React.FC = () => {
   //TODO: Programmatically check what platform and then show floating only on android
   //When user is present, reroute
   useEffect(() => {
-    if (!user)
+    if (!user) return;
     if (reroutePath) {
       let _reroutePath = reroutePath;
       setReroutePath(undefined);
