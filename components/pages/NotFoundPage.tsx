@@ -1,10 +1,14 @@
-import { IonButtons, IonContent, IonFooter, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonBackButton, IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonMenuButton, IonPage, IonTitle, IonToolbar, useIonRouter } from '@ionic/react';
 import { useParams } from 'react-router';
 import { PlayerControls } from 'components/ui/PlayerControls';
 import { useEffect } from 'react';
 import Parse from "parse";
+import { logInOutline } from 'ionicons/icons';
 
 const NotFoundPage: React.FC = () => {
+
+
+	const router = useIonRouter();
 
   const { name } = useParams<{ name: string; }>();
   useEffect(() => {
@@ -19,8 +23,15 @@ const NotFoundPage: React.FC = () => {
         <IonToolbar>
           <IonButtons slot="start">
             <IonMenuButton />
+              <span className="px-2 w-20 hidden md:block"></span>
           </IonButtons>
-          <IonTitle>TITLE</IonTitle>
+          <IonTitle>Oops</IonTitle>
+          <IonButtons slot="end">
+            <IonButton fill="clear" onClick={()=>{router.push("/signin")}}>
+              <IonIcon icon={logInOutline} />
+              <span className="px-2">Log in</span>
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
 

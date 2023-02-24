@@ -22,16 +22,31 @@ setupIonicReact({});
 export const UserState = createContext<IUserState>({
   user: undefined,
   isLoading: false,
-  reroutePath: "",
+  reroutePath: undefined,
   setReroutePath: () => null,
   notice: undefined,
   setNotice: () => null,
-
-  //SIGN UP
-  signUpError: () => null,
-  signUp: async () => null,
   language: "",
   setLanguage: () => null,
+  isOnboarding: false,
+  setIsOnboarding: () => null,
+
+  //SIGN UP
+  signUpError: undefined,
+  setSignUpError: () => null,
+  signUp: async () => null,
+  
+  logInError: undefined,
+  setLogInError: () => null,
+  logIn: async () => null,
+
+  logOutError: undefined,
+  setLogOutError: () => null,
+  logOut: async () => null,
+
+  resetError: undefined,
+  setResetError: () => null,
+  reset: async () => null,
 })
 export const Theme = createContext<ITheme>({
   isDark: false,

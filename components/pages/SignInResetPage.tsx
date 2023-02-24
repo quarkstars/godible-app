@@ -10,24 +10,20 @@ import { arrowBack, eye, eyeOff, logoApple, logoGoogle, shapesOutline } from "io
 import { useContext, useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 
-const SignInPage: React.FC = () => {
+const SignInResetPage: React.FC = () => {
   
 
 	const router = useIonRouter();
 
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState<string|undefined>();
 
   const {
-    logIn,
-    logInError,
-    setLogInError,
+    resetError,
+    setResetError,
+    reset,
     isLoading,
     user,
-    logOut,
-    logOutError,
-    reroutePath,
-    setReroutePath
   } = useContext(UserState);
 
   //Loading When Logging
@@ -38,16 +34,7 @@ const SignInPage: React.FC = () => {
   }, [isLoading])
   
   //TODO: Programmatically check what platform and then show floating only on android
-  //When user is present, reroute
-  useEffect(() => {
-    if (!user)
-    if (reroutePath) {
-      let _reroutePath = reroutePath;
-      setReroutePath(undefined);
-      router.push(_reroutePath);
-    }
-    else router.push("/profile");
-  }, [user]);
+
 	
 	return (
 		<IonPage>
@@ -58,16 +45,16 @@ const SignInPage: React.FC = () => {
                 <IonBackButton defaultHref="/"></IonBackButton>
               </div>
             </IonButtons>
-          <IonTitle>Log in to Continue</IonTitle>
+          <IonTitle>Reset Password</IonTitle>
             <IonButtons slot="end">
               <IonButton 
                 slot="end" 
                 fill="clear" 
                 size="small" 
                 color="medium"
-                    onClick={()=>{router.push("/signup", undefined, "replace")}}
+                    onClick={()=>{router.push("/signin")}}
                   >
-                Or Sign Up
+                Log In
               </IonButton>
             </IonButtons>
         </IonToolbar>
@@ -76,89 +63,74 @@ const SignInPage: React.FC = () => {
 
       <div className="flex flex-col items-center justify-center w-full min-h-full p-4 space-y-4 sm:bg-gray-100 dark:bg-light">
         <img src='/logo/godible-logo.png' className='w-40'></img>
-        {user ? 
-          <LoggedInAlready />
-        :
           <div className="block max-w-md p-6 bg-white rounded-lg dark:bg-light">
-            <IonButton 
-                color="medium" 
-                fill="outline"  
-                expand="block"
-                disabled={isLoading}
-                >
-              <IonIcon icon={logoGoogle} slot="start" />
-              Continue with Google
-            </IonButton>
-            <IonButton 
-              color="medium" 
-              fill="outline"  
-              expand="block"
-                disabled={isLoading}
-            >
-              <IonIcon icon={logoApple} slot="start" />
-              Continue with Apple
-            </IonButton>
-            <TextDivider>or</TextDivider>
-              {logInError &&
+
+              {(resetError && !message) &&
               <AlertInline
-                message={typeof logInError === "string" ? logInError : logInError?.message}
+                message={typeof resetError === "string" ? resetError : resetError?.message}
                 type="error"
-                onDismiss={()=>{setLogInError(undefined)}}
+                onDismiss={()=>{setResetError(undefined);}}
               />
+              }
+              {message &&
+              <div className="flex items-center justify-between">
+                <div className="flex-grow">
+                <AlertInline
+                  message={message}
+                  type="success"
+                />
+                </div>
+                <IonButton
+                  slot="end" 
+                  fill="clear" 
+                  size="small" 
+                  color="medium"
+                  onClick={()=>{router.push("/signin", undefined, "replace")}}
+                >
+                Log In</IonButton>
+              </div>
               }
               <div className="mb-6 form-group">
                     <IonItem>
-                      <IonLabel position='floating'>Email</IonLabel>
-                      <IonInput placeholder="Email" onIonChange={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
+                      <IonLabel position='floating'>Enter Email</IonLabel>
+                      <IonInput value={user?.get("email")} placeholder="Your Account Email" onIonChange={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                     </IonItem>
-              </div>
-              <div className="mb-6 form-group">
-                    <IonItem>
-                      <IonLabel position='floating'>Password</IonLabel>
-                      <IonInput type="password" onIonChange={(event) => setPassword(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
-                    </IonItem>
-
               </div>
               <IonButton 
                 color="primary" 
                 expand="block"
-                disabled={isLoading}
+                disabled={isLoading || typeof message === "string"}
                 onClick={() => {
                   //Validations
-                  if (user) return setLogInError("Already logged in");
-                  if (email==="" && password==="") return setLogInError("Missing Credentials");
-                  if (!isValidEmail(email)) return setLogInError("Invalid Email");
-                  if (password==="") return setLogInError("Missing Password");
+                  if (!isValidEmail(email)) return setResetError("Invalid Email");
                   //Login
-                  logIn(email, password)
+                  reset(email)
                     .then(() => {
                       //Logged in, so clear form
-                      if (!user) return;
+                      setMessage("Reset Sent!")
                       setEmail("");
-                      setPassword("");
                     })
                 }}
               >
-                Log in
+                Send Reset
               </IonButton>
               <div className='flex flex-col items-start justify-center w-full'>
                 <span className="h-0.5 w-full border-t border-gray-400 block border-opacity-10 mt-4"></span>
-                <button className="py-2"
-                  onClick={() =>router.push("/reset")}
-                >
-                  <span className="text-sm font-medium text-primary-shade hover:underline dark:text-primary-shade">Forgot password?</span>
-                </button>
-                <span className='text-xs'>Don&apos;t have an account yet?</span>
+
                 <div className='flex-grow' />
                 <span 
-                  onClick={()=>{router.push("/signup", undefined, "replace")}}
+                  onClick={()=>{router.push("/signin")}}
                   className='text-xs border-b-2 cursor-pointer'
                 >
-                  Sign up free
+                  Return to Log in
+                </span>
+                <span 
+                  className='text-xs pt-4 text-medium italic w-64'
+                >
+                  Powered by Back4App
                 </span>
               </div>
         </div>
-        }
       </div>
       </IonContent>
 		</IonPage>
@@ -166,4 +138,4 @@ const SignInPage: React.FC = () => {
 };
 
 
-export default SignInPage
+export default SignInResetPage

@@ -16,6 +16,7 @@ import InspirationsPage from './pages/InspirationsPage';
 import ProfilePage from './pages/ProfilePage';
 import PlaylistPage from './pages/PlaylistPage';
 import BookPage from './pages/BookPage';
+import SignInResetPage from './pages/SignInResetPage';
 
 interface ILocalLizedLabels {
   japanese?: string,
@@ -36,6 +37,14 @@ interface IPage {
 
 
 export const pages:IPage[] = [
+    // {
+    //     label: "Not Found",
+    //     path: "*", 
+    //     component: NotFoundPage, 
+    //     isNav: false,
+    //     isExact: false,
+    //     isRedirect: false,
+    // },
     {
         label: "Home",
         path: "/",
@@ -94,7 +103,7 @@ export const pages:IPage[] = [
         component: ProfilePage,
         icon: square,
         isNav: false,
-        isExact: false,
+        isExact: true,
         isRedirect: false,
     }, 
     //TODO: Add Transactions (Billing History)
@@ -108,7 +117,7 @@ export const pages:IPage[] = [
         component: PlaylistPage, //PlaylistsPage
         icon: square,
         isNav: false,
-        isExact: false,
+        isExact: true,
         isRedirect: false,
     }, 
     {
@@ -118,7 +127,7 @@ export const pages:IPage[] = [
         component: BookPage, //BookPage
         icon: square,
         isNav: false,
-        isExact: false,
+        isExact: true,
         isRedirect: false,
     }, 
     {
@@ -128,17 +137,9 @@ export const pages:IPage[] = [
         component: EpisodePage, //EpisodePage
         icon: square,
         isNav: false,
-        isExact: false,
+        isExact: true,
         isRedirect: false,
     }, 
-    // {
-    //     label: "Not Found",
-    //     path: "/*", //TODO: Does this work?
-    //     component: NotFoundPage, 
-    //     isNav: false,
-    //     isExact: false,
-    //     isRedirect: false,
-    // },
     {
         label: "SignUp",
         path: "/signup",
@@ -151,6 +152,14 @@ export const pages:IPage[] = [
         label: "SignIn",
         path: "/signin",
         component: SignInPage, 
+        isNav: false,
+        isExact: true,
+        isRedirect: false,
+    },
+    {
+        label: "SignInReset",
+        path: "/reset",
+        component: SignInResetPage, 
         isNav: false,
         isExact: true,
         isRedirect: false,
@@ -181,9 +190,9 @@ const Routes = () => {
                 if (page.variable) return (
                     <Route 
                         path={page.path+"/:"+page.variable}
-                        exact={page.isExact}
+                        // exact={page.isExact}
                         component={page.isRedirect ? undefined :  page.component}
-                        key={page.label}
+                        key={page.path+"/:"+page.variable}
                     >
                         {page.isRedirect && <Redirect to={page.path+"/:"+page.variable} />}
                     </Route>
