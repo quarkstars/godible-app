@@ -86,9 +86,9 @@ export const Player = createContext<IPlayer>({
 })
 
 initializeParse(
-  process.env.NEXT_PUBLIC_PARSE_HOST_URL!,
-  process.env.NEXT_PUBLIC_PARSE_APPLICATION_ID!,
-  process.env.NEXT_PUBLIC_PARSE_JAVASCRIPT_KEY!
+  'https://parseapi.back4app.com/',
+  'LmmiwtKIw2qLgkgPnoooMyXbfViwlBC00He9Szp3',
+  'u1xDTMsGODAoEHyUY04ozHPHPrXpWwvfGDHJa80V'
 )
 
 

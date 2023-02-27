@@ -168,7 +168,7 @@ const useUser = () => {
                 setLogInError({message:"Failed to log in with Google"});      
                 return;
             }
-            
+            console.log("GOOGLE USER", googleUser)
 
             let currentUser = new Parse.User();
             currentUser.set('username', googleUser.email);
@@ -177,14 +177,24 @@ const useUser = () => {
             if (googleUser.familyName) currentUser.set('lastName', googleUser.familyName);
             if (googleUser.imageUrl) currentUser.set('imageUrl', googleUser.imageUrl);
 
+
+        console.log("CURRENT USER", currentUser, {
+            id: googleUser.id,
+            id_token: googleUser.authentication.idToken,
+        })
+
             //Currently if a user exists already with the same email, it will not allow a new user
             //
+            let idToken = googleUser.authentication.idToken;
+            // if (idToken.split(".").length > 1) idToken = idToken.split(".")[0];
+            // console.log('idToken', idToken, googleUser.authentication.idToken.split("."))
+
             try {
                 setIsLoading(true);
                 currentUser = await currentUser.linkWith('google', {
                 authData: {
                     id: googleUser.id,
-                    id_token: googleUser.authentication.idToken,
+                    id_token: idToken,
                 }
                 });
             }
@@ -345,3 +355,4 @@ const useUser = () => {
 }
 
 export default useUser
+

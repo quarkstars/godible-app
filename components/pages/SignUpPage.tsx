@@ -43,7 +43,7 @@ const SignUpPage: React.FC = () => {
 
   //When user is present, reroute
   useEffect(() => {
-    if (!user)
+    if (!user) return;
     if (reroutePath) {
       let _reroutePath = reroutePath;
       setReroutePath(undefined);
