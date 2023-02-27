@@ -4,6 +4,4 @@
     <string name="title_activity_main">godible-app</string>
     <string name="package_name">com.godible.app</string>
     <string name="custom_url_scheme">com.godible.app</string>
-    <string name="custom_url_scheme">com.godible.app</string>
-    <string name="server_client_id">69348194563-7f0uh52uvpvphsndckq4slqbck2jddgs.apps.googleusercontent.com</string>
 </resources>

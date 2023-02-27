@@ -168,7 +168,6 @@ const useUser = () => {
                 setLogInError({message:"Failed to log in with Google"});      
                 return;
             }
-            console.log("GOOGLE USER", googleUser)
 
             let currentUser = new Parse.User();
             currentUser.set('username', googleUser.email);
@@ -177,11 +176,6 @@ const useUser = () => {
             if (googleUser.familyName) currentUser.set('lastName', googleUser.familyName);
             if (googleUser.imageUrl) currentUser.set('imageUrl', googleUser.imageUrl);
 
-
-        console.log("CURRENT USER", currentUser, {
-            id: googleUser.id,
-            id_token: googleUser.authentication.idToken,
-        })
 
             //Currently if a user exists already with the same email, it will not allow a new user
             //
