@@ -15,6 +15,7 @@ import useTheme, { ITheme } from "hooks/useTheme";
 import usePlayer, { IPlayer } from "hooks/usePlayer";
 import Routes from "./Routes";
 import useUser, { IUserState } from "hooks/useUser";
+import { initializeParse } from "@parse/react";
 
 setupIonicReact({});
 
@@ -39,6 +40,7 @@ export const UserState = createContext<IUserState>({
   logInError: undefined,
   setLogInError: () => null,
   logIn: async () => null,
+  logInWithGoogle: async () => null,
 
   logOutError: undefined,
   setLogOutError: () => null,
@@ -83,16 +85,14 @@ export const Player = createContext<IPlayer>({
     next: () => null,
 })
 
+initializeParse(
+  process.env.NEXT_PUBLIC_PARSE_HOST_URL!,
+  process.env.NEXT_PUBLIC_PARSE_APPLICATION_ID!,
+  process.env.NEXT_PUBLIC_PARSE_JAVASCRIPT_KEY!
+)
+
 
 const AppShell: React.FC = () => {
-  
-  //Initialize Parse
-  //TODO: move to .env
-  const PARSE_APPLICATION_ID = 'LmmiwtKIw2qLgkgPnoooMyXbfViwlBC00He9Szp3';
-  const PARSE_HOST_URL = 'https://parseapi.back4app.com/';
-  const PARSE_JAVASCRIPT_KEY = 'u1xDTMsGODAoEHyUY04ozHPHPrXpWwvfGDHJa80V';
-  Parse.initialize(PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY);
-  Parse.serverURL = PARSE_HOST_URL;
 
   const theme = useTheme();
   const userState = useUser();

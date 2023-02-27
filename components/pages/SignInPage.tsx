@@ -27,6 +27,7 @@ const SignInPage: React.FC = () => {
     logOut,
     logOutError,
     reroutePath,
+    logInWithGoogle,
     setReroutePath
   } = useContext(UserState);
 
@@ -46,7 +47,7 @@ const SignInPage: React.FC = () => {
       setReroutePath(undefined);
       router.push(_reroutePath);
     }
-    else router.push("/profile");
+    // else router.push("/profile");
   }, [user]);
 	
 	return (
@@ -81,15 +82,16 @@ const SignInPage: React.FC = () => {
         :
           <div className="block max-w-md p-6 bg-white rounded-lg dark:bg-light">
             <IonButton 
-                color="medium" 
-                fill="outline"  
-                expand="block"
-                disabled={isLoading}
-                >
+              color="medium" 
+              fill="outline"  
+              expand="block"
+              disabled={isLoading}
+              onClick={()=>{logInWithGoogle()}}
+            >
               <IonIcon icon={logoGoogle} slot="start" />
               Continue with Google
             </IonButton>
-            <IonButton 
+            {/* <IonButton 
               color="medium" 
               fill="outline"  
               expand="block"
@@ -97,7 +99,7 @@ const SignInPage: React.FC = () => {
             >
               <IonIcon icon={logoApple} slot="start" />
               Continue with Apple
-            </IonButton>
+            </IonButton> */}
             <TextDivider>or</TextDivider>
               {logInError &&
               <AlertInline

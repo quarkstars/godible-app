@@ -37,14 +37,14 @@ interface IPage {
 
 
 export const pages:IPage[] = [
-    // {
-    //     label: "Not Found",
-    //     path: "*", 
-    //     component: NotFoundPage, 
-    //     isNav: false,
-    //     isExact: false,
-    //     isRedirect: false,
-    // },
+    {
+        label: "Not Found",
+        path: "*", 
+        component: NotFoundPage, 
+        isNav: false,
+        isExact: false,
+        isRedirect: false,
+    },
     {
         label: "Home",
         path: "/",
@@ -171,13 +171,13 @@ const Routes = () => {
   return (
     <IonRouterOutlet id="main">
         {
-            pages.map((page) => {
+            pages.map((page, index) => {
                 return (
                     <Route 
                         path={page.path}
                         exact={page.isExact}
                         component={page.isRedirect ? undefined :  page.component}
-                        key={page.label}
+                        key={index+page.label}
                     >
                         {page.isRedirect && <Redirect to={page.path} />}
                     </Route>
@@ -185,18 +185,18 @@ const Routes = () => {
             })
         }    
         {
-            pages.map((page) => {
+            pages.map((page, index) => {
 
                 if (page.variable) return (
                     <Route 
                         path={page.path+"/:"+page.variable}
                         // exact={page.isExact}
                         component={page.component}
-                        key={page.path+"/:"+page.variable}
+                        key={index+page.path+"/:"+page.variable}
                     >
                     </Route>
                 )
-                return <></>
+                return <div key={index}></div>
             })
         }    
     </IonRouterOutlet>

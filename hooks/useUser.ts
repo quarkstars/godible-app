@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import { checkmarkCircle } from 'ionicons/icons';
 import Parse, { Error } from 'parse';
 import React, { SetStateAction, useState } from "react";
+import { isPlatform } from '@ionic/react';
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 
 // This is also where a non logged in user will store Language Preference, Volume and logically resolve when logging in 
 // where existing user language takes precedemce
@@ -35,6 +37,7 @@ export interface IUserState {
     logInError: any,
     setLogInError: React.Dispatch<any>,
     logIn: Function,
+    logInWithGoogle: Function,
 
     //LOG OUT
     logOutError: any,
@@ -60,7 +63,6 @@ const useUser = () => {
 
     //Logged in user
     const [user, setUser] = useState<Parse.Object|null|undefined>(); 
-    console.log(user)
 
     //language preference. Should be lowercase
     const [language, setLanguage] = useState<string>("english");
@@ -73,10 +75,22 @@ const useUser = () => {
 
     //Loading State, waiting for server response
     const [isLoading, setIsLoading] = useState<any>();
-
     
     //Loading State, waiting for server response
     const [isOnboarding, setIsOnboarding] = useState<any>();
+
+    useEffect(() => {
+        if (isPlatform('capacitor')) return;
+        try {
+                GoogleAuth.initialize({
+                    clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+                    scopes: ['profile', 'email'],
+                    grantOfflineAccess: true,
+                })
+        }
+        catch (err) { console.error(err) }
+    }, [isPlatform]);
+    
 
 
     //set Current User
@@ -97,10 +111,8 @@ const useUser = () => {
         const createdAt = user.get("createdAt");
         const createdTime = Math.floor(new Date(createdAt).getTime());
         if (!createdTime) return;
-        console.log()
         if (Date.now()-60000 < createdTime) {
             setIsOnboarding(true);
-            console.log("NEW", createdTime)
         }
     }, [user]);
     
@@ -109,7 +121,6 @@ const useUser = () => {
     const [logInError, setLogInError] = useState<any>();
     const logIn = async function (email: string, password: string): Promise<Parse.Object | Error | undefined> {
         // Note that these values come from state variables that we've declared before
-        console.log('LOGIN', email, password)
         try {
             setIsLoading(true);
             const loggedInUser: Parse.User = await Parse.User.logIn(email, password);
@@ -138,12 +149,81 @@ const useUser = () => {
             return error;
         }
       };
+            
+      // Function to log into Google
+      // Gets a Google User and then links with Parse User which is the actual user the app uses
+      // Google User will be signed in but will be unused
+      //https://www.youtube.com/watch?v=GwtpoWZ_78E TODO: Add Reverse Client Id to App 15:00
+      //TODO: When putting on store for auto login you need keyprint or something 17:50
+      const logInWithGoogle = async function () {
+            let googleUser:any;
+            try {
+                googleUser = await GoogleAuth.signIn();
+            }
+            catch (error) {
+                setLogInError(error);    
+                return error;
+            }
+            if (!googleUser) {
+                setLogInError({message:"Failed to log in with Google"});      
+                return;
+            }
+            
+
+            let currentUser = new Parse.User();
+            currentUser.set('username', googleUser.email);
+            currentUser.set('email', googleUser.email);
+            if (googleUser.givenName) currentUser.set('firstName', googleUser.givenName);
+            if (googleUser.familyName) currentUser.set('lastName', googleUser.familyName);
+            if (googleUser.imageUrl) currentUser.set('imageUrl', googleUser.imageUrl);
+
+            //Currently if a user exists already with the same email, it will not allow a new user
+            //
+            try {
+                setIsLoading(true);
+                currentUser = await currentUser.linkWith('google', {
+                authData: {
+                    id: googleUser.id,
+                    id_token: googleUser.authentication.idToken,
+                }
+                });
+            }
+            catch (error) {
+                setLogInError(error); 
+                setIsLoading(false);   
+                GoogleAuth.signOut().catch();
+                return error;
+
+            }
+ 
+            if (!currentUser) {
+                setLogOutError({message: "Failed to Log In"});
+                GoogleAuth.signOut().catch();
+                return;
+            }
+            setNotice({
+                message: "Logged in with Google",
+                icon: checkmarkCircle,
+                color: "green",
+            });
+            setLogInError(undefined);
+            setUser(currentUser);
+            setIsLoading(false);
+
+            return currentUser;
+            
+
+      };
     
       const [logOutError, setLogOutError] = useState<any>();
       //Log out Function
       const logOut = async function (): Promise<Parse.Object | Error | undefined> {
+        
+        setIsLoading(true);
+        //Try to sign out gooogle user if exists
+        GoogleAuth.signOut().catch();
+
         try {
-            setIsLoading(true);
             await Parse.User.logOut();
             // To verify that current user is now empty, currentAsync can be used
             const currentUser: Parse.User<Parse.Attributes>|undefined|null = await Parse.User.current();
@@ -213,7 +293,7 @@ const useUser = () => {
     };
 
     const [resetError, setResetError] = useState<any>();
-    //Log out Function
+    //Reset Password Request
     const reset = async function (email: string): Promise<boolean> {
       try {
           setIsLoading(true);
@@ -250,6 +330,7 @@ const useUser = () => {
         logInError,
         setLogInError,
         logIn,
+        logInWithGoogle,
 
         //LOG OUT
         logOutError,

@@ -28,6 +28,7 @@ const SignUpPage: React.FC = () => {
     isLoading,
     reroutePath,
     setReroutePath,
+    logInWithGoogle,
   } = useContext(UserState);
 
   //Loading When Logging
@@ -86,11 +87,12 @@ const SignUpPage: React.FC = () => {
             fill="outline"  
             expand="block"
             disabled={isLoading}
+            onClick={()=>{logInWithGoogle()}}
           >
               <IonIcon icon={logoGoogle} slot="start" />
               Continue with Google
             </IonButton>
-            <IonButton 
+            {/* <IonButton 
               color="medium" 
               fill="outline"  
               expand="block"
@@ -98,7 +100,7 @@ const SignUpPage: React.FC = () => {
             >
               <IonIcon icon={logoApple} slot="start" />
               Continue with Apple
-            </IonButton>
+            </IonButton> */}
             <TextDivider>or email</TextDivider>
             
               {signUpError &&
