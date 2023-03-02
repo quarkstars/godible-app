@@ -4,6 +4,7 @@ import { PlayerControls } from 'components/ui/PlayerControls';
 import { useEffect } from 'react';
 import Parse from "parse";
 import { logInOutline } from 'ionicons/icons';
+import Toolbar from 'components/ui/Toolbar';
 
 const NotFoundPage: React.FC = () => {
 
@@ -20,19 +21,11 @@ const NotFoundPage: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonMenuButton />
-              <span className="px-2 w-20 hidden md:block"></span>
-          </IonButtons>
-          <IonTitle>Oops</IonTitle>
-          <IonButtons slot="end">
-            <IonButton fill="clear" onClick={()=>{router.push("/signin")}}>
-              <IonIcon icon={logInOutline} />
-              <span className="px-2">Log in</span>
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
+        <Toolbar>
+          <IonTitle>
+            Not Found
+          </IonTitle>
+        </Toolbar>
       </IonHeader>
 
       <IonContent fullscreen>

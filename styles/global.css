@@ -1,3 +1,5 @@
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif&display=swap');
+
 :root {
   --safe-area-top: env(safe-area-inset-top);
   --safe-area-bottom: env(safe-area-inset-bottom, 0);
@@ -393,10 +395,12 @@ ion-note {
 ion-item.selected {
   --color: var(--ion-color-primary);
 } 
-
-
 /* Menu END */
 
-/* FAB BUTTON */
+/* INITIAL AVATAR */
 
-/* END FAB BUTTON */
+.initials-avatar {
+  background-color: #6f7077!important;
+}
+
+/* END INITIAL AVATAR */

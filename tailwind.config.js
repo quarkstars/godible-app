@@ -35,6 +35,9 @@ module.exports = {
         'light-tint': '#383a3e',
       },
     },
+    fontFamily: {
+      serif: ['"Noto Serif"', 'Georgia', 'Times New Roman'],
+    },
     screens: {
       mobile: '0px',
 
