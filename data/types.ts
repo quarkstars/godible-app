@@ -5,23 +5,28 @@ export interface IUser {
 
 export interface IEpisode {
     number: number, 
-    book: IBook,
+    slug: string,
+    book?: IBook,
+    customTitle?: string,
     audioPath: ILangString,
     chapter?: number,
     chapterName?: ILangString,
     speech?: ISpeech,
     publishedAt?: number,
     searchText?: ILangString,
+    imageUrl?: string,
 }
 
 export interface ILangString {
     defaultLanguage: string, //name of language to default to if the language requested doesn't exist
-    english?: string,
+    english?: string
     japanese?: string,
 }
 
 export interface IBook {
-    name: ILangString,
+    title: ILangString,
+    slug?: string,
+    imageUrl?: string,
 }
 
 //TODO: Do the languages mirror each other perfectly?

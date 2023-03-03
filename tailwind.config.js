@@ -3,6 +3,11 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
+      textShadow: {
+        sm: '0 1px 1px var(--tw-shadow-color)',
+        DEFAULT: '1px 2px 2px var(--tw-shadow-color)',
+        lg: '4px 8px 8px var(--tw-shadow-color)',
+      },
       colors: {
         primary: '#61db92',
         'primary-shade': '#55c180',
@@ -39,7 +44,7 @@ module.exports = {
       serif: ['"Noto Serif"', 'Georgia', 'Times New Roman'],
     },
     screens: {
-      mobile: '0px',
+      mobile: '320px',
 
       xs: '576px',
 
@@ -53,5 +58,5 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/line-clamp')],
 };

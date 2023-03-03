@@ -15,8 +15,9 @@ export const PlayerControls = () => {
     const sampleEpisodes: IEpisode[] = [
         {
             number: 1, 
+            slug: "12fda",
             book: {
-                name: {
+                title: {
                     defaultLanguage: "english",
                     english: "Cheon Bomo Gyeong"
                 }
@@ -33,8 +34,9 @@ export const PlayerControls = () => {
         },
         {
             number: 2, 
+            slug: "12fda",
             book: {
-                name: {
+                title: {
                     defaultLanguage: "english",
                     english: "Cheon Bomo Gyeong"
                 }
