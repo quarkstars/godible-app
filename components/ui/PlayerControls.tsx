@@ -1,64 +1,38 @@
-import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonIcon, IonPopover, IonProgressBar, IonRange, IonRippleEffect, IonToolbar } from '@ionic/react'
+import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonModal, IonPopover, IonProgressBar, IonRange, IonRippleEffect, IonTitle, IonToolbar, useIonModal, useIonRouter } from '@ionic/react'
 import { bookmarkOutline, chevronDown, chevronUp, heartOutline, list, pauseCircle, play, playCircle, playSkipBack, playSkipForward, radio, returnDownBack, returnUpForward, volumeHigh, volumeLow, volumeMedium, volumeOff } from 'ionicons/icons'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Player } from 'components/AppShell';
 import { useContext, useState } from 'react';
 import { IEpisode } from 'data/types';
 import { AnimatePresence } from 'framer-motion';
 import { motion } from "framer-motion";
 import { calculateTime } from 'hooks/usePlayer';
+import { sampleEpisodes } from 'data/sampleEpisodes';
+import Thumbnail from './Thumbnail';
+import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
+import PlayerListModal from './PlayerListModal';
 
 export const PlayerControls = () => {
 
     const player = useContext(Player);
-
-    const sampleEpisodes: IEpisode[] = [
-        {
-            number: 1, 
-            slug: "12fda",
-            book: {
-                title: {
-                    defaultLanguage: "english",
-                    english: "Cheon Bomo Gyeong"
-                }
-            },
-            audioPath: {
-                defaultLanguage: "english",
-                english: "https://res.cloudinary.com/dcgw7rsyo/video/upload/v1676658093/307961689-44100-2-b910d8b215148_dnnfxm.mp3"
-            },
-            // chapter?: number,
-            // chapterName?: ILangString,
-            // speech?: ISpeech,
-            // publishedAt?: number,
-            // searchText?: ILangString,
-        },
-        {
-            number: 2, 
-            slug: "12fda",
-            book: {
-                title: {
-                    defaultLanguage: "english",
-                    english: "Cheon Bomo Gyeong"
-                }
-            },
-            audioPath: {
-                defaultLanguage: "english",
-                english: "https://res.cloudinary.com/dcgw7rsyo/video/upload/ac_mp3/v1677088974/307964199-44100-2-85c026ec8f97f_gy7rxy.mp3"
-            },
-        }
-    ]
-    useEffect(() => {
-        if (player.episodes) return;
-        player.setEpisodes(sampleEpisodes);
-        //player.setIndex(0);
-    }, [player.episodes]);
-
-    
-
+        
     //Player Functions
-    const triggerEpisodeListModal = () => {
-
+    const [present, dismiss] = useIonModal(PlayerListModal, {
+        onDismiss: (data: string, role: string) => dismiss(data, role),
+        episodes: player.episodes,
+        index: player.index
+    });
+    function openPlayerListModal() {
+        if (!player.episodes || typeof player.index !== "number" ) return;
+        present({
+        onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+            if (ev.detail.role === 'confirm') {
+            setMessage(`Hello, ${ev.detail.data}!`);
+            }
+        },
+        });
     }
+
     const bookmarkEpisode = () => {
 
     }
@@ -68,11 +42,34 @@ export const PlayerControls = () => {
     if (player.volume < .33) volumeIcon = volumeLow;
     if (player.volume < .05) volumeIcon = volumeOff;
 
-    console.log('volume', player.volume)
+    let episode: undefined|IEpisode;
+    let bookPath: undefined|string;
+	const router = useIonRouter();
+    if (player.episodes && typeof player.index == "number") {
+        episode = player?.episodes[player.index];
+        bookPath = (episode.book?.slug) ? "/book/" + episode.book?.slug : undefined;
+    }
 
+    const modal = useRef<HTMLIonModalElement>(null);
+    const input = useRef<HTMLIonInputElement>(null);
+  
+    const [message, setMessage] = useState(
+      'This modal example uses triggers to automatically open a modal when the button is clicked.'
+    );
+  
+    function confirm() {
+      modal.current?.dismiss(input.current?.value, 'confirm');
+    }
+  
+    function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
+      if (ev.detail.role === 'confirm') {
+        setMessage(`Hello, ${ev.detail.data}!`);
+      }
+    }
     return (
+        <>
         <AnimatePresence>
-            {!player.isVisible ?
+            {!player.isVisible  ?
             <motion.div
                 key={"hidden-bar"}
                 initial={{ scale: 0, opacity: 0}}
@@ -80,12 +77,14 @@ export const PlayerControls = () => {
                 exit={{opacity: 0,  x: -100}}
                 transition={{ scale: "easeInOut" }}
             >
+                { player.episodes &&<>
                 <IonFab slot="fixed" vertical="bottom" horizontal="end" onClick={()=>{player.setIsVisible(true)}}>
                     <IonFabButton color="light">
                         <IonIcon icon={radio}></IonIcon>
                     </IonFabButton>
                 </IonFab>
                 <IonProgressBar value={(player.currentSeconds)/(player.duration||100)}></IonProgressBar>
+                </>}
             </motion.div>
             :
             <motion.div
@@ -95,19 +94,31 @@ export const PlayerControls = () => {
                 exit={{opacity: 0, height: 0}}
                 transition={{ ease: "easeInOut" }}
             >
+                {player.episodes && <>
                 <IonToolbar color={"light"}>
                     <div className="flex flex-row items-center justify-center w-full px-4 space-x-4">   
                         <div className="justify-start hidden xs:flex sm:w-full">    
-                            <div className="flex-shrink-0 hidden bg-black rounded-sm w-28 h-28 xs:block">
-                            {/* TODO: Add the episode icon */}
+                            <div className="flex-shrink-0 hidden w-28 h-28 xs:block">
+                                <Thumbnail 
+                                    size={112}
+                                    imageUrl={episode?.imageUrl}
+                                    onCornerClick={() => {if (bookPath) router.push(bookPath)}}
+                                    cornerImageUrl={episode?.book?.imageUrl}
+                                    onClick={() => {if (episode) router.push("/episode/" + episode?.slug)}}
+                                    overlayColor='#000000'
+                                >
+                                    <span className="text-4xl font-bold text-white dark:text-white">
+                                        {episode?.number}
+                                    </span>
+                                </Thumbnail>
                             </div>
                             <div className="flex-row items-center justify-center hidden w-full h-auto max-w-sm xs:flex">
                                 <IonButtons>
                                     <IonButton                                            
                                         //TODO: Ion Modal - Player Episode Modal *
-                                        onClick={()=>{player.episodes?.map((episode) => {
-                                            console.log('CONTAINS Epsisode: ', episode.number)
-                                            })
+                                        id="open-modal"
+                                        onClick={()=>{
+                                            openPlayerListModal()
                                         }}
                                     >
                                         <IonIcon slot="icon-only" icon={list} />
@@ -128,9 +139,8 @@ export const PlayerControls = () => {
                                     <IonButtons>
                                         <IonButton                                            
                                              //TODO: Ion Modal - Player Episode Modal 
-                                            onClick={()=>{player.episodes?.map((episode) => {
-                                                console.log('CONTAINS Epsisode: ', episode.number)
-                                                })
+                                            onClick={()=>{
+                                                openPlayerListModal()
                                             }}
                                         >
                                             <IonIcon slot="icon-only" icon={list}/>
@@ -169,6 +179,7 @@ export const PlayerControls = () => {
                                     <button 
                                         className="flex items-center justify-center w-10 h-10 rounded-full shadow-md xs:w-16 xs:h-16 ion-activatable ripple-parent circle bg-primary hover:bg-primary-shade focus:outline-none"
                                         onClick={() => player.togglePlayPause()}
+                                        style={{opacity: player.audio?.src ? 1 : .5}}
                                     >   
                                             <IonRippleEffect type="unbounded"></IonRippleEffect>
                                             {player.isPlaying ?
@@ -229,12 +240,13 @@ export const PlayerControls = () => {
                                 </IonButtons>
                                 </div>
                             </div>
-                            <div className="flex items-center justify-between w-full h-16 ">
-                                {(player.isReady || player.isPlaying || player.currentSeconds > 0) && 
+                            <div className="flex items-center justify-center w-full h-16 ">
+                                {((player.isReady || player.isPlaying || player.currentSeconds > 0) && player.audio?.src ) && 
                                     <div className="text-xs text-gray-500 sm:text-md">
-                                        <span>{(player.currentSeconds && !isNaN(player.currentSeconds )) ? calculateTime(player.currentSeconds) : "00:00"}</span>
+                                        <span>{(player.currentSeconds && !isNaN(player.currentSeconds)) ? calculateTime(player.currentSeconds) : "00:00"}</span>
                                     </div>
                                 }
+                                {player.audio?.src &&<>
                                 {(player.isReady || player.isPlaying || player.currentSeconds > 0) ?
                                     <IonRange
                                         value={player.currentSeconds}
@@ -256,11 +268,12 @@ export const PlayerControls = () => {
                                     </div>
 
                                 }
+                                </>}
                                 <div className="flex items-center h-16 text-xs text-gray-500 sm:text-md">
                                     <AnimatePresence>
                                     {!player.message ? <>
                                         {(player.isReady || player.isPlaying || player.currentSeconds > 0) && 
-                                            <span>
+                                            <span className="w-full text-center">
                                                 {(player.duration && !isNaN(player.duration)) ? calculateTime(player.duration) : "00:00"}
                                             </span>
                                         }
@@ -269,9 +282,9 @@ export const PlayerControls = () => {
                                         <motion.div 
                                             className="flex space-x-2"
                                             key={"hidden-bar"}
-                                            initial={{ width: 0, opacity: 0}}
-                                            animate={{ width: "auto", opacity: 1}}
-                                            exit={{opacity: 0,  width: 0}}
+                                            initial={{ scale: 0, opacity: 0}}
+                                            animate={{ scale: 1, opacity: 1}}
+                                            exit={{opacity: 0,  scale: 0}}
                                             transition={{ scale: "easeInOut" }}
                                         >
                                             <span>{player.message}</span>
@@ -321,8 +334,31 @@ export const PlayerControls = () => {
                         </div>
                     </div>
                 </IonToolbar>
+                </>}
             </motion.div>
             }
         </AnimatePresence>
+
+        <IonModal ref={modal} trigger="open-modal" onWillDismiss={(ev) => onWillDismiss(ev)}>
+        <IonHeader>
+        <IonToolbar>
+            <IonButtons slot="start">
+            <IonButton onClick={() => modal.current?.dismiss()}>Cancel</IonButton>
+            </IonButtons>
+            <IonTitle>Welcome</IonTitle>
+            <IonButtons slot="end">
+            <IonButton strong={true} onClick={() => confirm()}>
+                Confirm
+            </IonButton>
+            </IonButtons>
+        </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding">
+        <IonItem>
+            Hi
+        </IonItem>
+        </IonContent>
+        </IonModal>
+        </>
     )
 }

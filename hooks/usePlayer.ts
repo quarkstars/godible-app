@@ -1,3 +1,4 @@
+import { useIonRouter } from '@ionic/react';
 import { UserState } from './../components/AppShell';
 //Used in AppShell to create a PlayerContext and interact with a consistent player while browsing the app
 
@@ -34,6 +35,7 @@ export interface IPlayer {
         setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
         message?: string,
         setMessage: React.Dispatch<React.SetStateAction<string | undefined>>,
+        setIsAutoPlay: React.Dispatch<React.SetStateAction<boolean>>,
         switchEpisode: Function,
         rewind: Function,
         next: Function,
@@ -56,7 +58,7 @@ const usePlayer = ():IPlayer => {
     //Toggle Visibility
     const [isVisible, setIsVisible] = useState<boolean>(true);
 
-    
+
     const [episodes, setEpisodes] = useState<IEpisode[]|undefined>();
     const [index, setIndex] = useState<number>(0);
     const _audio = useRef(new Audio()) 
@@ -74,8 +76,13 @@ const usePlayer = ():IPlayer => {
 
         let audioPath = episode.audioPath?.[language];
         if (!audioPath) audioPath = episode.audioPath?.[episode.audioPath.defaultLanguage];
-        if (!audioPath) return setMessage("No audio")
-
+        if (!audioPath)  {
+            setMessage("Become a donor to access this audio");
+            togglePlayPause(false);
+            audio.removeAttribute('src');
+            audio?.load();
+            return;
+        }
         //Found Audio, set it
         audio.src = audioPath;
         audio?.load();
@@ -168,7 +175,7 @@ const usePlayer = ():IPlayer => {
 
     const togglePlayPause = (setIsPlay?: boolean) => {
         const audio = _audio.current;
-        if (!audio) return;
+        if (!audio || !audio.src) return;
         if (setIsPlay) return audio.play();
         if (isPlaying || setIsPlay === false) {
             audio.pause();
@@ -265,7 +272,15 @@ const usePlayer = ():IPlayer => {
     }
 
 
-    //TODO: Next Previous
+    //Certain paths pause audio
+    useEffect(() => {
+        if (!location || !location.pathname) return;
+        if (location.pathname === "/signup" || location.pathname === "/signin") {
+            togglePlayPause(false)
+        }
+    }, [location.pathname])
+    
+
 
     return {
         isPlaying,
@@ -274,6 +289,7 @@ const usePlayer = ():IPlayer => {
         togglePlayPause,
         episodes,
         setEpisodes,
+        setIsAutoPlay,
         volume,
         setVolume,
         setTimeTilNext,

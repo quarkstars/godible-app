@@ -1,6 +1,6 @@
 
 import React, { createContext } from "react";
-import { IonApp, IonLabel, IonRouterOutlet, setupIonicReact, IonTabs, IonTabBar, IonTabButton, IonIcon, IonSplitPane  } from '@ionic/react';
+import { IonApp, IonLabel, IonRouterOutlet, setupIonicReact, IonTabs, IonTabBar, IonTabButton, IonIcon, IonSplitPane, IonFooter, IonToolbar  } from '@ionic/react';
 import { StatusBar, Style } from '@capacitor/status-bar';
 
 import { IonReactRouter } from '@ionic/react-router';
@@ -16,6 +16,7 @@ import usePlayer, { IPlayer } from "hooks/usePlayer";
 import Routes from "./Routes";
 import useUser, { IUserState } from "hooks/useUser";
 import { initializeParse } from "@parse/react";
+import { PlayerControls } from "./ui/PlayerControls";
 
 setupIonicReact({});
 
@@ -83,6 +84,7 @@ export const Player = createContext<IPlayer>({
     isReady: false,
     rewind: () => null,
     next: () => null,
+    setIsAutoPlay: () => null,
 })
 
 initializeParse(
@@ -106,7 +108,7 @@ const AppShell: React.FC = () => {
             <IonReactRouter>
               <IonSplitPane contentId="main">
                 <Menu />
-                <Routes />
+                  <Routes />
               </IonSplitPane>
             </IonReactRouter>
           </IonApp>

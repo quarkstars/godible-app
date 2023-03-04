@@ -34,8 +34,8 @@ export default function SlideList(props:ISlideListProps) {
     useLayoutEffect(() => {
         if (!bounds.width || !props?.idealWidth || !props.setItemWidth) return;
         let itemCount = Math.round(bounds.width/props.idealWidth);
-        let itemWidth = (props.spaceBetween) ? bounds.width/props.idealWidth-(props.spaceBetween*(itemCount-1)) : bounds.width/props.idealWidth;
-        props.setItemWidth(Math.round(bounds.width/itemCount))
+        let itemWidth = (props.spaceBetween) ? (bounds.width/itemCount)-(props.spaceBetween*(itemCount-1)) : bounds.width/props.idealWidth;
+        props.setItemWidth(itemWidth)
         setItemCount(itemCount);
     }, [bounds.width, props.idealWidth, props.setItemWidth])
     console.log(itemCount)

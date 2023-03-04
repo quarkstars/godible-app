@@ -1,4 +1,4 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonPage, IonText, IonTitle, IonToolbar, useIonRouter } from '@ionic/react'
+import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonMenuButton, IonPage, IonText, IonTitle, IonToolbar, useIonRouter } from '@ionic/react'
 import Hero from 'components/ui/Hero';
 import SlideList from 'components/ui/SlideList';
 import Toolbar from 'components/ui/Toolbar';
@@ -6,20 +6,25 @@ import { logInOutline } from 'ionicons/icons'
 import { Swiper, SwiperSlide } from "swiper/react";
 import React, { useState } from 'react'
 import Thumbnail from 'components/ui/Thumbnail';
+import { EpisodeCard } from 'components/ui/EpisodeCard';
+import { IEpisode } from 'data/types';
+import { sampleEpisodes } from 'data/sampleEpisodes';
+import { PlayerControls } from 'components/ui/PlayerControls';
 
 const HomePage:React.FC = () => {
 
 
 	const router = useIonRouter();
 
-  const [episodeWidth, setEpisodeWidth] = useState<number>(148)
+  const [episodeWidth, setEpisodeWidth] = useState<number>(148);
+
 
   return (
     <IonPage>
     <IonHeader>
       <Toolbar>
         <IonTitle>
-          Not Ga
+          Welcome
         </IonTitle>
       </Toolbar>
       </IonHeader>
@@ -45,49 +50,27 @@ const HomePage:React.FC = () => {
             </IonButton>
           </div>
           
-          <SlideList isCarousel spaceBetween={30} setItemWidth={setEpisodeWidth} idealWidth={200}>
-            <SwiperSlide key="fdafda">
-              <div className='flex flex-col items-center justify-start py-4 bg-dark dark:bg-light rounded-xl' style={{width: episodeWidth}}>
-                <Thumbnail 
-                  size={episodeWidth-32} 
-                  overlayColor='#000000'
-                  cornerImageUrl='https://cdn.shopify.com/s/files/1/0267/3780/3343/files/CBG_Thumbnail_160x160.png?v=1666202514'
-                  imageUrl='https://images.unsplash.com/photo-1677477605371-f65e2ef8759d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
-                >
-                  <span className="text-3xl font-bold text-white dark:text-white">10</span>
-                  <span className="text-lg font-bold text-white dark:text-white">to</span>
-                  <span className="text-3xl font-bold text-white dark:text-white">539</span>
-                </Thumbnail>
-                <span className="px-4 pt-5 pb-2 text-lg font-medium max-h-20 line-clamp-2 ">Speech When the saint go  mfdafdafda fda fda dfaarchi marching in</span>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide key="fdafda">
-              <div className='flex flex-col items-center justify-start py-4 bg-dark dark:bg-light rounded-xl' style={{width: episodeWidth}}>
-                <Thumbnail 
-                  size={episodeWidth-32} 
-                  overlayColor='#000000'
-                  cornerImageUrl='https://cdn.shopify.com/s/files/1/0267/3780/3343/files/CBG_Thumbnail_160x160.png?v=1666202514'
-                  imageUrl='https://images.unsplash.com/photo-1677477605371-f65e2ef8759d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
-                >
-                  <span className="text-3xl font-bold text-white dark:text-white">10</span>
-                </Thumbnail>
-                <span className="px-4 pt-5 pb-2 text-lg font-medium max-h-20 line-clamp-2 ">Speech When the saint go marching</span>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className='h-64 bg-black'style={{width: episodeWidth}}></div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className='h-64 bg-black'style={{width: episodeWidth}}></div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className='h-64 bg-black'style={{width: episodeWidth}}></div>
-            </SwiperSlide>
-
+          <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={225}>
+            {sampleEpisodes.map((episode, index) => {
+              return (
+                <SwiperSlide key={episode.objectId}>
+                  <EpisodeCard 
+                    size={episodeWidth}
+                    episodes={sampleEpisodes}
+                    index={index}
+                    {...episode}
+                  />
+              </SwiperSlide>
+              )
+            })
+            }
           </SlideList>
         </div>
       </div>
       </IonContent>
+      <IonFooter>
+        <PlayerControls />
+      </IonFooter>
     </IonPage>
   )
 }
