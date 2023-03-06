@@ -29,7 +29,7 @@ const PlayerListModal = (props: IPlayerListModalProps) => {
       <IonContent className="ion-padding">
         {props.episodes.map((episode, index) => {
           return(
-            <IonItem>
+            <IonItem key={index}>
               {`Episode ${episode.number}`}
             </IonItem>
           )
