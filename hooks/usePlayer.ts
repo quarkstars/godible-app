@@ -2,7 +2,7 @@ import { useIonRouter } from '@ionic/react';
 import { UserState } from './../components/AppShell';
 //Used in AppShell to create a PlayerContext and interact with a consistent player while browsing the app
 
-import { IEpisode } from 'data/types';
+import { IEpisode, IList } from 'data/types';
 import React, { useContext, useEffect, useRef, useState } from 'react'
 
 interface IProgressBar {
@@ -13,8 +13,8 @@ interface IProgressBar {
 export interface IPlayer {
         audio?: HTMLAudioElement,
         togglePlayPause: Function,
-        episodes?: IEpisode[]
-        setEpisodes: React.Dispatch<React.SetStateAction<IEpisode[] | undefined>>,
+        list?: IList
+        setList: React.Dispatch<React.SetStateAction<IList | undefined>>,
         volume: number,
         setVolume: React.Dispatch<React.SetStateAction<number>>,
         index: number,
@@ -59,7 +59,7 @@ const usePlayer = ():IPlayer => {
     const [isVisible, setIsVisible] = useState<boolean>(true);
 
 
-    const [episodes, setEpisodes] = useState<IEpisode[]|undefined>();
+    const [list, setList] = useState<IList|undefined>();
     const [index, setIndex] = useState<number>(0);
     const _audio = useRef(new Audio()) 
     const [isAutoPlay, setIsAutoPlay] = useState<boolean>(false);
@@ -70,8 +70,8 @@ const usePlayer = ():IPlayer => {
     useEffect(() => {
         const audio = _audio.current;
         if (!audio) return;
-        if (!episodes || typeof index !== "number") return;
-        const episode = episodes[index];
+        if (!list?.episodes || typeof index !== "number") return;
+        const episode = list?.episodes[index];
         if (!episode) return;
 
         let audioPath = episode.audioPath?.[language];
@@ -99,7 +99,7 @@ const usePlayer = ():IPlayer => {
 
         return () => {if (timer) clearTimeout(timer);}
 
-    }, [_audio.current, episodes, index, language]);
+    }, [_audio.current, list?.episodes, index, language]);
     //Start Audio when audio loads if autoplay is on
 
 
@@ -163,7 +163,7 @@ const usePlayer = ():IPlayer => {
         // when you get to the end
         if ((duration && !isNaN(duration)) && duration > 1 && currentSeconds >= duration) {
             togglePlayPause(false);
-            if (index+1 < (episodes?.length||0)) {
+            if (index+1 < (list?.episodes?.length||0)) {
                 setTimeTilNext(5);
                 setIsAutoPlay(true);
             }
@@ -247,7 +247,7 @@ const usePlayer = ():IPlayer => {
 
     const next = () => {
         const isEnding = duration && currentSeconds >= duration -10;
-        if (isEnding || index+1 < (episodes?.length||0)) {
+        if (isEnding || index+1 < (list?.episodes?.length||0)) {
             setMessage(undefined);
             setTimeTilNext(undefined);
             switchEpisode(index+1);
@@ -287,8 +287,8 @@ const usePlayer = ():IPlayer => {
         duration,
         audio: _audio.current,
         togglePlayPause,
-        episodes,
-        setEpisodes,
+        list,
+        setList,
         setIsAutoPlay,
         volume,
         setVolume,

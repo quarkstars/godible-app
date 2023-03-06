@@ -10,27 +10,23 @@ import { calculateTime } from 'hooks/usePlayer';
 import { sampleEpisodes } from 'data/sampleEpisodes';
 import Thumbnail from './Thumbnail';
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
-import PlayerListModal from './PlayerListModal';
+import ListModal from './ListModal';
 
 export const PlayerControls = () => {
 
     const player = useContext(Player);
         
     //Player Functions
-    const [present, dismiss] = useIonModal(PlayerListModal, {
+    const [present, dismiss] = useIonModal(ListModal, {
         onDismiss: (data: string, role: string) => dismiss(data, role),
-        episodes: player.episodes,
-        index: player.index
+        list: player.list,
+        setList: player.setList,
+        index: player.index,
+        setIndex: player.setIndex,
     });
-    function openPlayerListModal() {
-        if (!player.episodes || typeof player.index !== "number" ) return;
-        present({
-        onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
-            if (ev.detail.role === 'confirm') {
-            setMessage(`Hello, ${ev.detail.data}!`);
-            }
-        },
-        });
+    function openListModal() {
+        if (!player.list?.episodes || typeof player.index !== "number" ) return;
+        present();
     }
 
     const bookmarkEpisode = () => {
@@ -45,25 +41,19 @@ export const PlayerControls = () => {
     let episode: undefined|IEpisode;
     let bookPath: undefined|string;
 	const router = useIonRouter();
-    if (player.episodes && typeof player.index == "number") {
-        episode = player?.episodes[player.index];
+    if (player.list?.episodes && typeof player.index == "number") {
+        episode = player.list.episodes[player.index];
         bookPath = (episode.book?.slug) ? "/book/" + episode.book?.slug : undefined;
     }
 
     const modal = useRef<HTMLIonModalElement>(null);
-    const input = useRef<HTMLIonInputElement>(null);
   
-    const [message, setMessage] = useState(
-      'This modal example uses triggers to automatically open a modal when the button is clicked.'
-    );
+
   
-    function confirm() {
-      modal.current?.dismiss(input.current?.value, 'confirm');
-    }
-  
+
     function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
       if (ev.detail.role === 'confirm') {
-        setMessage(`Hello, ${ev.detail.data}!`);
+        // setMessage(`Hello, ${ev.detail.data}!`);
       }
     }
     return (
@@ -77,7 +67,7 @@ export const PlayerControls = () => {
                 exit={{opacity: 0,  x: -100}}
                 transition={{ scale: "easeInOut" }}
             >
-                { player.episodes &&<>
+                { player.list?.episodes &&<>
                 <IonFab slot="fixed" vertical="bottom" horizontal="end" onClick={()=>{player.setIsVisible(true)}}>
                     <IonFabButton color="light">
                         <IonIcon icon={radio}></IonIcon>
@@ -94,7 +84,7 @@ export const PlayerControls = () => {
                 exit={{opacity: 0, height: 0}}
                 transition={{ ease: "easeInOut" }}
             >
-                {player.episodes && <>
+                {player.list?.episodes && <>
                 <IonToolbar color={"light"}>
                     <div className="flex flex-row items-center justify-center w-full px-4 space-x-4">   
                         <div className="justify-start hidden xs:flex sm:w-full">    
@@ -118,7 +108,7 @@ export const PlayerControls = () => {
                                         //TODO: Ion Modal - Player Episode Modal *
                                         id="open-modal"
                                         onClick={()=>{
-                                            openPlayerListModal()
+                                            openListModal()
                                         }}
                                     >
                                         <IonIcon slot="icon-only" icon={list} />
@@ -140,7 +130,7 @@ export const PlayerControls = () => {
                                         <IonButton                                            
                                              //TODO: Ion Modal - Player Episode Modal 
                                             onClick={()=>{
-                                                openPlayerListModal()
+                                                openListModal()
                                             }}
                                         >
                                             <IonIcon slot="icon-only" icon={list}/>
@@ -202,7 +192,7 @@ export const PlayerControls = () => {
 
                                 <IonButtons>
                                     <IonButton
-                                        disabled={!player.isReady && !player.isPlaying && player.index+2 > (player.episodes?.length||0)}
+                                        disabled={!player.isReady && !player.isPlaying && player.index+2 > (player.list?.episodes?.length||0)}
                                         onClick={()=> {
                                             player.next()
                                         }}
@@ -339,7 +329,7 @@ export const PlayerControls = () => {
             }
         </AnimatePresence>
 
-        <IonModal ref={modal} trigger="open-modal" onWillDismiss={(ev) => onWillDismiss(ev)}>
+        {/* <IonModal ref={modal} trigger="open-modal" onWillDismiss={(ev) => onWillDismiss(ev)}>
         <IonHeader>
         <IonToolbar>
             <IonButtons slot="start">
@@ -358,7 +348,7 @@ export const PlayerControls = () => {
             Hi
         </IonItem>
         </IonContent>
-        </IonModal>
+        </IonModal> */}
         </>
     )
 }

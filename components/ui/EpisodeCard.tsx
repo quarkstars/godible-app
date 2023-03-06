@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import Thumbnail from './Thumbnail'
-import { IEpisode } from 'data/types'
+import { IEpisode, IList } from 'data/types'
 import { Player, UserState } from 'components/AppShell'
 import { text, userDefaultLanguage } from 'data/translations'
 import { IonRippleEffect, useIonRouter } from '@ionic/react'
@@ -8,7 +8,7 @@ import { IonRippleEffect, useIonRouter } from '@ionic/react'
 interface IEpisodeCardProps extends IEpisode {
     size: number,
     index: number,
-    episodes: IEpisode[],
+    list: IList,
 }
 
 export const EpisodeCard = (props: IEpisodeCardProps) => {
@@ -37,7 +37,7 @@ export const EpisodeCard = (props: IEpisodeCardProps) => {
     const handleEpisodeClick = (e) => {
         e.preventDefault();
         player.setIsAutoPlay(true);
-        player.setEpisodes(props.episodes);
+        player.setList(props.list);
         player.setIndex(props.index);
         router.push(episodePath);
         setHovering(true);

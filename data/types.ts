@@ -4,6 +4,13 @@ export interface IUser {
     id?: string,
 }
 
+export interface IList {
+    objectId?: string, //Will not be defined if not
+    name?: string,
+    user?: IUser,
+    episodes: IEpisode[],
+}
+
 export interface IEpisode {
     objectId: string,
     number: number, 

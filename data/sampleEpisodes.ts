@@ -2,7 +2,7 @@ import { IEpisode } from "./types";
 
 export const sampleEpisodes: IEpisode[] = [
     {
-        objectId: "fdafdgr",
+        objectId: "fdaafdgr",
         number: 1, 
         slug: "cbmg-1",
         
@@ -14,7 +14,7 @@ export const sampleEpisodes: IEpisode[] = [
             },
             imageUrl: "https://cdn.shopify.com/s/files/1/0267/3780/3343/files/CBG_Thumbnail_160x160.png?v=1666202514",
             slug: "cheon-bomo-gyeong",
-            objectId: "fdafda",
+            objectId: "fdaagfda",
         },
         // audioPath: {
         //     defaultLanguage: "english",
@@ -28,7 +28,7 @@ export const sampleEpisodes: IEpisode[] = [
         slug: "cbmg-225",
         imageUrl: "https://images.unsplash.com/photo-1677784037976-76555e60bf4f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
         book: {
-            objectId: "fdsafgdg4",
+            objectId: "fdsafgfgdg4",
             title: {
                 defaultLanguage: "english",
                 english: "Cheon Bomo Gyeong"
@@ -40,12 +40,12 @@ export const sampleEpisodes: IEpisode[] = [
         // },
     },
     {
-        objectId: "fdafda",
+        objectId: "fdagafda",
         number: 12, 
         slug: "cbmg-12",
         imageUrl: "https://images.unsplash.com/photo-1677784037976-76555e60bf4f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
         book: {
-            objectId: "fdsafgdg4",
+            objectId: "fdsaaafdafgdg4",
             title: {
                 defaultLanguage: "english",
                 english: "Cheon Bomo Gyeong"
@@ -57,12 +57,12 @@ export const sampleEpisodes: IEpisode[] = [
         },
     },
     {
-        objectId: "fdafdsafgtr",
+        objectId: "fdafdshjafgtr",
         number: 136, 
         slug: "cbmg-83",
         imageUrl: "https://images.unsplash.com/photo-1677784037976-76555e60bf4f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
         book: {
-            objectId: "fdsafg24dg4",
+            objectId: "fdsafaag24dg4",
             title: {
                 defaultLanguage: "english",
                 english: "Cheon Bomo Gyeong"
