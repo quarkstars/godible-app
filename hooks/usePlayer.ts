@@ -83,6 +83,7 @@ const usePlayer = ():IPlayer => {
             audio?.load();
             return;
         }
+        if (audioPath === audio.src) return;
         //Found Audio, set it
         audio.src = audioPath;
         audio?.load();

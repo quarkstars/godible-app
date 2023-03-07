@@ -26,10 +26,16 @@ const Hero = () => {
   return (
     <div 
       style={{
-        background: 'url("/img/godible-bg.jpg") no-repeat center center',
-        backgroundSize: "cover",
         maxWidth: "100vw",
+        backgroundImage: "url(/img/godible-bg.jpg)",
+        backgroundSize: "100%",
+        backgroundPosition: "center center",
       }}
+      // style={{
+      //   background: 'url("/img/godible-bg.jpg") no-repeat center center',
+      //   backgroundSize: "cover",
+      //   maxWidth: "100vw",
+      // }}
     >
       <div className="flex flex-col justify-center w-full h-screen bg-gray-700 bg-opacity-50 sm:h-auto">
         <div className="flex flex-row items-center">

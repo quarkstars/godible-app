@@ -53,12 +53,12 @@ const HomePage:React.FC = () => {
           <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={225}>
             {sampleEpisodes.map((episode, index) => {
               return (
-                <SwiperSlide key={"latesteps-"+episode.objectId}>
+                <SwiperSlide key={"lateps-"+episode.objectId}>
                   <EpisodeCard 
                     size={episodeWidth}
                     list={{episodes: sampleEpisodes}}
                     index={index}
-                    {...episode}
+                    episode={episode}
                   />
               </SwiperSlide>
               )

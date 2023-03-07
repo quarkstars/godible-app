@@ -11,6 +11,7 @@ import { sampleEpisodes } from 'data/sampleEpisodes';
 import Thumbnail from './Thumbnail';
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
 import ListModal from './ListModal';
+import useEpisode from 'hooks/useEpisode';
 
 export const PlayerControls = () => {
 
@@ -40,10 +41,12 @@ export const PlayerControls = () => {
 
     let episode: undefined|IEpisode;
     let bookPath: undefined|string;
+    const {
+        appendEpisodeStrings,
+    } = useEpisode()
 	const router = useIonRouter();
     if (player.list?.episodes && typeof player.index == "number") {
-        episode = player.list.episodes[player.index];
-        bookPath = (episode.book?.slug) ? "/book/" + episode.book?.slug : undefined;
+        episode = appendEpisodeStrings(player.list.episodes[player.index]);
     }
 
     const modal = useRef<HTMLIonModalElement>(null);
@@ -92,9 +95,9 @@ export const PlayerControls = () => {
                                 <Thumbnail 
                                     size={112}
                                     imageUrl={episode?.imageUrl}
-                                    onCornerClick={() => {if (bookPath) router.push(bookPath)}}
-                                    cornerImageUrl={episode?.book?.imageUrl}
-                                    onClick={() => {if (episode) router.push("/episode/" + episode?.slug)}}
+                                    onCornerClick={() => {if (episode?._bookPath) router.push(episode._bookPath)}}
+                                    cornerImageUrl={episode?._bookImageUrl}
+                                    onClick={() => {if (episode) router.push(episode._path!)}}
                                     overlayColor='#000000'
                                 >
                                     <span className="text-4xl font-bold text-white dark:text-white">

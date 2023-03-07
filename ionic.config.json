@@ -1,0 +1,7 @@
+{
+  "name": "godible-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}
