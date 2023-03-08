@@ -93,7 +93,7 @@ const SignInResetPage: React.FC = () => {
               <div className="mb-6 form-group">
                     <IonItem>
                       <IonLabel position='floating'>Enter Email</IonLabel>
-                      <IonInput value={user?.get("email")} placeholder="Your Account Email" onIonChange={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
+                      <IonInput value={user.email} placeholder="Your Account Email" onIonChange={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                     </IonItem>
               </div>
               <IonButton 
@@ -125,7 +125,7 @@ const SignInResetPage: React.FC = () => {
                   Return to Log in
                 </span>
                 <span 
-                  className='text-xs pt-4 text-medium italic w-64'
+                  className='w-64 pt-4 text-xs italic text-medium'
                 >
                   Powered by Back4App
                 </span>

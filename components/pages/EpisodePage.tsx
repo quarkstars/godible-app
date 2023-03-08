@@ -1,14 +1,15 @@
-import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonPage, IonTitle, useIonViewWillEnter } from '@ionic/react'
+import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonPage, IonTitle, useIonModal, useIonViewWillEnter } from '@ionic/react'
 import { Player, UserState } from 'components/AppShell'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
 import { text, userDefaultLanguage } from 'data/translations'
 import { IEpisode } from 'data/types'
 import useEpisode from 'hooks/useEpisode'
-import { add, bookOutline, bookmark, chevronDown, language, playCircle } from 'ionicons/icons'
+import { add, bookOutline, bookmark, chevronDown, language, playCircle, settings, settingsOutline } from 'ionicons/icons'
 import React, { useContext, useEffect, useState } from 'react'
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import Thumbnail from 'components/ui/Thumbnail'
+import SettingsModal from 'components/ui/SettingsModal'
 
 
 
@@ -16,6 +17,14 @@ const EpisodePage:React.FC = () => {
 
   const player = useContext(Player);
   
+    //Modal
+    const [presentSettings, dimissSettings] = useIonModal(SettingsModal, {
+        onDismiss: (data: string, role: string) => dimissSettings(data, role),
+    });
+    function openSettingsModal() {
+        if (!player.list?.episodes || typeof player.index !== "number" ) return;
+        presentSettings();
+    }
   
   const {
     appendEpisodeStrings,
@@ -137,7 +146,7 @@ const EpisodePage:React.FC = () => {
       </div>
       <div className="flex justify-center px-4 py-4 width-full">  
         <div className="justify-center px-4" style={{ maxWidth: "768px"}}> 
-          <div className='flex justify-center w-full'>
+          <div className='flex justify-center w-full -ml-3 xs:ml-0'>
             {(episode?._bookTitle && episode?._chapterName) && 
             <IonBreadcrumbs color="dark">
               <IonBreadcrumb href={episode?._bookPath}>{episode?._bookTitle}</IonBreadcrumb>
@@ -217,7 +226,7 @@ const EpisodePage:React.FC = () => {
                 </IonButton>
               </IonButtons>
               <IonButtons>
-                <IonButton fill="clear" size="small"  onClick={()=>{}} >
+                <IonButton fill="clear" size="small"  onClick={()=>openSettingsModal()} >
                   <IonIcon icon={language} color="medium" slot="icon-only" />
                 </IonButton>
               </IonButtons>

@@ -4,12 +4,13 @@ import SlideList from 'components/ui/SlideList';
 import Toolbar from 'components/ui/Toolbar';
 import { logInOutline } from 'ionicons/icons'
 import { Swiper, SwiperSlide } from "swiper/react";
-import React, { useState } from 'react'
+import React, { useState, useContext, useEffect, useRef } from 'react'
 import Thumbnail from 'components/ui/Thumbnail';
 import { EpisodeCard } from 'components/ui/EpisodeCard';
 import { IEpisode } from 'data/types';
 import { sampleEpisodes } from 'data/sampleEpisodes';
 import { PlayerControls } from 'components/ui/PlayerControls';
+import { Player } from 'components/AppShell';
 
 const HomePage:React.FC = () => {
 
@@ -17,7 +18,14 @@ const HomePage:React.FC = () => {
 	const router = useIonRouter();
 
   const [episodeWidth, setEpisodeWidth] = useState<number>(148);
-  console.log("sampleEpisodes", sampleEpisodes)
+  
+  //TODO: Attempting to prevent reordering by the list reorderer
+  const player = useContext(Player);
+  useEffect(() => {
+    setLatestEpisodes(JSON.parse(latestEpisodesString.current));
+  }, [player.list])
+  const [latestEpisodes, setLatestEpisodes] = useState(sampleEpisodes);
+  const latestEpisodesString = useRef(JSON.stringify(sampleEpisodes));
 
   return (
     <IonPage>
@@ -51,7 +59,7 @@ const HomePage:React.FC = () => {
           </div>
           
           <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={225}>
-            {sampleEpisodes.map((episode, index) => {
+            {latestEpisodes.map((episode, index) => {
               return (
                 <SwiperSlide key={"lateps-"+episode.objectId}>
                   <EpisodeCard 
@@ -65,16 +73,7 @@ const HomePage:React.FC = () => {
             })
             }
           </SlideList>
-          <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={225}>
-            {sampleEpisodes.map((episode, index) => {
-              return (
-                <SwiperSlide key={"latesteps-"+episode.objectId}>
-                  {index}
-              </SwiperSlide>
-              )
-            })
-            }
-          </SlideList>
+
         </div>
       </div>
       </IonContent>

@@ -11,7 +11,7 @@ const Toolbar = ({children}) => {
         user
       } = useContext(UserState);
 
-    
+    console.log("user", user)
 	const router = useIonRouter();
     return (
         
@@ -22,13 +22,13 @@ const Toolbar = ({children}) => {
             </IonButtons>
             {children}
             <IonButtons slot="end">
-                {user ?
+                {user.objectId ?
                     <IonAvatar
                         onClick={()=>{router.push("/profile");}}
                     >
-                        {user.get("imageUrl") ?
+                        {user.imageUrl ?
                             <img 
-                                src={user.get("imageUrl")} 
+                                src={user.imageUrl} 
                                 alt="My Profile" 
                                 className='p-2'
                             />
@@ -36,7 +36,7 @@ const Toolbar = ({children}) => {
                             <div
                                 className='p-2'
                             >
-                                <InitialsAvatar name={`${user.get("firstName")} ${user.get("lastName")}`}  />
+                                <InitialsAvatar name={`${user.firstName} ${user.lastName}`}  />
                             </div>
                         }
                     </IonAvatar>

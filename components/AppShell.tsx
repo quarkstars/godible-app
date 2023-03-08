@@ -22,7 +22,7 @@ setupIonicReact({});
 
 //Setup Contexts
 export const UserState = createContext<IUserState>({
-  user: undefined,
+  user: {},
   isLoading: false,
   reroutePath: undefined,
   setReroutePath: () => null,
@@ -50,6 +50,10 @@ export const UserState = createContext<IUserState>({
   resetError: undefined,
   setResetError: () => null,
   reset: async () => null,
+
+  updateUser: async (update: IUser) => { return update},
+  updateError: undefined,
+  setUpdateError: () => null,
 })
 export const Theme = createContext<ITheme>({
   isDark: false,

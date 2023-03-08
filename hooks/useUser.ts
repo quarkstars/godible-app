@@ -1,3 +1,5 @@
+import { IUser } from 'data/types';
+import { IList } from 'data/types';
 import { useEffect } from 'react';
 //Used in AppShell to create a UserContext and interact with the logged in User on the server
 
@@ -6,6 +8,7 @@ import Parse, { Error } from 'parse';
 import React, { SetStateAction, useState } from "react";
 import { isPlatform } from '@ionic/react';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
+import useParse from './useParse';
 
 // This is also where a non logged in user will store Language Preference, Volume and logically resolve when logging in 
 // where existing user language takes precedemce
@@ -17,7 +20,7 @@ interface INotice {
 }
 
 export interface IUserState {
-    user?: Parse.Object|null,
+    user: IUser,
     isLoading: boolean,
     reroutePath: string|undefined,
     setReroutePath: React.Dispatch<SetStateAction<string | undefined>>,
@@ -27,6 +30,12 @@ export interface IUserState {
     setLanguage: React.Dispatch<SetStateAction<string>>,
     isOnboarding: boolean,
     setIsOnboarding: React.Dispatch<SetStateAction<boolean>>,
+
+    //UPDATE
+    updateUser: (update: IUser) => Promise<IUser>,
+    setUpdateError: React.Dispatch<any>,
+    updateError: any,
+
 
     //SIGN UP
     signUpError: any,
@@ -61,11 +70,26 @@ export const isValidEmail = (email: string) => {
 
 const useUser = () => {
 
+    const {
+        addParseObjectProperties,
+    } = useParse();
+
     //Logged in user
-    const [user, setUser] = useState<Parse.Object|null|undefined>(); 
+    const [user, setUser] = useState<IUser>({}); 
 
     //language preference. Should be lowercase
     const [language, setLanguage] = useState<string>("english");
+
+    //Preferences TODO: Delete
+    // //md, lg, xl
+    // const [fontSize, setFontSize] = useState<string>("lg");
+    // //light normal strong
+    // const [fontContrast, setFontContrast] = useState<string>("normal");
+    // //serif or sanserif
+    // const [fontStyle, setFontStyle] = useState<string>("serif");
+
+    //User's list of 
+    // const [lists, setLists] = useState<IList[]|undefined>(undefined);
 
     //When logging in, reroute to a specific path
     const [reroutePath, setReroutePath] = useState<string|undefined>();
@@ -93,23 +117,30 @@ const useUser = () => {
     
 
 
-    //set Current User
-    const getCurrentUser = async function (): Promise<Parse.Object|null|undefined> {
+    //Get Current User
+    const getCurrentUser = async function (): Promise<IUser> {
         const currentUser: Parse.User|undefined|null = await Parse.User.current();
-        if (currentUser) setUser(currentUser);
-        return currentUser;
+        console.log("CURRENT USER", currentUser)
+        if (currentUser) {
+            const currentUserJSON = currentUser.toJSON();
+            setUser(currentUserJSON);
+            return currentUserJSON;
+        }
+        return getResetUser({});
     };
+    //Get Current User
     useEffect(() => {
         if (!Parse) return;
-        if (user) return;
+        if (user.objectId) return;
         getCurrentUser();
     }, [Parse]);
 
     //set onboarding if created within a minute ago
     useEffect(() => {
         if (!user) return;
-        const createdAt = user.get("createdAt");
-        const createdTime = Math.floor(new Date(createdAt).getTime());
+        const createdAt = user.createdAt;
+        //TODO: Test again
+        const createdTime = Math.floor(new Date(createdAt!).getTime());
         if (!createdTime) return;
         if (Date.now()-60000 < createdTime) {
             setIsOnboarding(true);
@@ -119,7 +150,7 @@ const useUser = () => {
 
     //Login Function
     const [logInError, setLogInError] = useState<any>();
-    const logIn = async function (email: string, password: string): Promise<Parse.Object | Error | undefined> {
+    const logIn = async function (email: string, password: string): Promise<IUser | Error | undefined> {
         // Note that these values come from state variables that we've declared before
         try {
             setIsLoading(true);
@@ -128,6 +159,9 @@ const useUser = () => {
             const currentUser: Parse.User<Parse.Attributes>|undefined|null = await Parse.User.current();
             if (!currentUser) {
                 setLogOutError({message: "Failed to Log In"});
+                setIsLoading(false);
+                setUser({});
+                return;
             }
             else {
                 setNotice({
@@ -136,12 +170,13 @@ const useUser = () => {
                     color: "green",
                 });
                 setLogInError(undefined);
+                // Update state variable holding current user
+                const currentUserJSON = currentUser.toJSON();
+                setUser(currentUserJSON);
+                setIsLoading(false);
+                return currentUserJSON;
             }
 
-            // Update state variable holding current user
-            setUser(currentUser);
-            setIsLoading(false);
-            return currentUser;
         } catch (error: any) {
             // Error can be caused by wrong parameters or lack of Internet connection
             setLogInError(error);
@@ -210,42 +245,49 @@ const useUser = () => {
                 icon: checkmarkCircle,
                 color: "green",
             });
+            const currentUserJSON = currentUser.toJSON();
             setLogInError(undefined);
-            setUser(currentUser);
+            setUser(currentUserJSON);
             setIsLoading(false);
 
-            return currentUser;
+            return currentUserJSON;
             
 
       };
     
       const [logOutError, setLogOutError] = useState<any>();
       //Log out Function
-      const logOut = async function (): Promise<Parse.Object | Error | undefined> {
+      const logOut = async function (): Promise<IUser | Error > {
         
         setIsLoading(true);
         //Try to sign out gooogle user if exists
         GoogleAuth.signOut().catch();
 
         try {
+            console.log('start log out)')
             await Parse.User.logOut();
+            console.log('end log out)')
             // To verify that current user is now empty, currentAsync can be used
             const currentUser: Parse.User<Parse.Attributes>|undefined|null = await Parse.User.current();
             if (!currentUser) {
                 setLogOutError({message: "Already Logged out"});
+                setIsLoading(false);
+                setUser(getResetUser({}));
+                return getResetUser({});
             }
             else {
                 setNotice({
-                    message: "Account created!",
+                    message: "Logged out!",
                     icon: checkmarkCircle,
                     color: "green",
                 });
                 setLogOutError(undefined);
+                const currentUserJSON = currentUser.toJSON();
+                // Update state variable holding current user
+                setUser(prev => getResetUser(prev));
+                setIsLoading(false);
+                return currentUserJSON;
             }
-            // Update state variable holding current user
-            setUser(currentUser);
-            setIsLoading(false);
-            return currentUser;
         } catch (error: any) {
             setIsLoading(false);
             setLogOutError(error);
@@ -253,12 +295,20 @@ const useUser = () => {
         }
       };
     
-    
+    //TODO: Get resetSettings
+    const getResetUser = (currentUser: IUser): IUser => {
+        return {
+            language: currentUser.language || "english",
+            fontSize: currentUser.fontSize || "normal",
+            fontContrast: currentUser.fontContrast || "normal",
+            fontStyle: currentUser.language || "serif",
+        }
+    }
 
     
     const [signUpError, setSignUpError] = useState<any>();
     // Email Sign up Function - Returns User or Error
-    const signUp = async function (email: string, password: string, first: string, last: string): Promise<Parse.Object | Error | undefined> {
+    const signUp = async function (email: string, password: string, first: string, last: string): Promise<IUser | Error | undefined> {
         //TODO: Do not do this is user is already defined...
         // Note that these values come from state variables that we've declared before
         try {
@@ -271,11 +321,12 @@ const useUser = () => {
                     email: email,
                     firstName: first,
                     lastName: last,
-                    langauge: language,
+                    language,
                 }
             )
             if (!newUser) {
                 setSignUpError({message: "An issue occured"});
+                return getResetUser({});
             } 
             else {
                 setNotice({
@@ -284,10 +335,11 @@ const useUser = () => {
                     color: "green",
                 });
                 setSignUpError(undefined);
+                const newUserJSON = newUser.toJSON();
+                setIsLoading(false);
+                setUser (newUserJSON);
+                return newUserJSON;
             }
-            setIsLoading(false);
-            setUser (newUser)
-            return newUser;
         } catch (error: any) {
             // signUp can fail if any parameter is blank or failed an uniqueness check on the server
             setSignUpError(error);
@@ -311,6 +363,34 @@ const useUser = () => {
       }
     };
 
+    //Update User
+    const [updateError, setUpdateError] = useState<any>();
+    const updateUser = async function (updates: IUser): Promise<IUser> {
+        let prevUser = user;
+        let newUser:IUser = {
+            ...prevUser,
+            ...updates,
+        }
+        setUser(newUser);
+        //If user is logged in, save updates to the server or reverse them if failed.
+        if (!user.objectId) return newUser;
+        try {
+            setIsLoading(true);
+            const currentParseUser: Parse.User|undefined|null = await Parse.User.current();
+            if (!currentParseUser) throw "No User"
+            const updatedParseUser = addParseObjectProperties(currentParseUser, updates)
+            updatedParseUser.save()
+            setIsLoading(false);
+            setUpdateError(undefined);
+            return newUser;
+        } catch (error: any) {
+            setIsLoading(false);
+            setUpdateError(error);
+            setUser(prevUser);
+            return prevUser;
+        }
+    };
+
 
     return {
         user,
@@ -319,12 +399,15 @@ const useUser = () => {
         setReroutePath,
         notice,
         setNotice,
+
+        //Preferences
         language,
         setLanguage,
         getCurrentUser,
         isOnboarding,
         setIsOnboarding,
 
+   
         //SIGN UP
         signUpError,
         setSignUpError,
@@ -345,6 +428,11 @@ const useUser = () => {
         reset,
         setResetError,
         resetError,
+
+        //UPDATE
+        updateUser,
+        updateError,
+        setUpdateError,
     }
 }
 

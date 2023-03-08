@@ -1,20 +1,42 @@
-export interface IUser {
+export interface ParseObjectToJson {
     objectId?: string,
-    language?: string, //Can exist when the user is not logged in
-    fontSize?: string, //md, lg, xl
-    fontContrast?: string, //full, 800, 600
-    fontStyle?: string, //serif, sanserif
-    savedEpisodeIds?: string[],
+    id?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    className?: string;
 }
 
-export interface IList {
-    objectId?: string, //Will not be defined if not
+export interface IUser extends ParseObjectToJson {
+
+    language?: string, //Can exist when the user is not logged in
+    fontSize?: string, //small, normal, large
+    fontContrast?: string, //light, normal, strong
+    fontStyle?: string, //serif, sanserif
+
+    //Simple list of all pointers
+    lists?: IList[]
+    savedListId?: string,
+
+    email?: string,
+    imageUrl?: string,
+    firstName?: string,
+    lastName?: string,
+}
+
+export interface IList extends ParseObjectToJson {
     name?: string,
     user?: IUser,
     episodes: IEpisode[],
+    
+    //public list for speeches
+    isPublic?: boolean,
+
+    //Do I need this to make a relation?
+    // "__type"?: "Pointer", 
+    // className?: "List"
 }
 
-export interface IEpisode {
+export interface IEpisode  extends ParseObjectToJson {
     objectId: string,
     number: number, 
     slug: string,
@@ -26,7 +48,7 @@ export interface IEpisode {
     chapterName?: ILangString,
     speech?: ISpeech,
     publishedAt?: number,
-    searchText?: ILangString,
+    searchText?: string,
     imageUrl?: string,
     quote?: string,
     isForbidden?: boolean,
@@ -56,7 +78,7 @@ export interface ILangString {
     japanese?: string,
 }
 
-export interface IBook {
+export interface IBook extends ParseObjectToJson{
     objectId: string,
     title: ILangString,
     slug?: string,
@@ -71,6 +93,7 @@ export interface IBook {
 //TODO: Do the languages mirror each other perfectly?
 export interface ISpeech {
     name: ILangString,
+    slug: string, //This would be book slug+speech name
     book: IBook,
     startIndex: number,
     endIndex: number,

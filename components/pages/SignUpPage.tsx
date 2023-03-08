@@ -41,16 +41,16 @@ const SignUpPage: React.FC = () => {
   //TODO: Programmatically check what platform and then show floating only on android
   
 
-  //When user is present, reroute
+  //When loggedin user is present, reroute
   useEffect(() => {
-    if (!user) return;
+    if (!user.objectId) return;
     if (reroutePath) {
       let _reroutePath = reroutePath;
       setReroutePath(undefined);
       router.push(_reroutePath);
     }
     else router.push("/profile");
-  }, [user]);
+  }, [user.objectId]);
   
 	
 	return (
@@ -78,7 +78,7 @@ const SignUpPage: React.FC = () => {
       <IonContent>
       <div className="flex flex-col items-center justify-center w-full min-h-full p-4 space-y-4 sm:bg-green-800">
         <img src='/logo/godible-logo.png' className='w-40'></img>
-        {user ?
+        {user.objectId ?
           <LoggedInAlready />
         :
           <div className="block max-w-md p-6 bg-white rounded-lg dark:bg-light">
@@ -146,7 +146,7 @@ const SignUpPage: React.FC = () => {
               expand="block" 
                 onClick={() => {
                   //Validate
-                  if (user) return setSignUpError("Already logged in");
+                  if (user.objectId) return setSignUpError("Already logged in");
                   if (email==="" && password==="") return setSignUpError("Create your credentials");
                   if (!isValidEmail(email)) return setSignUpError("Invalid email");
                   if (password==="") return setSignUpError("Create a password");

@@ -1,7 +1,8 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonList, IonPage, IonReorder, IonReorderGroup, IonTitle, IonToolbar, ItemReorderEventDetail } from '@ionic/react'
+import { IonButton, IonButtons, IonContent, IonHeader, IonImg, IonItem, IonLabel, IonList, IonPage, IonPopover, IonReorder, IonReorderGroup, IonTitle, IonToolbar, ItemReorderEventDetail } from '@ionic/react'
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
 import { IEpisode, IList } from 'data/types';
-import React, {useRef} from 'react'
+import useEpisode from 'hooks/useEpisode';
+import React, {useRef, useMemo} from 'react'
 
 interface IPlayerListModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
@@ -13,6 +14,17 @@ interface IPlayerListModalProps {
 
 const ListModal = (props: IPlayerListModalProps) => {
 
+  //Prep episode data
+  const {
+    appendEpisodeStrings
+  } = useEpisode();
+
+  let episodes = useMemo(() => {
+    if (!props.list?.episodes) return [];
+    return props.list?.episodes.map((episode) => {
+      return appendEpisodeStrings(episode);
+    })
+  }, [props.list?.episodes, props.list, props.index])
   
   function handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
     // Sync location of current Index
@@ -57,12 +69,23 @@ const ListModal = (props: IPlayerListModalProps) => {
         <IonList>
         {/* The reorder gesture is disabled by default, enable it to drag and drop items */}
         <IonReorderGroup disabled={false} onIonItemReorder={handleReorder}>
-        {props.list?.episodes.map((episode, _index) => {
-          let weight = (_index === props.index) ? "font-bold" : "font-normal"
+        {episodes.map((episode, index) => {
+          let weight = (index === props.index) ? "font-bold" : "font-normal"
           return(
             <IonItem key={"list-"+episode.objectId}>
               <IonReorder slot="start"></IonReorder>
-              <span className={`${weight}`}>{`Episode ${episode.number}`}</span>
+              <div className="w-8 h-8 overflow-hidden rounded-lg cursor-pointer" id={`context-menu-trigger-${index}`}>
+                <img  src={episode._bookImageUrl ? episode._bookImageUrl : episode.imageUrl} alt={episode._bookTitle} />
+              </div>
+              <span className={`pl-3 ${weight}`}>{`Episode ${episode.number}`}</span>
+
+              <IonPopover trigger={`context-menu-trigger-${index}`} triggerAction="click">
+                <IonContent class="ion-padding">
+                  {episode._bookTitle && <span className="pb-2 pr-2 font-bold">{episode._bookTitle}</span>}
+                  <br/>
+                  {episode._bookTitle && <span>{episode._metaDataBlocks?.join(" \n ")}</span>}
+                </IonContent>
+              </IonPopover>
             </IonItem>
           )
         })

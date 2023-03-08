@@ -63,7 +63,7 @@ export const EpisodeCard = (props: IEpisodeCardProps) => {
                 </span>
             </Thumbnail>
             <span 
-                className="px-4 pt-5 pb-2 text-lg font-medium max-h-20 line-clamp-2 "
+                className="px-4 pt-2 pb-0 font-medium text-md max-h-20 line-clamp-2 "
             >
                 {episode._fullTitle}
             </span>

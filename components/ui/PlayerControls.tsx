@@ -12,14 +12,17 @@ import Thumbnail from './Thumbnail';
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
 import ListModal from './ListModal';
 import useEpisode from 'hooks/useEpisode';
+import SettingsModal from './SettingsModal';
 
 export const PlayerControls = () => {
 
     const player = useContext(Player);
         
     //Player Functions
-    const [present, dismiss] = useIonModal(ListModal, {
-        onDismiss: (data: string, role: string) => dismiss(data, role),
+
+    //List Modal
+    const [presentList, dimissList] = useIonModal(ListModal, {
+        onDismiss: (data: string, role: string) => dimissList(data, role),
         list: player.list,
         setList: player.setList,
         index: player.index,
@@ -27,7 +30,15 @@ export const PlayerControls = () => {
     });
     function openListModal() {
         if (!player.list?.episodes || typeof player.index !== "number" ) return;
-        present();
+        presentList();
+    }
+    //Settings Modal
+    const [presentSettings, dimissSettings] = useIonModal(SettingsModal, {
+        onDismiss: (data: string, role: string) => dimissSettings(data, role),
+    });
+    function openSettingsModal() {
+        if (!player.list?.episodes || typeof player.index !== "number" ) return;
+        presentSettings();
     }
 
     const bookmarkEpisode = () => {
@@ -205,23 +216,10 @@ export const PlayerControls = () => {
                                 </IonButtons>
                                 <div className="block sm:hidden">
                                     <IonButtons>
-                                        <IonButton id="volume-mobile-trigger">
+                                        <IonButton onClick={()=>openSettingsModal()}>
                                             <IonIcon slot="icon-only" icon={volumeIcon} />
                                         </IonButton>
                                     </IonButtons>
-                                    <IonPopover trigger="volume-mobile-trigger" triggerAction="click">
-                                        <IonContent class="ion-padding">
-                                            <IonRange
-                                                value={player.volume}
-                                                max={1}
-                                                step={.01}
-                                                onIonChange={(detail) => {
-                                                    let volume = Number(detail.target.value); 
-                                                    player.setVolume(volume);                                            
-                                                }}
-                                            />
-                                        </IonContent>
-                                    </IonPopover>
                                 </div>
                                 <div className="block sm:hidden">
                                 <IonButtons>
@@ -301,22 +299,9 @@ export const PlayerControls = () => {
                         <div className="flex-row items-center justify-center hidden w-full h-auto max-w-xs sm:flex">
                             {/* TODO: VOLUME ONLY ON WEB? Capacitor control?  */}
                             <IonButtons>
-                                <IonButton id="volume-desk-trigger">
+                                <IonButton onClick={()=>openSettingsModal()}>
                                     <IonIcon slot="icon-only" icon={volumeIcon} />
                                 </IonButton>
-                                <IonPopover trigger="volume-desk-trigger" triggerAction="click">
-                                        <IonContent class="ion-padding">
-                                            <IonRange
-                                                value={player.volume}
-                                                max={1}
-                                                step={.01}
-                                                onIonChange={(detail) => {
-                                                    let volume = Number(detail.target.value); 
-                                                    player.setVolume(volume);                                            
-                                                }}
-                                            />
-                                        </IonContent>
-                                    </IonPopover>
                             </IonButtons>
                             <IonButtons>
                                 <IonButton size="large" onClick={()=>{player.setIsVisible(false)}}>

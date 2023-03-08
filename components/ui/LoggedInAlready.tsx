@@ -10,11 +10,11 @@ const LoggedInAlready = () => {
         logOut,
       } = useContext(UserState);
 
-      if (!user) return <></>
+      if (!user.objectId) return <></>
     return (
-        <div className="flex flex-col max-w-md p-6 bg-white rounded-lg dark:bg-light py-8 justify-center">
-            <span className="w-full text-center font-bold">{`${user.get("firstName")} ${user.get("lastName")}`}</span>
-            <span className="w-full text-center font-medium pb-4">{`You are logged in as ${user.get("email")}`}</span>
+        <div className="flex flex-col justify-center max-w-md p-6 py-8 bg-white rounded-lg dark:bg-light">
+            <span className="w-full font-bold text-center">{`${user.firstName} ${user.lastName}`}</span>
+            <span className="w-full pb-4 font-medium text-center">{`You are logged in as ${user.email}`}</span>
             <IonButton 
                 color="primary" 
                 expand="block"

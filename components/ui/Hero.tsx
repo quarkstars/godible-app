@@ -28,8 +28,9 @@ const Hero = () => {
       style={{
         maxWidth: "100vw",
         backgroundImage: "url(/img/godible-bg.jpg)",
-        backgroundSize: "100%",
+        backgroundSize: "cover",
         backgroundPosition: "center center",
+        backgroundRepeat: "no-repeat",
       }}
       // style={{
       //   background: 'url("/img/godible-bg.jpg") no-repeat center center',
