@@ -11,7 +11,7 @@ import { sampleEpisodes } from 'data/sampleEpisodes';
 import Thumbnail from './Thumbnail';
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
 import ListModal from './ListModal';
-import useEpisode from 'hooks/useEpisode';
+import useEpisodes from 'hooks/useEpisodes';
 import SettingsModal from './SettingsModal';
 
 export const PlayerControls = () => {
@@ -54,7 +54,7 @@ export const PlayerControls = () => {
     let bookPath: undefined|string;
     const {
         appendEpisodeStrings,
-    } = useEpisode()
+    } = useEpisodes()
 	const router = useIonRouter();
     if (player.list?.episodes && typeof player.index == "number") {
         episode = appendEpisodeStrings(player.list.episodes[player.index]);

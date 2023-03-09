@@ -1,3 +1,4 @@
+import { IExactQuery } from './../data/types';
 import React from 'react'
 
 const useParse = () => {
@@ -11,6 +12,10 @@ const useParse = () => {
             }
         }
         return updatedObject;
+    }
+
+    const getParseAndQuery = (query: IExactQuery) => {
+        
     }
 
     return {

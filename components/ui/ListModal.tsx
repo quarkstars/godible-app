@@ -1,7 +1,7 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonImg, IonItem, IonLabel, IonList, IonPage, IonPopover, IonReorder, IonReorderGroup, IonTitle, IonToolbar, ItemReorderEventDetail } from '@ionic/react'
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
 import { IEpisode, IList } from 'data/types';
-import useEpisode from 'hooks/useEpisode';
+import useEpisodes from 'hooks/useEpisodes';
 import React, {useRef, useMemo} from 'react'
 
 interface IPlayerListModalProps {
@@ -17,7 +17,7 @@ const ListModal = (props: IPlayerListModalProps) => {
   //Prep episode data
   const {
     appendEpisodeStrings
-  } = useEpisode();
+  } = useEpisodes();
 
   let episodes = useMemo(() => {
     if (!props.list?.episodes) return [];

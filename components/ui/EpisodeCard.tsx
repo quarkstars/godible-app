@@ -4,7 +4,7 @@ import { IEpisode, IList } from 'data/types'
 import { Player, UserState } from 'components/AppShell'
 import { text, userDefaultLanguage } from 'data/translations'
 import { IonRippleEffect, useIonRouter } from '@ionic/react'
-import useEpisode from 'hooks/useEpisode'
+import useEpisodes from 'hooks/useEpisodes'
 
 interface IEpisodeCardProps {
     size: number,
@@ -20,7 +20,7 @@ export const EpisodeCard = (props: IEpisodeCardProps) => {
     //Prep episode data
     const {
       appendEpisodeStrings
-    } = useEpisode();
+    } = useEpisodes();
 
     const episode = appendEpisodeStrings(props.episode)
     

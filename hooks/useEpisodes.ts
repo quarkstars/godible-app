@@ -1,16 +1,30 @@
+import { IExactQuery } from './../data/types';
 import { UserState } from 'components/AppShell';
 import { text, userDefaultLanguage } from 'data/translations';
 import { IEpisode } from 'data/types';
-import React, {useContext} from 'react'
+import React, {useContext, useState, useRef} from 'react'
 
 
 //Construct useful strings based on episode data and append them to the episode
 
 
-const useEpisode = () => {
+const useEpisodes = () => {
     const {
       language
     } = useContext(UserState);
+
+    const [error, setError] = useState<any>();
+    const [isLoading, setIsLoading] = useState<boolean>();
+    const [episodes, setEpisodes] = useState<IEpisode[]|undefined>();
+    const [episode, setEpisode] = useState<IEpisode[]|undefined>();
+
+    
+    const page = useRef<number|undefined>(1);
+    // const [isLoadingMore, setIsLoadingMore] = useState<boolean>();
+    const maxPages = useRef <number|undefined>();
+    const search = useRef <string|undefined>();
+    const query = useRef <IExactQuery|undefined>();
+    const sortedBy = useRef <string|undefined>();
     
     const appendEpisodeStrings = (episode: IEpisode): IEpisode => {
         const _lang = (language) ? language : userDefaultLanguage;
@@ -66,11 +80,33 @@ const useEpisode = () => {
     }
     
 
+    //Gets episodes up to 24 at a time
+    const getEpisodes = (search?: string, query?: IExactQuery, sortedBy?: string) => {
+
+    }
+
+    const getMoreEpisodes = () => {
+
+    }
+    
+    
+    //Gets episodes up to 24 at a time
+    const getEpisode = (episodeId?: string) => {
+
+    }
 
 
     return {
         appendEpisodeStrings,
+        error,
+        setError,
+        isLoading,
+        setIsLoading,
+        episodes,
+        getEpisodes,
+        episode,
+        getEpisode,
     }
 }
 
-export default useEpisode
+export default useEpisodes

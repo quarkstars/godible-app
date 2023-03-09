@@ -98,7 +98,7 @@ const useUser = () => {
     const [notice, setNotice] = useState<INotice|undefined>();
 
     //Loading State, waiting for server response
-    const [isLoading, setIsLoading] = useState<any>();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     
     //Loading State, waiting for server response
     const [isOnboarding, setIsOnboarding] = useState<any>();
@@ -372,6 +372,7 @@ const useUser = () => {
             ...updates,
         }
         setUser(newUser);
+        //TODO: Protect user table from writing new columns
         //If user is logged in, save updates to the server or reverse them if failed.
         if (!user.objectId) return newUser;
         try {

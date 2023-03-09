@@ -32,8 +32,13 @@ export interface IList extends ParseObjectToJson {
     isPublic?: boolean,
 
     //Do I need this to make a relation?
-    // "__type"?: "Pointer", 
-    // className?: "List"
+    __type?: "Pointer", 
+    //The user's lists will be ordered by the index. "Saved" list will always be index 0
+    index?: number
+}
+
+export interface IExactQuery {
+    ["key"]?: string,
 }
 
 export interface IEpisode  extends ParseObjectToJson {
@@ -91,10 +96,21 @@ export interface IBook extends ParseObjectToJson{
 }
 
 //TODO: Do the languages mirror each other perfectly?
-export interface ISpeech {
-    name: ILangString,
-    slug: string, //This would be book slug+speech name
-    book: IBook,
-    startIndex: number,
-    endIndex: number,
+export interface ISpeech extends IList {
+    speechName?: ILangString,
+    slug?: string, //This would be book slug+speech name
+    book?: IBook,
+    startIndex?: number,
+    endIndex?: number,
+    //If the speech is only available in a certain language
+    language?: string,
+}
+
+export interface IInspiration extends ParseObjectToJson {
+    episodeId?: string,
+    userId?: string,
+    bookId?: string,
+    heartCount?: number,
+    isPublic?: boolean,
+    text?: string,
 }

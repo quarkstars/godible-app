@@ -4,7 +4,7 @@ import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
 import { text, userDefaultLanguage } from 'data/translations'
 import { IEpisode } from 'data/types'
-import useEpisode from 'hooks/useEpisode'
+import useEpisodes from 'hooks/useEpisodes'
 import { add, bookOutline, bookmark, chevronDown, language, playCircle, settings, settingsOutline } from 'ionicons/icons'
 import React, { useContext, useEffect, useState } from 'react'
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
@@ -28,7 +28,7 @@ const EpisodePage:React.FC = () => {
   
   const {
     appendEpisodeStrings,
-  } = useEpisode();
+  } = useEpisodes();
 
   const [episode, setEpisode] = useState<IEpisode|undefined>()
   useIonViewWillEnter(() => {
