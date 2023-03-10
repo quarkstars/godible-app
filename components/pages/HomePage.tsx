@@ -153,12 +153,14 @@ const HomePage:React.FC = () => {
             {latestEpisodes.map((episode, index) => {
               return (
                 <SwiperSlide key={"lateps-"+episode.objectId}>
-                  <EpisodeCard 
+                  <Thumbnail 
                     size={episodeWidth}
-                    list={{episodes: sampleEpisodes}}
-                    index={index}
-                    episode={episode}
-                  />
+                    imageUrl={episode.imageUrl}
+                    overlayColor='#000000'
+
+                  >
+                    <span className="text-2xl font-bold text-white">Topic</span>
+                  </Thumbnail>
               </SwiperSlide>
               )
             })
