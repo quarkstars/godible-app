@@ -14,7 +14,7 @@ import {
   } from '@ionic/react';
 import { useContext } from 'react';
 import { useLocation } from 'react-router-dom';
-import { archiveOutline, archiveSharp, bookmarkOutline, heartOutline, heartSharp, list, mailOutline, mailSharp, moonOutline, paperPlaneOutline, paperPlaneSharp, sunnyOutline, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
+import { archiveOutline, archiveSharp, bookmark, bookmarkOutline, heartOutline, heartSharp, list, mailOutline, mailSharp, moonOutline, paperPlaneOutline, paperPlaneSharp, sunnyOutline, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
 import { Theme } from 'components/AppShell';
 import { pages } from 'components/Routes';
   
@@ -25,7 +25,7 @@ import { pages } from 'components/Routes';
     title: string;
   }
 
-  const titles = ['Saved', 'Saved','Saved', ];
+  const titles = ['Saved', 'Test List', ];
   
   const Menu: React.FC = () => {
     const location = useLocation();
@@ -73,7 +73,7 @@ import { pages } from 'components/Routes';
                 <IonList id="labels-list">
                   {titles.map((listTitle, index) => (
                     <IonItem lines="none" key={index} >
-                      <IonIcon slot="start" icon={listTitle==="Saved" ? bookmarkOutline : list} />
+                      <IonIcon slot="start" icon={listTitle==="Saved" ? bookmark : list} />
                       <IonLabel>{listTitle}</IonLabel>
                     </IonItem>
                   ))}

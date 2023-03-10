@@ -41,8 +41,8 @@ const useEpisodes = () => {
         let _title = `${text["Episode"][_lang]} ${number}`;
         if (episode?.customTitle) _title = episode?.customTitle;
         let _fullTitle = (_bookTitle) ? _bookTitle + " " + _title : _title;
-        if (!_title) _title = text["Episode"][_lang]+ " " + episode?.number
-        const _path = "/episode/" + episode.slug;
+        if (!_title) _title = text["Episode"][_lang]+ " " + episode?.number;
+        const _path = "/episode/" + episode?.slug;
 
         //Chapter Name
         let _hasChapter = (typeof episode?.chapter === "number")
@@ -60,6 +60,8 @@ const useEpisodes = () => {
         //Text
         const textInLanguage = episode?.text?.[_lang]; 
         const _textBlocks:string[] = (textInLanguage) ? textInLanguage.split(/\r?\n/) : undefined;
+        const _quote = episode?.quote?.[_lang]; 
+        console.log("QUOTE", episode?.quote)
 
         return {
             ...episode,
@@ -76,6 +78,7 @@ const useEpisodes = () => {
             _textBlocks,
             _authorImageUrl,
             _metaDataBlocks,
+            _quote,
         };
     }
     
@@ -85,12 +88,17 @@ const useEpisodes = () => {
 
     }
 
+
+    const getTopics = () => {
+
+    }
+
     const getMoreEpisodes = () => {
 
     }
     
     
-    //Gets episodes up to 24 at a time
+    //get a single episode
     const getEpisode = (episodeId?: string) => {
 
     }

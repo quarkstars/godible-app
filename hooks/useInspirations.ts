@@ -40,6 +40,12 @@ const useInspirations = () => {
 
     }
 
+    //returns true if episode is saved by user
+    const appendInspirationHearts = (inspirations?: IInspiration[]) => {
+
+    }
+
+
 
     return {
         error,

@@ -2,102 +2,129 @@ import { IonButton, IonButtons, IonIcon } from '@ionic/react'
 import { add, addCircle, chevronBack, chevronDown, chevronForward, play, playCircle } from 'ionicons/icons'
 import React from 'react'
 
-const Hero = () => {
+interface IHeroProps {
+  title?: string,
+  subtitle?: string,
+  mainButtonText?: string,
+  mainButtonIcon?: string,
+  onClickMain?: Function,
+  subButtonText?: string,
+  subButtonIcon?: string,
+  onClickSub?: Function,
+  overlayColor?: string,
+  bgImageUrl?: string,
+  isQuote?: boolean,
+  scrollIsHidden?: boolean,
+  preImageUrl?: string,
+  preText?: string,
+  postImageUrl?: string,
+  postText?: string,
+}
 
-  //title
-  //children
-  //mainButtonText - Let God's Word Be Heard
-  //mainButtonIcon
-  //onClickMain
-  //subButtonText Listen 
-  //subButtonIcon PlayCircle
-  //isMainClear
-  //onClickSub 
-  //overlayColor
-  //bgImageUrl
-  //onNext 
-  //TODO: isShowingNext
-  //onPrevious
-  //isShowingPrevious
-  //TODO: isQuote
-  //TODO: preImageUrl
-  //preText
+const Hero = (props: IHeroProps) => {
+
+const {
+  
+  title, //Let God's Word Be Heard
+  subtitle,
+  mainButtonText,
+  mainButtonIcon,
+  onClickMain,
+  subButtonText,
+  subButtonIcon,
+  onClickSub,
+  overlayColor,
+  bgImageUrl, //"/logo/godible.png"
+  postImageUrl, 
+  postText,
+  scrollIsHidden,
+  isQuote,
+  preImageUrl,
+  preText,
+} = props;
 
   return (
     <div 
       style={{
         maxWidth: "100vw",
-        backgroundImage: "url(/img/godible-bg.jpg)",
+        backgroundImage: `url(${bgImageUrl})`,
         backgroundSize: "cover",
         backgroundPosition: "center center",
         backgroundRepeat: "no-repeat",
       }}
-      // style={{
-      //   background: 'url("/img/godible-bg.jpg") no-repeat center center',
-      //   backgroundSize: "cover",
-      //   maxWidth: "100vw",
-      // }}
+
     >
-      <div className="flex flex-col justify-center w-full h-screen bg-gray-700 bg-opacity-50 sm:h-auto">
+      <div className="flex flex-col justify-center w-full h-screen bg-opacity-50 sm:h-auto" style={{background: overlayColor}}>
         <div className="flex flex-row items-center">
             <div 
               className="flex flex-col justify-center flex-grow w-full px-12 py-2 mx-auto sm:max-w-3xl sm:px-16 lg:px-8"
-              style={{minHeight: "28em"}}
+              style={{minHeight: "26em"}}
             >
 
 
               <div className="max-w-3xl sm:mx-auto lg:max-w-5xl">
-                <div className="flex flex-col mb-6 sm:text-center sm:mb-6 ">
-                  <a href="/" className="mb-6 sm:mx-auto">
-                    {/* <div className="flex items-center justify-center w-24 rounded-full bg-teal-accent-400">
-                      <img src="/logo/godible-logo.png" alt="Pre Image"></img>
-                    </div> */}
-                  </a>
-                  <div className="max-w-5xl mb-4 sm:mx-auto sm:text-center lg:max-w-5xl sm:mb-6">
-                    <p className="pb-6 text-sm tracking-wide text-gray-300 uppercase dark:text-gray-300 sm:text-md">
-                    Today&apos;s Episode
-                    </p>
-                    {/* <h2 className="max-w-5xl mb-6 font-sans text-4xl font-bold leading-none tracking-tight text-white dark:text-white sm:text-5xl sm:mx-auto text-shadow">
-                      Let God&apos;s Word be Heard
-                    </h2> */}
+                <div className="flex flex-col items-center w-full mb-2 sm:text-center sm:mb-2 ">
+                  {preImageUrl &&
+                    <div className="flex items-center justify-center w-24 rounded-full bg-teal-accent-400">
+                      <img src={preImageUrl} alt="Pre Image"></img>
+                    </div>
+                  }
+                  <div className="max-w-5xl mb-2 sm:mx-auto sm:text-center lg:max-w-5xl sm:mb-3">
+                    {preText &&
+                      <p className="pb-6 text-sm tracking-wide text-center text-gray-300 uppercase dark:text-gray-300 sm:text-md">
+                        {preText}
+                      </p>
+                    }
+                    {title &&
+                    <h2 className="max-w-5xl mb-6 font-sans text-5xl font-bold leading-none tracking-tight text-center text-white dark:text-white md:8xl xs:text-6xl sm:text-7xl sm:mx-auto text-shadow">
+                      {title}
+                    </h2>
+                    }
+                    {isQuote && 
                     <span className="-mb-10 font-serif text-4xl leading-none text-white dark:text-white sm:text-5xl">
                     “
                     </span>
-                    <p className="font-serif text-white text-md mobile:text-lg dark:text-white xs:text-2xl" style={{marginTop: /*TODO: isQuote ? */ "-15px"}}>
-                      Those were not just steps in my personal life but steps to heal the wounds of God&apos;s bitter sorrow by paying indemnity for history. Those were not just steps in my personal life buhistory.”
+                    }
+                    {subtitle &&
+                    <p className="font-serif text-center text-white text-md mobile:text-lg dark:text-white xs:text-2xl" style={{marginTop: isQuote ? "-15px" : "0px"}}>
+                      {`${subtitle}${isQuote?"”":""}`}
                     </p>
+                    }
                   </div>
-                  <div className="flex items-center justify-start w-full sm:justify-center">
+                  <div className="flex items-center justify-center w-full cursor-pointer" onClick={(e) => {if (onClickMain) onClickMain(e)}}>
+                    {postImageUrl &&
                       <div className="w-4 h-4 overflow-hidden rounded-sm">
-                        <img src="https://cdn.shopify.com/s/files/1/0267/3780/3343/files/CBG_Thumbnail_160x160.png?v=1666202514" className="w-full h-full"/>
+                        <img src={postImageUrl} className="w-full h-full"/>
                       </div>
-                      <span className="pl-2 text-xs italic text-white dark:text-white">Chung Bu Mo Gyung Episode 6</span>
+                    }
+                    {postText && <span className="pl-2 text-xs italic text-white dark:text-white">{postText}</span>}
                   </div>
-                  <div className="mt-6 -ml-5 sm:ml-0">
-                    {/* <IonButton color="primary" fill="solid">
-                      <IonIcon icon={playCircle} color="fullblack" />
-                      <span className="pl-2 text-black dark:text-black">Sign Up</span>
-                    </IonButton> */}
-                    <IonButton fill="clear">
-                      <IonIcon icon={playCircle} color="fullwhite" size="large" />
-                      <span className="pl-2 text-white dark:text-white">Listen</span>
-                      {/* Sign Up */}
+                  <div className="mt-4 -ml-5 sm:ml-0">
+                    {mainButtonText &&
+                    <IonButton fill={mainButtonIcon ? "clear" : "outline"} color="fullwhite" onClick={(e) => {if (onClickMain) onClickMain(e)}}>
+                      {mainButtonIcon && <IonIcon icon={mainButtonIcon} color="fullwhite" size="large" />}
+                      <span className={`text-white dark:text-white ${mainButtonIcon ? "pl-2" : ""}`}>{mainButtonText}</span>
                     </IonButton>
-                    <IonButton fill="clear">
-                      <IonIcon icon={add} color="fullwhite" />
-                      <span className="pl-2 text-white dark:text-white">To List</span>
+                    }
+                    {subButtonText &&
+                    <IonButton fill={subButtonIcon ? "clear" : "outline"} color="fullwhite" onClick={(e) => {if (onClickSub) onClickSub(e)}}>
+                      {subButtonIcon && <IonIcon icon={subButtonIcon} color="fullwhite" />}
+                      <span className={`text-white dark:text-white ${subButtonIcon ? "pl-2" : ""}`}>{subButtonText}</span>
                     </IonButton>
+                    }
                   </div>
                 </div>
               </div>
             </div>
         </div>
-        <div className="flex items-start justify-center w-full h-10 sm:hidden">
-          <div className='flex flex-col items-center justify-start'>
-            <span className="w-full text-xs uppercase text-medium">Scroll</span>
-            <IonIcon icon={chevronDown} color="medium" size="small" />
+        {!scrollIsHidden &&
+          <div className="flex items-start justify-center w-full h-10 sm:hidden">
+            <div className='flex flex-col items-center justify-start'>
+              <span className="w-full text-xs uppercase text-medium">Scroll</span>
+              <IonIcon icon={chevronDown} color="medium" size="small" />
+            </div>
           </div>
-        </div>
+        }
       </div>
     </div>
   )

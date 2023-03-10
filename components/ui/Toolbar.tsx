@@ -1,4 +1,4 @@
-import { IonAvatar, IonButton, IonButtons, IonIcon, IonLabel, IonMenuButton, IonToolbar, useIonRouter } from '@ionic/react'
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonIcon, IonLabel, IonMenuButton, IonToolbar, useIonRouter } from '@ionic/react'
 import { UserState } from 'components/AppShell';
 import { arrowForward } from 'ionicons/icons';
 import React, { useContext } from 'react'
@@ -18,7 +18,9 @@ const Toolbar = ({children}) => {
         <IonToolbar>
             <IonButtons slot="start">
             <IonMenuButton />
-                <span className="hidden w-20 px-2 md:block"></span>
+                <div className="hidden px-2 md:block">
+                    <IonBackButton />
+                </div>
             </IonButtons>
             {children}
             <IonButtons slot="end">

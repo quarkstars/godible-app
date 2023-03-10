@@ -80,16 +80,7 @@ const useUser = () => {
     //language preference. Should be lowercase
     const [language, setLanguage] = useState<string>("english");
 
-    //Preferences TODO: Delete
-    // //md, lg, xl
-    // const [fontSize, setFontSize] = useState<string>("lg");
-    // //light normal strong
-    // const [fontContrast, setFontContrast] = useState<string>("normal");
-    // //serif or sanserif
-    // const [fontStyle, setFontStyle] = useState<string>("serif");
 
-    //User's list of 
-    // const [lists, setLists] = useState<IList[]|undefined>(undefined);
 
     //When logging in, reroute to a specific path
     const [reroutePath, setReroutePath] = useState<string|undefined>();
@@ -391,6 +382,12 @@ const useUser = () => {
             return prevUser;
         }
     };
+
+    //TODO: Get next episode based on criteria
+    //lastEpisode?: IEpisode, //For link and episode number
+    //lastListId?: string, //Check what's next on the list and load the whole list or just check the next on in the book exists if not, just start that one over.
+    //lastEpisodePercent?: number, //If episode is 92% complete
+    //lastEpisodeSeconds?: number, 
 
 
     return {

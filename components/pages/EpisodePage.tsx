@@ -1,15 +1,17 @@
-import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonPage, IonTitle, useIonModal, useIonViewWillEnter } from '@ionic/react'
+import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonLabel, IonPage, IonTextarea, IonTitle, IonToggle, useIonModal, useIonViewWillEnter } from '@ionic/react'
 import { Player, UserState } from 'components/AppShell'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
 import { text, userDefaultLanguage } from 'data/translations'
 import { IEpisode } from 'data/types'
 import useEpisodes from 'hooks/useEpisodes'
-import { add, bookOutline, bookmark, chevronDown, language, playCircle, settings, settingsOutline } from 'ionicons/icons'
+import { add, bookOutline, bookmark, bulb, chevronDown, chevronUp, language, pauseCircle, playCircle, settings, settingsOutline } from 'ionicons/icons'
 import React, { useContext, useEffect, useState } from 'react'
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import Thumbnail from 'components/ui/Thumbnail'
 import SettingsModal from 'components/ui/SettingsModal'
+import Inspiration from 'components/ui/Inspiration'
+import TextDivider from 'components/ui/TextDivider'
 
 
 
@@ -38,6 +40,18 @@ const EpisodePage:React.FC = () => {
     
   });
 
+  const {user} = useContext(UserState);
+  let fontContrast = "text-gray-700 dark:text-gray-300";
+  if (user.fontContrast==="low") fontContrast = "text-gray-500";
+  if (user.fontContrast==="high") fontContrast = "text-black dark:text-white";
+  let fontSize = "text-lg";
+  if (user.fontSize==="small") fontSize = "text-sm";
+  if (user.fontSize==="large") fontSize = "text-xl";
+  let fontStyle = "font-serif";
+  if (user.fontStyle==="sanserif") fontStyle = "";
+
+
+
   useEffect(() => {
         //If current episode matches location, get the episode from the server
         const currentSlug = location.pathname.substring(location.pathname.lastIndexOf('/') + 1);
@@ -49,36 +63,34 @@ const EpisodePage:React.FC = () => {
   }, [player.list?.episodes[player.index], location.pathname])
   
 
+  const [showQuote, setShowQuote] = useState(false);  
   useEffect(() => {
     if (!episode) return;
-    //If the episode matches the current location and there's nothing playing, load the episode into the player
+    //TODO: If episode is not in the player, load it.
+
+    
+    if (showQuote === false && episode.isForbidden) setShowQuote(true);
   }, [episode]);
   
   
   //Prep episode data
-  const quote = (episode?.quote) ? `${episode?.quote}”` : undefined;
+  const quote = (episode?._quote) ? `${episode?._quote}”` : undefined;
   let imageUrl = episode?.imageUrl || "/img/godible-bg.jpg";
 
-
-  //TODO: Show quote only when no text available
-  const [showQuote, setShowQuote] = useState(true);  
   const controls = useAnimationControls();
   useEffect(() => {
       if (showQuote) controls.start({ rotate: 180 })
       else controls.start({ rotate: 0 })
   }, [showQuote]);
   const metaControls = useAnimationControls();
-  const metaControls2 = useAnimationControls();
-  const [showMeta, setShowMeta] = useState(true);  
+  const [showMeta, setShowMeta] = useState(false);  
   useEffect(() => {
       if (showMeta) {
-        metaControls.start({ rotate: 180 });
-        metaControls2.start({ width: 120 });
+        metaControls.start({ width: 120 });
 
       }
       else {
-        metaControls.start({ rotate: 0 });
-        metaControls2.start({ width: 60 });
+        metaControls.start({ width: 60 });
       }
   }, [showMeta]);''
 
@@ -110,7 +122,7 @@ const EpisodePage:React.FC = () => {
                   className="flex justify-center w-full cursor-pointer"
                   onClick={()=>setShowQuote(prev => !prev)}
                 >
-                <span className="ml-16 -mb-8 font-serif text-6xl leading-none text-white dark:text-white sm:text-7xl">
+                <span className="ml-6 -mb-8 font-serif text-6xl leading-none text-white dark:text-white sm:text-7xl">
                   “
                 </span>
                 <motion.div
@@ -133,7 +145,7 @@ const EpisodePage:React.FC = () => {
                       animate={{ height: "auto", opacity: 1}}
                       exit={{opacity: 0,  height: 0}}
                     >
-                    <div className="p-3 font-serif text-xl font-medium text-white dark:text-white">
+                    <div className="p-3 font-serif text-xl font-medium leading-relaxed text-white dark:text-white">
                       {quote}
                     </div>
                     </motion.div>
@@ -146,7 +158,7 @@ const EpisodePage:React.FC = () => {
       </div>
       <div className="flex justify-center px-4 py-4 width-full">  
         <div className="justify-center px-4" style={{ maxWidth: "768px"}}> 
-          <div className='flex justify-center w-full -ml-3 xs:ml-0'>
+          <div className='flex flex-wrap justify-center w-full -ml-3 xs:ml-0'>
             {(episode?._bookTitle && episode?._chapterName) && 
             <IonBreadcrumbs color="dark">
               <IonBreadcrumb href={episode?._bookPath}>{episode?._bookTitle}</IonBreadcrumb>
@@ -156,27 +168,19 @@ const EpisodePage:React.FC = () => {
             {(episode?._bookTitle && !episode?._chapterName) && 
               <IonBreadcrumb color="dark" href={episode?._bookPath}>{episode?._bookTitle}</IonBreadcrumb>
             }   
-            
-            <motion.div
-              key={"quote"}
-              animate={metaControls}
-              className="opacity-50"
-            >
               {episode?._metaDataBlocks &&
-              <IonButtons>
-                <IonButton fill="clear" size="small"  onClick={()=>setShowMeta(prev => !prev)} >
-                  <IonIcon icon={chevronDown} color="dark" size="small" slot="icon-only" />
+                <IonButton fill="clear" size="small" color="medium" onClick={()=>setShowMeta(prev => !prev)} >
+                  <IonIcon icon={showMeta ? chevronUp : chevronDown} color="medium" size="small" slot="start" />
+                  <IonLabel color="medium">{showMeta ? "Less" : "More"}</IonLabel>
                 </IonButton>
-              </IonButtons>
               }
-            </motion.div>
           </div>     
           <div className="flex flex-wrap justify-center w-full pb-8">
             <div className={`flex items-start justify-center sm:items-center w-full`}>
-              <motion.div className="overflow-hidden rounded-md pointer-cursor" onClick={()=>setShowMeta(prev => !prev)} animate={metaControls2}>
+              <motion.div className="overflow-hidden rounded-md pointer-cursor" onClick={()=>setShowMeta(prev => !prev)} animate={metaControls}>
                 <img 
                   src={episode?._bookImageUrl}
-                  className="w-full"
+                  className="w-full cursor-pointer"
                 />
               </motion.div>
                               
@@ -211,8 +215,8 @@ const EpisodePage:React.FC = () => {
           </div>   
           <div className="flex justify-center w-full pb-8">
               <IonButtons>
-                <IonButton fill="clear" size="small"  onClick={()=>{}} >
-                  <IonIcon icon={playCircle} color="medium" slot="icon-only" />
+                <IonButton fill="clear" size="small"  onClick={()=>{player.togglePlayPause()}} >
+                  <IonIcon icon={player.isPlaying ? pauseCircle : playCircle} color="medium" slot="icon-only" />
                 </IonButton>
               </IonButtons>
               <IonButtons>
@@ -281,7 +285,7 @@ const EpisodePage:React.FC = () => {
               default:
                 return(
                   <p
-                    className="pb-2 font-serif"
+                    className={`pb-2 leading-relaxed ${fontStyle} ${fontSize} ${fontContrast}`}
                   >
                     {line.replace(/#/g,'')}
                   </p>
@@ -289,6 +293,49 @@ const EpisodePage:React.FC = () => {
             } 
           })
         }
+        <div id="topics" className="flex flex-col w-full p-8 py-4 rounded-lg bg-dark dark:bg-light">
+            <h4 className="leading-relaxed">Godible is possible because of the support of listeners like you</h4>
+            <div className="flex items-center w-full space-x-2">
+            </div>
+        </div>
+        <div id="topics" className="flex flex-col w-full pt-8">
+            <h4 className="leading-none">Topics</h4>
+            <div className="flex flex-wrap items-center w-full space-x-2">
+              <IonChip>Outline</IonChip>
+              <IonChip>Outline</IonChip>
+              <IonChip>Outline</IonChip>
+              <IonChip>Outline</IonChip>
+              <IonChip>fga</IonChip>
+              <IonChip>Outline</IonChip>
+              <IonChip>fdafa</IonChip>
+              <IonChip>Outline</IonChip>
+            </div>
+        </div>
+        <div id="inspirations" className="flex flex-col w-full pt-8">
+          <div className="flex items-center justify-between w-full space-x-2">
+              <h4 className="leading-none">Inspirations</h4>
+              <IonChip>0</IonChip>
+          </div>
+          <form className="mb-6">
+          <div className="px-4 py-2 mb-4 bg-white border border-gray-200 rounded-lg rounded-t-lg dark:bg-gray-800 dark:border-gray-700">
+              <IonTextarea placeholder="Write an inspiration..." autoGrow></IonTextarea>
+          </div>
+          <div className="flex justify-end w-full">
+            <IonButton fill="clear" color="medium">
+              <IonToggle></IonToggle>
+              Private
+            </IonButton>
+            <IonButton color="primary">
+              <IonIcon icon={bulb} slot="start"/>
+              Save
+            </IonButton>
+          </div>
+          </form>
+        </div>
+        <Inspiration />
+        <TextDivider>Others&apos; Inspirations</TextDivider>
+        <div id="trending"></div>
+        <Inspiration />
         </div>
       </div>
       </IonContent>

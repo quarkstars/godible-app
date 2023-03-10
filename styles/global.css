@@ -236,15 +236,21 @@ body.dark .title-default, body.dark ion-list-header {
   line-height: 1.5;
   box-sizing: border-box;
 }
-h1, h2, h3, h4, h5, h6, p, ion-label {
+h1, h2, h3, h4, h5, h6, p, ion-label, ion-button, ion-item {
   color: #44585d;
 }
 
 
-.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6, .dark p, .dark ion-label {
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6, .dark p, .dark ion-label, .dark ion-item  {
   color: #a2a4ab;
 }
+.dark ion-list, .dark ion-item::part(native) {
+    background-color: rgba(0,0,0,0);
+}
 
+.dark ion-button  {
+  color: #eff0f1;
+}
 body {
   height: 100vh;
   background-color: #ecf0f1;

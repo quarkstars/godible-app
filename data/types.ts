@@ -21,6 +21,20 @@ export interface IUser extends ParseObjectToJson {
     imageUrl?: string,
     firstName?: string,
     lastName?: string,
+
+    //
+    heartCount?: number,
+    flagCount?: number,
+
+    
+    currentStreak?: number,
+    maxStreak?: number,
+    listeningSecondsTotal?: number,
+
+    lastEpisode?: IEpisode,
+    lastListId?: string,
+    lastEpisodePercent?: number,
+    lastEpisodeSeconds?: number,
 }
 
 export interface IList extends ParseObjectToJson {
@@ -55,7 +69,7 @@ export interface IEpisode  extends ParseObjectToJson {
     publishedAt?: number,
     searchText?: string,
     imageUrl?: string,
-    quote?: string,
+    quote?: ILangString,
     isForbidden?: boolean,
     metaData?: ILangString,
 
@@ -73,6 +87,7 @@ export interface IEpisode  extends ParseObjectToJson {
     _textBlocks?: string[],
     _authorImageUrl?: string,
     _metaDataBlocks?: string[],
+    _quote?: string,
 
 
 }
@@ -92,6 +107,7 @@ export interface IBook extends ParseObjectToJson{
     author?: ILangString,
     metaData?: ILangString,
     description?: ILangString,
+    tagline?: ILangString,
     buyLink?: ILangString,
 }
 
@@ -107,10 +123,22 @@ export interface ISpeech extends IList {
 }
 
 export interface IInspiration extends ParseObjectToJson {
-    episodeId?: string,
+    episodeId?: IEpisode, //name, slug, number, image
     userId?: string,
     bookId?: string,
-    heartCount?: number,
     isPublic?: boolean,
     text?: string,
+    user?: IUser,
+    flagCount?: number,
+    heartCount?: number,
+    //Appended when delivered to client
+    _isHearted: boolean,
+    _isFlagged: boolean,
+}
+
+export interface IInspirationFeedback extends ParseObjectToJson {
+    userId?: string,
+    inspirationId?: string,
+    isHearted: boolean,
+    isFlagged: boolean,
 }
