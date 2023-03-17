@@ -1,5 +1,5 @@
 import { IonButton, IonButtons, IonContent, IonIcon, IonLabel, IonPopover, useIonPopover } from '@ionic/react'
-import { ellipsisVertical, flag, heartOutline, pencil, trash } from 'ionicons/icons'
+import { ellipsisVertical, flag, flagOutline, heartOutline, pencil, trash } from 'ionicons/icons'
 import React, {useState} from 'react'
 
 
@@ -56,8 +56,19 @@ const Inspiration = () => {
             {/* TODO: Click to scroll to other inspirations */}
             <IonButtons>
                 <IonButton size="large">
+                    <IonIcon slot="start" icon={flagOutline} />
+                    {/* <IonLabel>Reported</IonLabel> */}
+                </IonButton>
+            </IonButtons>
+            <IonButtons>
+                <IonButton size="large">
                     <IonIcon slot="start" icon={heartOutline} />
                     <IonLabel>0</IonLabel>
+                </IonButton>
+            </IonButtons>
+            <IonButtons>
+                <IonButton size="small">
+                    <IonIcon slot="icon-only" size="small" icon={pencil} />
                 </IonButton>
             </IonButtons>
         </div>

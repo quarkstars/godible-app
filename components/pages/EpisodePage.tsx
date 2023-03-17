@@ -1,11 +1,11 @@
-import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonLabel, IonPage, IonTextarea, IonTitle, IonToggle, useIonModal, useIonViewWillEnter } from '@ionic/react'
+import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonLabel, IonPage, IonRippleEffect, IonTextarea, IonTitle, IonToggle, useIonModal, useIonViewWillEnter } from '@ionic/react'
 import { Player, UserState } from 'components/AppShell'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
 import { text, userDefaultLanguage } from 'data/translations'
 import { IEpisode } from 'data/types'
 import useEpisodes from 'hooks/useEpisodes'
-import { add, bookOutline, bookmark, bulb, chevronDown, chevronUp, language, pauseCircle, playCircle, settings, settingsOutline } from 'ionicons/icons'
+import { add, bookOutline, bookmark,  documentTextOutline, chevronDown, chevronUp, language, pauseCircle,  playCircle, settings, settingsOutline, documentText, megaphone, send, checkmarkCircle } from 'ionicons/icons'
 import React, { useContext, useEffect, useState } from 'react'
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import Thumbnail from 'components/ui/Thumbnail'
@@ -100,9 +100,16 @@ const EpisodePage:React.FC = () => {
     <IonPage>
     <IonHeader>
       <Toolbar>
-        <IonTitle>
-          {episode?._title}
-        </IonTitle>
+        {/* <IonTitle> */}
+          <div className='flex items-center justify-center flex-row w-full space-x-2'>
+            <div className="h-full flex items-center text-lg font-medium">{episode?._title}</div>
+            <IonButtons>
+              <IonButton size="small">
+                <IonIcon icon={documentTextOutline} slot="icon-only" />
+              </IonButton>
+            </IonButtons>
+          </div>
+        {/* </IonTitle> */}
       </Toolbar>
       </IonHeader>
       <IonContent>
@@ -301,14 +308,9 @@ const EpisodePage:React.FC = () => {
         <div id="topics" className="flex flex-col w-full pt-8">
             <h4 className="leading-none">Topics</h4>
             <div className="flex flex-wrap items-center w-full space-x-2">
-              <IonChip>Outline</IonChip>
-              <IonChip>Outline</IonChip>
-              <IonChip>Outline</IonChip>
-              <IonChip>Outline</IonChip>
-              <IonChip>fga</IonChip>
-              <IonChip>Outline</IonChip>
-              <IonChip>fdafa</IonChip>
-              <IonChip>Outline</IonChip>
+              <IonChip outline>God</IonChip>
+              <IonChip outline>Love</IonChip>
+              <IonChip outline>Joy</IonChip>
             </div>
         </div>
         <div id="inspirations" className="flex flex-col w-full pt-8">
@@ -317,23 +319,26 @@ const EpisodePage:React.FC = () => {
               <IonChip>0</IonChip>
           </div>
           <form className="mb-6">
-          <div className="px-4 py-2 mb-4 bg-white border border-gray-200 rounded-lg rounded-t-lg dark:bg-gray-800 dark:border-gray-700">
+          <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg rounded-t-lg dark:bg-gray-800 dark:border-gray-700">
               <IonTextarea placeholder="Write an inspiration..." autoGrow></IonTextarea>
           </div>
-          <div className="flex justify-end w-full">
-            <IonButton fill="clear" color="medium">
-              <IonToggle></IonToggle>
-              Private
-            </IonButton>
-            <IonButton color="primary">
-              <IonIcon icon={bulb} slot="start"/>
-              Save
-            </IonButton>
+          <div className='w-full items-center flex justify-between'>
+            <div className="font-bold  space-x-2 flex items-center text-primary ">
+              <IonIcon icon={checkmarkCircle} />
+              <span className="italic font-medium">Saved to Device</span>
+            </div>
+            <div className="flex justify-end items-center space-x-2">
+              <span className="text-medium italic">Private</span>
+              <IonButton color="medium" fill="clear">
+                <IonIcon icon={send} slot="end"/>
+                Publish
+              </IonButton>
+            </div>
           </div>
           </form>
         </div>
         <Inspiration />
-        <TextDivider>Others&apos; Inspirations</TextDivider>
+        <TextDivider>Public Inspirations</TextDivider>
         <div id="trending"></div>
         <Inspiration />
         </div>

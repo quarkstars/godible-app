@@ -3,7 +3,7 @@ import React from 'react'
 import { Redirect, Route } from 'react-router'
 
 import NotFoundPage from "components/pages/NotFoundPage";
-import { book, bookOutline, bulb, bulbOutline, cafe, cafeOutline, library, mic, micOutline, radio, radioOutline, search, searchOutline, square, } from "ionicons/icons";
+import { book, bookOutline, documentText, documentTextOutline, cafe, cafeOutline, library, mic, micOutline, radio, radioOutline, search, searchOutline, square, } from "ionicons/icons";
 import { FC } from "react";
 import SignUpPage from './pages/SignUpPage';
 import SignInPage from './pages/SignInPage';
@@ -90,8 +90,8 @@ export const pages:IPage[] = [
         label: "Inspirations",
         path: "/inspirations", //InspirationsPage
         component: InspirationsPage,
-        icon: bulb,
-        iosIcon: bulbOutline,
+        icon: documentText,
+        iosIcon: documentTextOutline,
         isNav: true,
         isExact: true,
         isRedirect: false,
