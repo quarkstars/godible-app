@@ -1,4 +1,4 @@
-import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonLabel, IonPage, IonRippleEffect, IonTextarea, IonTitle, IonToggle, useIonModal, useIonViewWillEnter } from '@ionic/react'
+import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonLabel, IonPage, IonRippleEffect, IonTextarea, IonTitle, IonToggle, IonToolbar, useIonModal, useIonViewWillEnter } from '@ionic/react'
 import { Player, UserState } from 'components/AppShell'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
@@ -12,6 +12,7 @@ import Thumbnail from 'components/ui/Thumbnail'
 import SettingsModal from 'components/ui/SettingsModal'
 import Inspiration from 'components/ui/Inspiration'
 import TextDivider from 'components/ui/TextDivider'
+import Inspirations from 'components/ui/Inspirations'
 
 
 
@@ -92,8 +93,12 @@ const EpisodePage:React.FC = () => {
       else {
         metaControls.start({ width: 60 });
       }
-  }, [showMeta]);''
+  }, [showMeta]);
 
+  const [presentInspirations, dismissInspirations] = useIonModal(EpisodeInspirations, {
+    onDismiss: (data: string, role: string) => dimissSettings(data, role),
+    episode,
+});
 
 
   return (
@@ -104,7 +109,11 @@ const EpisodePage:React.FC = () => {
           <div className='flex items-center justify-center flex-row w-full space-x-2'>
             <div className="h-full flex items-center text-lg font-medium">{episode?._title}</div>
             <IonButtons>
-              <IonButton size="small">
+              <IonButton size="small"
+                onClick={((e:any) => {
+                  presentInspirations()
+                })}
+              >
                 <IonIcon icon={documentTextOutline} slot="icon-only" />
               </IonButton>
             </IonButtons>
@@ -348,6 +357,30 @@ const EpisodePage:React.FC = () => {
         <PlayerControls />
       </IonFooter>
     </IonPage>
+  )
+}
+
+const EpisodeInspirations = ({inspirations, episode}) => {
+
+  return (    
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonButton color="medium" onClick={() => {}}>
+              Close
+            </IonButton>
+          </IonButtons>
+          <IonTitle>My Inspirations</IonTitle>
+          <IonButtons slot="end">
+            <IonButton onClick={() => {}}>New List</IonButton>
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
+    <IonContent class="ion-padding">
+    <Inspirations inspirations={inspirations} isTitleHidden episode={episode} />
+  </IonContent>  
+  </IonPage>
   )
 }
 

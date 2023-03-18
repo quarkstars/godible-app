@@ -38,7 +38,9 @@ export const PlayerControls = () => {
     });
     function openSettingsModal() {
         if (!player.list?.episodes || typeof player.index !== "number" ) return;
-        presentSettings();
+        presentSettings({
+            initialBreakpoint:0.85,
+        })
     }
 
     const bookmarkEpisode = () => {

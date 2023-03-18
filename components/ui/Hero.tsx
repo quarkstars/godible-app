@@ -118,10 +118,10 @@ const {
             </div>
         </div>
         {!scrollIsHidden &&
-          <div className="flex items-start justify-center w-full h-10 sm:hidden">
+          <div className="flex items-start justify-center w-full h-10 sm:hidden opacity-50">
             <div className='flex flex-col items-center justify-start'>
-              <span className="w-full text-xs uppercase text-medium">Scroll</span>
-              <IonIcon icon={chevronDown} color="medium" size="small" />
+              <span className="w-full text-xs uppercase text-dark">Scroll</span>
+              <IonIcon icon={chevronDown} color="light" size="small" />
             </div>
           </div>
         }

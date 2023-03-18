@@ -2,7 +2,7 @@ import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonImg, IonItem,
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
 import { IEpisode, IList } from 'data/types';
 import useEpisodes from 'hooks/useEpisodes';
-import { add, bookmarkOutline, ellipsisVertical, pauseCircle, playCircle, trash } from 'ionicons/icons';
+import { add, addCircle, addCircleOutline, bookmarkOutline, chevronForward, ellipsisVertical, eye, pauseCircle, playCircle, trash } from 'ionicons/icons';
 import React, {useRef, useMemo, useState, useContext} from 'react'
 import TextDivider from './TextDivider';
 import { Player } from 'components/AppShell';
@@ -58,7 +58,7 @@ const ListModal = (props: IPlayerListModalProps) => {
         episode: inspectedEpisode
     });
     const [presentMenu, dismissMenu] = useIonPopover(EpisodeMenu, {
-        onDismiss: (data: any, role: string) => dismissDetails(data, role),
+        onDismiss: (data: any, role: string) => dismissMenu(data, role),
         episode: inspectedEpisode
     });
 
@@ -84,14 +84,23 @@ const ListModal = (props: IPlayerListModalProps) => {
         {/* The reorder gesture is disabled by default, enable it to drag and drop items */}
         <IonReorderGroup disabled={false} onIonItemReorder={handleReorder}>
         {episodes.map((episode, index) => {
-          let weight = (index === props.index) ? "font-bold" : "font-normal"
+          let weight = (index === props.index) ? "font-bold" : "font-medium";
+          let highlight = (index === props.index) ? "light" : undefined;
           let isCurrent = (player.index === index);
           let isPlaying = (isCurrent && player.isPlaying)
           return(
-            <IonItem key={"list-"+episode.objectId}>
+            <IonItem 
+              key={"list-"+episode.objectId} 
+              color={highlight}
+              onClick={(e: any) => {
+                  props.onDismiss(episode.slug, "read")
+              }}
+              button
+            >
               <IonReorder slot="start"></IonReorder>
-              <div className="w-8 h-8 overflow-hidden rounded-lg cursor-pointer" 
+              <div className="w-10 h-10 overflow-hidden rounded-lg cursor-pointer" 
                 onClick={(e: any) => {
+                    e.stopPropagation();
                     setInspectedEpisode(episode);
                     presentDetails({
                     event: e,
@@ -101,13 +110,21 @@ const ListModal = (props: IPlayerListModalProps) => {
               >
                 <img  src={episode._bookImageUrl ? episode._bookImageUrl : episode.imageUrl} alt={episode._bookTitle} />
               </div>
-              <span className={`pl-3 ${weight}`}>{`Episode ${episode.number}`}</span>
+              <div className='flex flex-col'>
+                <span className={`pl-3 truncated ${weight}`}>{`Episode ${episode.number}`}</span>
+                <div className={`hidden xs:flex space-x-1 pl-3 text-medium font-medium text-xs items-center ${weight}`}>
+                  <span className="truncated">{episode?._bookTitle}</span>
+                   {episode?._chapterName && <IonIcon icon={chevronForward} /> }
+                   {episode?._chapterName && <span className="truncated">{episode?._chapterName}</span>}
+                  </div>
+              </div>
               <IonButtons slot="end">
                 <IonButton>
                   <IonIcon icon={isPlaying ? pauseCircle : playCircle} slot="icon-only" />
                 </IonButton>
                 <IonButton
                   onClick={(e: any) => {
+                      e.stopPropagation();
                       setInspectedEpisode(episode);
                       presentMenu({
                       event: e,
@@ -118,14 +135,6 @@ const ListModal = (props: IPlayerListModalProps) => {
                   <IonIcon icon={ellipsisVertical} slot="icon-only" />
                 </IonButton>
               </IonButtons>
-
-              <IonPopover trigger={`context-menu-trigger-${index}`} triggerAction="click">
-                <IonContent class="ion-padding">
-                  {episode._bookTitle && <span className="pb-2 pr-2 font-bold">{episode._bookTitle}</span>}
-                  <br/>
-                  {episode._bookTitle && <span>{episode._metaDataBlocks?.join(" \n ")}</span>}
-                </IonContent>
-              </IonPopover>
             </IonItem>
           )
         })
@@ -143,6 +152,11 @@ const EpisodeDetails = ({episode}) => {
     {episode?._bookTitle && <span className="pb-2 pr-2 font-bold">{episode?._bookTitle}</span>}
     <br/>
     {episode?._bookTitle && <span>{episode?._metaDataBlocks?.join(" \n ")}</span>}
+    <br/>
+    {/* <IonButton fill="clear" size="small">
+      <IonIcon icon={eye}  color="medium" slot="start" />
+      Read
+    </IonButton> */}
   </IonContent>  )
 }
 
@@ -150,6 +164,14 @@ const EpisodeMenu = ({episode}) => {
   return (    
     <IonContent class="ion-padding">
             <ul className="py-1 text-sm text-gray-700 dark:text-gray-200">
+                {/* <li>
+                <IonButton fill="clear" expand="block" >
+                    <div className="flex items-center justify-start w-full space-x-2">
+                        <IonIcon icon={eye}  color="medium" />
+                        <IonLabel>Read</IonLabel>
+                    </div>
+                </IonButton>
+                </li> */}
                 <li>
                 <IonButton fill="clear" expand="block" >
                     <div className="flex items-center justify-start w-full space-x-2">
@@ -161,13 +183,13 @@ const EpisodeMenu = ({episode}) => {
                 <li>
                 <IonButton fill="clear" expand="block" >
                     <div className="flex items-center justify-start w-full space-x-2">
-                        <IonIcon icon={add} color="medium"/>
+                        <IonIcon icon={addCircleOutline} color="medium"/>
                         <IonLabel >Other List</IonLabel>
                     </div>
                 </IonButton>
                 </li>
                 <li>
-                <TextDivider>!</TextDivider>
+                <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
                 <IonButton fill="clear" expand="block" >
                     <div className="flex items-center justify-start w-full space-x-2">
                         <IonIcon icon={trash} color="danger" />

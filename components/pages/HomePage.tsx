@@ -2,7 +2,7 @@ import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonMe
 import Hero from 'components/ui/Hero';
 import SlideList from 'components/ui/SlideList';
 import Toolbar from 'components/ui/Toolbar';
-import { add, arrowForwardOutline, logIn, logInOutline, playCircle } from 'ionicons/icons'
+import { add, addCircleOutline, arrowForwardOutline, logIn, logInOutline, playCircle } from 'ionicons/icons'
 import { Swiper, SwiperSlide } from "swiper/react";
 import React, { useState, useContext, useEffect, useRef } from 'react'
 import Thumbnail from 'components/ui/Thumbnail';
@@ -92,7 +92,7 @@ const HomePage:React.FC = () => {
                   mainButtonIcon={playCircle}
                   onClickMain={(e) => handleListenClick(e, index)}
                   subButtonText={"List"}
-                  subButtonIcon={add}
+                  subButtonIcon={addCircleOutline}
                   onClickSub={() => router.push("/")}
                   overlayColor={"rgba(0,0,0,.6)"}
                   bgImageUrl={episode.imageUrl}

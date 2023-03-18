@@ -479,3 +479,16 @@ ion-item.selected {
 }
 
 /* END CHIP OUTLINE */
+
+/* POPOVER OUTLINE */
+
+ion-popover::part(content) {
+  width:auto;
+  max-width: 300px;
+}
+
+/* END POPOVER OUTLINE */
+
+ion-modal::part(content) {
+  border-radius: 10px;
+}

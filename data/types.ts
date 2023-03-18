@@ -113,11 +113,12 @@ export interface IBook extends ParseObjectToJson{
 
 //TODO: Do the languages mirror each other perfectly?
 export interface ISpeech extends IList {
-    speechName?: ILangString,
+    // speechName?: ILangString,
     slug?: string, //This would be book slug+speech name
-    book?: IBook,
-    startIndex?: number,
-    endIndex?: number,
+    // book?: IBook, 
+    metaData?: ILangString,
+    // startIndex?: number,
+    // endIndex?: number,
     //If the speech is only available in a certain language
     language?: string,
 }
@@ -142,3 +143,4 @@ export interface IInspirationFeedback extends ParseObjectToJson {
     isHearted: boolean,
     isFlagged: boolean,
 }
+
