@@ -5,7 +5,7 @@ import Toolbar from 'components/ui/Toolbar'
 import { text, userDefaultLanguage } from 'data/translations'
 import { IEpisode } from 'data/types'
 import useEpisodes from 'hooks/useEpisodes'
-import { add, bookOutline, bookmark,  documentTextOutline, chevronDown, chevronUp, language, pauseCircle,  playCircle, settings, settingsOutline, documentText, megaphone, send, checkmarkCircle } from 'ionicons/icons'
+import { add, bookOutline, bookmark,  documentTextOutline, chevronDown, chevronUp, language, pauseCircle,  playCircle, settings, settingsOutline, documentText, megaphone, send, checkmarkCircle, calendar, close, addCircleOutline } from 'ionicons/icons'
 import React, { useContext, useEffect, useState } from 'react'
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import Thumbnail from 'components/ui/Thumbnail'
@@ -26,7 +26,9 @@ const EpisodePage:React.FC = () => {
     });
     function openSettingsModal() {
         if (!player.list?.episodes || typeof player.index !== "number" ) return;
-        presentSettings();
+        presentSettings({
+          initialBreakpoint:0.85,
+      });
     }
   
   const {
@@ -111,7 +113,9 @@ const EpisodePage:React.FC = () => {
             <IonButtons>
               <IonButton size="small"
                 onClick={((e:any) => {
-                  presentInspirations()
+                  presentInspirations({
+                    initialBreakpoint:0.85,
+                })
                 })}
               >
                 <IonIcon icon={documentTextOutline} slot="icon-only" />
@@ -242,7 +246,7 @@ const EpisodePage:React.FC = () => {
               </IonButtons>
               <IonButtons>
                 <IonButton fill="clear" size="small"  onClick={()=>{}} >
-                  <IonIcon icon={add} color="medium" slot="icon-only" />
+                  <IonIcon icon={addCircleOutline} color="medium" slot="icon-only" />
                 </IonButton>
               </IonButtons>
               <IonButtons>
@@ -367,13 +371,15 @@ const EpisodeInspirations = ({inspirations, episode}) => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton color="medium" onClick={() => {}}>
-              Close
+            <IonButton onClick={() => {}}>
+              <IonIcon icon={close} slot="icon-only" />
             </IonButton>
           </IonButtons>
-          <IonTitle>My Inspirations</IonTitle>
+          <IonTitle>Inspirations</IonTitle>
           <IonButtons slot="end">
-            <IonButton onClick={() => {}}>New List</IonButton>
+            <IonButton onClick={() => {}}>
+              <IonIcon icon={calendar} slot="icon-only" />
+            </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>

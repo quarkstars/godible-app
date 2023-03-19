@@ -2,8 +2,9 @@ import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabe
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
 import { Player, Theme, UserState } from 'components/AppShell';
 import { IEpisode, IList } from 'data/types';
-import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff } from 'ionicons/icons';
+import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close } from 'ionicons/icons';
 import React, {useRef, useContext} from 'react'
+import TextDivider from './TextDivider';
 
 interface IPlayerListModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
@@ -41,12 +42,16 @@ const SettingsModal = (props: IPlayerListModalProps) => {
         <IonToolbar>
           <IonButtons slot="start">
             <IonButton color="medium" onClick={() => props.onDismiss(null, 'close')}>
-              Close
+              <IonIcon icon={close} slot="icon-only"/>
+              {/* Default */}
             </IonButton>
           </IonButtons>
           <IonTitle>Settings</IonTitle>
           <IonButtons slot="end">
-            <IonButton onClick={() => props.onDismiss(null, 'undo')}>Undo</IonButton>
+            <IonButton onClick={() => props.onDismiss(null, 'undo')}>
+              <IonIcon icon={refresh} slot="icon-only"/>
+              {/* Default */}
+            </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
@@ -65,18 +70,16 @@ const SettingsModal = (props: IPlayerListModalProps) => {
             />
           </IonItem>
           <IonItem>
-            <IonLabel><span className="block">Theme</span></IonLabel>
-              <IonToggle
-                slot="end"
-                name="darkMode"
-                checked={theme.isDark}
-                onClick={() => {theme.setIsDark(!theme.isDark)}}
-              />
-            <IonIcon slot={'end'} icon={theme.isDark ?  moonOutline : sunnyOutline} />
+            <IonIcon slot={'start'} icon={theme.isDark ?  moonOutline : sunnyOutline} />
+            <IonToggle
+              name="darkMode"
+              checked={theme.isDark}
+              onClick={() => {theme.setIsDark(!theme.isDark)}}
+            />
           </IonItem>
           <IonItem> 
-            <IonLabel><span className="hidden xs:block">Language</span></IonLabel>
-            <IonButtons slot="end">
+            <IonIcon icon={languageIcon} slot="start" />
+            <IonButtons>
               <IonButton 
                 size="small" 
                 color={(language === "english" || typeof language === "undefined") ? "dark" : "medium"} 
@@ -99,10 +102,10 @@ const SettingsModal = (props: IPlayerListModalProps) => {
               </IonButton>
             </IonButtons>
         </IonItem>
-        <IonItem></IonItem>
+        <IonItem><IonIcon slot="start"></IonIcon></IonItem>
         <IonItem> 
-          <IonLabel><span className="hidden xs:block">Font</span></IonLabel>
-          <IonButtons slot="end">
+          <IonIcon icon={text} slot="start" />
+          <IonButtons>
               <IonButton 
                 size="small" 
                 color={(fontStyle === "serif" || typeof fontStyle === "undefined") ? "dark" : "medium"} 
@@ -126,8 +129,8 @@ const SettingsModal = (props: IPlayerListModalProps) => {
           </IonButtons>
         </IonItem>
         <IonItem> 
-          <IonLabel><span className="hidden xs:block">Size</span></IonLabel>
-          <IonButtons slot="end">
+          <IonIcon icon={trendingUp} slot="start" />
+          <IonButtons>
               <IonButton 
                 size="small" 
                 color={fontSize === "small" ? "dark" : "medium"} 
@@ -159,10 +162,13 @@ const SettingsModal = (props: IPlayerListModalProps) => {
               <span className="text-xl capitalize">Large</span>
             </IonButton>
           </IonButtons>
+          <div className='-space-x-2 '>
+          </div>
+
         </IonItem>
         <IonItem> 
-          <IonLabel><span className="hidden xs:block">Contrast</span></IonLabel>
-          <IonButtons slot="end">
+          <IonIcon icon={contrast} slot="start" />
+          <IonButtons>
               <IonButton 
                 size="small" 
                 onClick={() => {

@@ -489,6 +489,9 @@ ion-popover::part(content) {
 
 /* END POPOVER OUTLINE */
 
+/* MODAL RADIUS */
+/* TODO: When under certain size, then. Not sure how to control if modal is sheet or not */
 ion-modal::part(content) {
   border-radius: 10px;
 }
+/* END MODAL RADIUS */

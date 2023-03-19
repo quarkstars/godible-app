@@ -28,7 +28,7 @@ const Inspiration = () => {
                         src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
                         alt="Michael Gough" />Me</p>
                 <p className="text-sm italic text-medium">
-                    Private · Feb 8, 22
+                    Public · Feb 8, 22
                 {/* <time pubdate datetime="2022-02-08" title="February 8th, 2022">Feb. 8, 2022</time> */}
                 </p>
             </div>      
@@ -49,19 +49,18 @@ const Inspiration = () => {
 
             </IonPopover>
         </footer>
-        <p className="text-gray-600 dark:text-gray-300">Very straight-to-point article. Really worth time reading. Thank you! But tools are just the
-            instruments for the UX designers. The knowledge of the design tools are as important as the
-            creation of the design strategy.</p>
+        <p className="text-gray-600 dark:text-gray-300">I am so motivated to learn about church history from this Godible. This is an area I haven&apos;t spent enough time and is so important to pass to the next generation.
+            </p>
         <div className="flex items-center mt-4 space-x-4">
             {/* TODO: Click to scroll to other inspirations */}
             <IonButtons>
-                <IonButton size="large">
+                <IonButton size="small">
                     <IonIcon slot="start" icon={flagOutline} />
                     {/* <IonLabel>Reported</IonLabel> */}
                 </IonButton>
             </IonButtons>
             <IonButtons>
-                <IonButton size="large">
+                <IonButton size="small">
                     <IonIcon slot="start" icon={heartOutline} />
                     <IonLabel>0</IonLabel>
                 </IonButton>
