@@ -6,7 +6,7 @@ import Thumbnail from './Thumbnail';
 import { UserState } from 'components/AppShell';
 import { userDefaultLanguage } from 'data/translations';
 
-interface IEpisodeListItemProps {
+interface ISpeechListItemProps {
   list: ISpeech,
   onPlay?: (e: any) => void,
   onAdd?: (e: any) => void,
@@ -14,7 +14,7 @@ interface IEpisodeListItemProps {
   highlightStrings?: string[]
 }
 
-const SpeechListItem = (props: IEpisodeListItemProps) => {
+const SpeechListItem = (props: ISpeechListItemProps) => {
   const list = props.list;
 
   const {
@@ -70,13 +70,13 @@ const SpeechListItem = (props: IEpisodeListItemProps) => {
         <span className='pl-3 line text-light font-medium text-md'>Speech</span>
       
         <div className="w-4 h-4 overflow-hidden rounded-lg hidden xs:block" >
-          <img src={firstEpisode.imageUrl} alt={firstEpisode._bookTitle} />
+          <img src={firstEpisode.imageUrl} alt={firstEpisode.number?.toString()} />
         </div>
         <div className="hidden xs:block">
           <IonIcon color="medium" icon={chevronForward} /> 
         </div>
         <div className="w-4 h-4 overflow-hidden rounded-lg hidden xs:block" >
-          <img src={lastEpisode.imageUrl} alt={firstEpisode._bookTitle} />
+          <img src={lastEpisode.imageUrl} alt={lastEpisode.number?.toString()} />
         </div>
         <span className='line text-medium italic text-sm hidden sm:block pl-4'>{`${list.episodes.length} Episodes `}</span>
 

@@ -1,19 +1,16 @@
-import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail } from '@ionic/react'
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonRange, IonReorder, IonReorderGroup, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail } from '@ionic/react'
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
 import { Player, Theme, UserState } from 'components/AppShell';
 import { IEpisode, IList } from 'data/types';
-import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send } from 'ionicons/icons';
+import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close } from 'ionicons/icons';
 import React, {useRef, useContext} from 'react'
 import TextDivider from './TextDivider';
-import InitialsAvatar from 'react-initials-avatar';
 
-interface IPlayerListModalProps {
+interface IOnboardingModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
-  isProfile?: boolean,
-
 }
 
-const SettingsModal = (props: IPlayerListModalProps) => {
+const OnboardingModal = (props: IOnboardingModalProps) => {
 
   //TODO: Get translations
 
@@ -50,87 +47,16 @@ const SettingsModal = (props: IPlayerListModalProps) => {
             </IonButton>
           </IonButtons>
           <IonTitle>Settings</IonTitle>
-            <IonIcon icon={checkmarkCircle} slot="end" className="ion-padding" />
-            {/* <IonSpinner name="dots" slot="end" className="ion-padding" /> */}
+          <IonButtons slot="end">
+            <IonButton onClick={() => props.onDismiss(null, 'undo')}>
+              <IonIcon icon={refresh} slot="icon-only"/>
+              {/* Default */}
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        {props.isProfile && 
-        <>
-          <IonItem>               
-            <div
-                  className="w-20 h-20 rounded-full overflow-hidden"
-                >
-                  {user.imageUrl ?
-                      <img 
-                          src={user.imageUrl} 
-                          alt="My Profile" 
-                          className='p-2'
-                      />
-                  :
-                      <div
-                          className='p-2'
-                      >
-                          <InitialsAvatar name={`${user.firstName} ${user.lastName}`}  />
-                      </div>
-                  }
-              </div>
-            <IonButtons>
-              <IonButton 
-                size="small" 
-                color="medium"
-
-              >
-                Clear
-              </IonButton>
-              <IonButton 
-                size="small" 
-                fill="outline"
-                color="medium"
-
-              >                
-                Change
-              </IonButton>
-            </IonButtons>
-          </IonItem>
-            <div className="grid grid-cols-2 gap-4 w-full">
-              <div className="mb-6 form-group">
-                  <IonItem>
-                    <IonLabel position='floating'>First name</IonLabel>
-                    <IonInput 
-                      placeholder="First" 
-                      // onIonChange={(event) => setFirst(typeof event.target.value === "string" ? event.target.value : "")}
-                    >
-
-                    </IonInput>
-                  </IonItem>
-              </div>
-              <div className="mb-6 form-group">
-                  <IonItem>
-                    <IonLabel position='floating'>Last name</IonLabel>
-                    <IonInput 
-                      placeholder="Last" 
-                      // onIonChange={(event) => setLast(typeof event.target.value === "string" ? event.target.value : "")}
-                    >
-
-                    </IonInput>
-                  </IonItem>
-              </div>
-            </div>
-            <div className="w-full">
-                  <IonItem>
-                    <IonLabel position='floating'>Email</IonLabel>
-                    <IonInput 
-                      placeholder="Email" 
-                      // onIonChange={(event) => setFirst(typeof event.target.value === "string" ? event.target.value : "")}
-                    >
-
-                    </IonInput>
-                  </IonItem>
-            </div>
-            </>}
         <IonList>
-          {!props.isProfile &&
           <IonItem> 
             <IonIcon icon={volumeIcon} />
             <IonRange
@@ -143,7 +69,6 @@ const SettingsModal = (props: IPlayerListModalProps) => {
                 }}
             />
           </IonItem>
-          }
           <IonItem>
             <IonIcon slot={'start'} icon={theme.isDark ?  moonOutline : sunnyOutline} />
             <IonToggle
@@ -177,85 +102,6 @@ const SettingsModal = (props: IPlayerListModalProps) => {
               </IonButton>
             </IonButtons>
         </IonItem>
-        
-        {props.isProfile && <>
-        <IonItem><IonIcon slot="start"></IonIcon></IonItem>
-        <IonItem> 
-            <IonIcon icon={alarm} slot="start" />
-            <IonLabel>Daily Reminder Time</IonLabel>
-            <IonSelect value="5" interface="action-sheet" slot="end" >
-              <IonSelectOption value="0">12:00 AM</IonSelectOption>
-              <IonSelectOption value="1">1:00 AM</IonSelectOption>
-              <IonSelectOption value="2">2:00 AM</IonSelectOption>
-              <IonSelectOption value="3">3:00 AM</IonSelectOption>
-              <IonSelectOption value="4">4:00 AM</IonSelectOption>
-              <IonSelectOption value="5">5:00 AM</IonSelectOption>
-              <IonSelectOption value="6">6:00 AM</IonSelectOption>
-              <IonSelectOption value="7">7:00 AM</IonSelectOption>
-              <IonSelectOption value="8">8:00 AM</IonSelectOption>
-              <IonSelectOption value="9">9:00 AM</IonSelectOption>
-              <IonSelectOption value="10">10:00 AM</IonSelectOption>
-              <IonSelectOption value="11">11:00 AM</IonSelectOption>
-              <IonSelectOption value="12">12:00 PM</IonSelectOption>
-              <IonSelectOption value="13">1:00 PM</IonSelectOption>
-              <IonSelectOption value="14">2:00 PM</IonSelectOption>
-              <IonSelectOption value="15">3:00 PM</IonSelectOption>
-              <IonSelectOption value="16">4:00 PM</IonSelectOption>
-              <IonSelectOption value="17">5:00 PM</IonSelectOption>
-              <IonSelectOption value="18">6:00 PM</IonSelectOption>
-              <IonSelectOption value="19">7:00 PM</IonSelectOption>
-              <IonSelectOption value="20">8:00 PM</IonSelectOption>
-              <IonSelectOption value="21">9:00 PM</IonSelectOption>
-              <IonSelectOption value="22">10:00 PM</IonSelectOption>
-              <IonSelectOption value="23">11:00 PM</IonSelectOption>
-            </IonSelect>
-        </IonItem>
-        <IonItem> 
-            <IonIcon icon={send} slot="start" />
-            <IonLabel>Send Me</IonLabel>
-
-                <IonSelect value="newest" slot="end">
-                  <IonSelectOption value="newest">Newest release</IonSelectOption>
-                  <IonSelectOption value="next">My next episode</IonSelectOption>
-                </IonSelect>
-        </IonItem>
-        <IonItem> 
-            <IonIcon icon={mail} slot="start" />
-            <IonLabel>Email ON</IonLabel>
-            <IonToggle
-              name="darkMode"
-              // checked={theme.isDark}
-              onClick={() => {}}
-            />
-        </IonItem>
-        
-        <IonItem> 
-            <IonIcon icon={notifications} slot="start" />
-            <IonLabel>Push Notification ON</IonLabel>
-            <IonToggle
-              name="darkMode"
-              // checked={theme.isDark}
-              onClick={() => {}}
-            />
-        </IonItem>
-        <IonItem> 
-            <IonIcon icon={chatbox} slot="start" />
-            <IonLabel>Text Message ON</IonLabel>
-            <IonToggle
-              name="darkMode"
-              // checked={theme.isDark}
-              onClick={() => {}}
-            />
-        </IonItem>
-        <IonItem> 
-            <IonIcon icon={phonePortraitOutline} slot="start" />    
-            <IonLabel>Phone</IonLabel>
-
-            <IonInput type="tel" placeholder='1 (000) 000-0000'>
-
-            </IonInput>
-        </IonItem>
-        </>}
         <IonItem><IonIcon slot="start"></IonIcon></IonItem>
         <IonItem> 
           <IonIcon icon={text} slot="start" />
@@ -358,4 +204,4 @@ const SettingsModal = (props: IPlayerListModalProps) => {
   )
 }
 
-export default SettingsModal
+export default OnboardingModal

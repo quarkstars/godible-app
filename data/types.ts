@@ -41,6 +41,9 @@ export interface IList extends ParseObjectToJson {
     name?: string,
     user?: IUser,
     episodes: IEpisode[],
+
+    // If came from a speech, the metaData will be added here. 
+    description?: string,
     
     //public list for speeches
     isPublic?: boolean,
