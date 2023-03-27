@@ -40,6 +40,7 @@ const BooksPage:React.FC = () => {
             })
             }
             </div>
+        <div className='text-medium w-full text-center py-5'>{`Copyright © ${new Date().getFullYear()}, FFWPU USA. All Rights Reserved.`}</div>
       </IonContent>
       <IonFooter>
         <PlayerControls />

@@ -13,6 +13,7 @@ import SettingsModal from 'components/ui/SettingsModal'
 import Inspiration from 'components/ui/Inspiration'
 import TextDivider from 'components/ui/TextDivider'
 import Inspirations from 'components/ui/Inspirations'
+import Copyright from 'components/ui/Copyright'
 
 
 
@@ -98,7 +99,7 @@ const EpisodePage:React.FC = () => {
   }, [showMeta]);
 
   const [presentInspirations, dismissInspirations] = useIonModal(EpisodeInspirations, {
-    onDismiss: (data: string, role: string) => dimissSettings(data, role),
+    onDismiss: (data: string, role: string) => dismissInspirations(data, role),
     episode,
 });
 
@@ -196,7 +197,7 @@ const EpisodePage:React.FC = () => {
               }
           </div>     
           <div className="flex flex-wrap justify-center w-full pb-8">
-            <div className={`flex items-start justify-center sm:items-center w-full`}>
+            <div className={`flex items-start justify-center sm:items-center w-auto`}>
               <motion.div className="overflow-hidden rounded-md pointer-cursor" onClick={()=>setShowMeta(prev => !prev)} animate={metaControls}>
                 <img 
                   src={episode?._bookImageUrl}
@@ -313,6 +314,7 @@ const EpisodePage:React.FC = () => {
             } 
           })
         }
+        <Copyright />
         <div id="topics" className="flex flex-col w-full p-8 py-4 rounded-lg bg-dark dark:bg-light">
             <h4 className="leading-relaxed">Godible is possible because of the support of listeners like you</h4>
             <div className="flex items-center w-full space-x-2">
@@ -364,23 +366,25 @@ const EpisodePage:React.FC = () => {
   )
 }
 
-const EpisodeInspirations = ({inspirations, episode}) => {
+const EpisodeInspirations = ({onDismiss, inspirations, episode}) => {
 
   return (    
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton onClick={() => {}}>
+            <IonButton 
+                onClick={() => onDismiss(null, 'close')}
+              >
               <IonIcon icon={close} slot="icon-only" />
             </IonButton>
           </IonButtons>
           <IonTitle>Inspirations</IonTitle>
-          <IonButtons slot="end">
+          {/* <IonButtons slot="end">
             <IonButton onClick={() => {}}>
               <IonIcon icon={calendar} slot="icon-only" />
             </IonButton>
-          </IonButtons>
+          </IonButtons> */}
         </IonToolbar>
       </IonHeader>
     <IonContent class="ion-padding">

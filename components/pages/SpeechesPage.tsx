@@ -4,30 +4,13 @@ import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
 import { sampleBooks } from 'data/sampleEpisodes'
 import React from 'react'
+import SearchPage from './SearchPage'
 
-const BooksPage:React.FC = () => {
+const SpeechesPage:React.FC = () => {
 
-  let book = sampleBooks[0]
   return (
-    <IonPage>
-      <IonHeader>
-        <Toolbar>
-          <IonTitle>
-            Speeches
-          </IonTitle>
-        </Toolbar>
-      </IonHeader>
-      <IonContent>
-        <div className="flex flex-col p-4 pt-4 sm:p-10 sm:pt-6">
-
-        </div>
-        <div id="episodes"></div>
-      </IonContent>
-      <IonFooter>
-        <PlayerControls />
-      </IonFooter>
-    </IonPage>
+    <SearchPage defaultMode="speeches" />
   )
 }
 
-export default BooksPage
+export default SpeechesPage

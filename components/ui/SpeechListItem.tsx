@@ -21,7 +21,7 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
     language
   } = useContext(UserState);
   const lang = (language) ? language : userDefaultLanguage;
-  const bookImageUrl = list.episodes[0]?.book?.imageUrl;
+  const imageUrl = list.episodes[0]?.book?.imageUrl || list.episodes[0]?.imageUrl;
   const firstEpisode = list.episodes[0];
   const lastEpisode = list.episodes[list.episodes.length-1]
   const metaData = list.metaData?.[lang];
@@ -54,30 +54,32 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
       }
     >
      <Thumbnail
-      imageUrl={bookImageUrl}
+      imageUrl={imageUrl}
       size={64}
       overlayColor='#000000'
      >
       <div className="flex flex-col font-bold text-white items-center">
         <span>{firstEpisode.number}</span>
+        {list.episodes.length > 1 && <>
         <span className="text-xs leading-none font-medium">to</span>
         <span>{lastEpisode.number}</span>
+        </>}
       </div>
      </Thumbnail>
     </div>
     <div className='flex flex-col'>
       <div className='flex space-x-1 items-center'>
-        <span className='pl-3 line text-light font-medium text-md'>Speech</span>
+        <span className='pl-3 line text-light font-medium text-md dark:text-dark'>Speech</span>
       
-        <div className="w-4 h-4 overflow-hidden rounded-lg hidden xs:block" >
+        {/* <div className="w-4 h-4 overflow-hidden rounded-lg hidden xs:block" >
           <img src={firstEpisode.imageUrl} alt={firstEpisode.number?.toString()} />
         </div>
         <div className="hidden xs:block">
           <IonIcon color="medium" icon={chevronForward} /> 
         </div>
         <div className="w-4 h-4 overflow-hidden rounded-lg hidden xs:block" >
-          <img src={lastEpisode.imageUrl} alt={lastEpisode.number?.toString()} />
-        </div>
+          <img src={lastEpisode.imageUrl} alt={firstEpisode.number?.toString()} />
+        </div> */}
         <span className='line text-medium italic text-sm hidden sm:block pl-4'>{`${list.episodes.length} Episodes `}</span>
 
       </div>

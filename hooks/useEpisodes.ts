@@ -39,7 +39,7 @@ const useEpisodes = () => {
         //If bookTitle exists but not in user's language, use book's default language
         if (!_bookTitle && episode?.book?.title) _bookTitle = episode?.book.title[episode?.book.title.defaultLanguage];
         let _title = `${text["Episode"][_lang]} ${number}`;
-        if (episode?.customTitle) _title = episode?.customTitle;
+        if (episode?.customTitle) _title = episode?.customTitle[_lang];
         let _fullTitle = (_bookTitle) ? _bookTitle + " " + _title : _title;
         if (!_title) _title = text["Episode"][_lang]+ " " + episode?.number;
         const _path = "/episode/" + episode?.slug;

@@ -1,13 +1,15 @@
-import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover } from '@ionic/react'
+import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover, IonFooter } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { BookCard } from 'components/ui/BookCard'
 import CardList from 'components/ui/CardList'
+import Copyright from 'components/ui/Copyright'
 import EpisodeListItem from 'components/ui/EpisodeListItem'
+import { PlayerControls } from 'components/ui/PlayerControls'
 import SpeechListItem from 'components/ui/SpeechListItem'
 import TextDivider from 'components/ui/TextDivider'
 import Thumbnail from 'components/ui/Thumbnail'
 import Toolbar from 'components/ui/Toolbar'
-import { sampleBooks, sampleEpisodes } from 'data/sampleEpisodes'
+import { sampleBooks, sampleEpisodes, sampleTopics } from 'data/sampleEpisodes'
 import useEpisodes from 'hooks/useEpisodes'
 import { bulb, card, chevronDown, closeCircle, filter, grid, list } from 'ionicons/icons'
 import React, {useRef, useState, useContext} from 'react'
@@ -28,13 +30,14 @@ interface ISearchPageProps {
 }
 
 
-const SearchPage:React.FC = (props: ISearchPageProps) => {
+const SearchPage = (props: ISearchPageProps) => {
 
   
   const player = useContext(Player);
   const {appendEpisodeStrings} = useEpisodes();
 
   const [episodeWidth, setEpisodeWidth] = useState<number>(148);
+  const [topicWidth, setTopicWidth] = useState<number>(148);
   const [bookWidth, setBookWidth] = useState<number>(376);
   const [display, setDisplay] = useState<string|undefined>(props.defaultDisplay);
   let displayIcon = list;
@@ -111,19 +114,23 @@ const SearchPage:React.FC = (props: ISearchPageProps) => {
                         <IonIcon icon={closeCircle}></IonIcon>
                       </IonChip>
                       
-                    <IonChip outline>God</IonChip>
+                    <IonChip outline>Heavenly Parent</IonChip>
                     <IonChip outline>Love</IonChip>
                     <IonChip outline>Joy</IonChip>
-                    <IonChip outline>God</IonChip>
                     <IonChip outline>Love</IonChip>
-                    <IonChip outline>Joy</IonChip>
+                    <IonChip outline>True Parents</IonChip>
+                    <IonChip outline>History</IonChip>
+                    <IonChip outline>Faith</IonChip>
                   </div>
                 </div>
                 <div className="-ml-3">
               </div>
             </div>
           </div>
+          {mode !== "speeches" && 
           <TextDivider>Books</TextDivider>
+          }
+          {mode !== "speeches" && 
           <div className='w-full flex justify-center'>
             <div className="flex flex-col w-full items-center" style={{maxWidth:"768px"}}>
               <CardList spaceBetween={10} setItemWidth={setBookWidth} idealWidth={376}>
@@ -144,27 +151,28 @@ const SearchPage:React.FC = (props: ISearchPageProps) => {
               </CardList>
             </div>
           </div>
-          <TextDivider>Topics</TextDivider>
-          <div className='w-full flex justify-center'>
+          }
+          {mode !== "speeches" && <TextDivider>Topics</TextDivider>}
+          {mode !== "speeches" && <div className='w-full flex justify-center'>
             <div className="flex flex-col w-full items-center" style={{maxWidth:"768px"}}>
-              <CardList spaceBetween={10} setItemWidth={setEpisodeWidth} idealWidth={150}>
-                {sampleEpisodes.map((episode, index) => {
+              <CardList spaceBetween={10} setItemWidth={setTopicWidth} idealWidth={150}>
+                {sampleTopics.map((topic, index) => {
                   return (
                     <Thumbnail 
-                      size={episodeWidth}
-                      imageUrl={episode.imageUrl}
+                      size={topicWidth}
+                      imageUrl={topic.imageUrl}
                       overlayColor='#000000'
                       key={index}
                     >
-                      <span className="text-2xl font-bold text-white">Topic</span>
+                      <span className="text-2xl font-bold text-white w-full text-center px-2">{topic.name?.english}</span>
                     </Thumbnail>
                   )
                 })
                 }
               </CardList>
             </div>
-          </div>
-          <TextDivider>
+          </div>}
+          {mode !== "speeches" && <TextDivider>
             <div className="flex items-center">
               <span>Episodes</span>
               <IonButton 
@@ -180,6 +188,8 @@ const SearchPage:React.FC = (props: ISearchPageProps) => {
               </IonButton>
             </div>
           </TextDivider>
+          }
+          {mode !== "speeches" && 
           <div className='w-full flex justify-center'>
             <div className="flex flex-col w-full items-stretch" style={{maxWidth:"768px"}}>
                 {sampleEpisodes.map((_episode, index) => {
@@ -195,17 +205,30 @@ const SearchPage:React.FC = (props: ISearchPageProps) => {
                 })}
             </div>
           </div>
+          }
           <TextDivider>Speeches</TextDivider>
           <div className='w-full flex justify-center'>
             <div className="flex flex-col w-full items-stretch" style={{maxWidth:"768px"}}>
               <SpeechListItem 
                 list={{name: "How to Gain Spiritual Help", episodes: sampleEpisodes, metaData: {defaultLanguage: "english", english: "1975\nWashington Monument\nSun Myung Moon"}}}
               />
+              
+              <SpeechListItem 
+                list={{name: "Where Do You Stand?", episodes: [sampleEpisodes[5]], metaData: {defaultLanguage: "english", english: "1975\nWashington Monument\nSun Myung Moon"}}}
+              />
+              
+              <SpeechListItem 
+                list={{name: "Boldly Fulfill God's Expectations", episodes: [sampleEpisodes[6]], metaData: {defaultLanguage: "english", english: "1975\nWashington Monument\nSun Myung Moon"}}}
+              />
             </div>
           </div>
         </div>
+        <Copyright />
       </IonContent>
-  </IonPage>
+      <IonFooter>
+        <PlayerControls />
+      </IonFooter>
+    </IonPage>
   )
 }
 
@@ -290,6 +313,6 @@ const SearchMode = ({
                 </li>
 
             </ul>
-  </IonContent>  
+      </IonContent>
   )
 }

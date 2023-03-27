@@ -17,6 +17,8 @@ import ProfilePage from './pages/ProfilePage';
 import PlaylistPage from './pages/PlaylistPage';
 import BookPage from './pages/BookPage';
 import SignInResetPage from './pages/SignInResetPage';
+import FAQPage from './pages/FAQPage';
+import TermsPage from './pages/TermsPage';
 
 interface ILocalLizedLabels {
   japanese?: string,
@@ -55,6 +57,17 @@ export const pages:IPage[] = [
         isExact: true,
         isRedirect: false,
     },
+    {   //TODO: Page Path goes to literally search/:term learn to do this right
+        label: "Search",
+        path: "/search", 
+        variable: "query", //query should be 4 letters or more
+        component: SearchPage, //SearchPage
+        icon: search,
+        iosIcon: searchOutline,
+        isNav: true,
+        isExact: true,
+        isRedirect: false,
+    }, 
     {
         label: "Books",
         path: "/books",
@@ -71,17 +84,6 @@ export const pages:IPage[] = [
         component: SpeechesPage, //SpeechesPage
         icon: mic,
         iosIcon: micOutline,
-        isNav: true,
-        isExact: true,
-        isRedirect: false,
-    }, 
-    {   //TODO: Page Path goes to literally search/:term learn to do this right
-        label: "Search",
-        path: "/search", 
-        variable: "query", //query should be 4 letters or more
-        component: SearchPage, //SearchPage
-        icon: search,
-        iosIcon: searchOutline,
         isNav: true,
         isExact: true,
         isRedirect: false,
@@ -160,6 +162,22 @@ export const pages:IPage[] = [
         label: "SignInReset",
         path: "/reset",
         component: SignInResetPage, 
+        isNav: false,
+        isExact: true,
+        isRedirect: false,
+    },
+    {
+        label: "Questions",
+        path: "/faq",
+        component: FAQPage, 
+        isNav: false,
+        isExact: true,
+        isRedirect: false,
+    },
+    {
+        label: "Terms",
+        path: "/terms",
+        component: TermsPage, 
         isNav: false,
         isExact: true,
         isRedirect: false,

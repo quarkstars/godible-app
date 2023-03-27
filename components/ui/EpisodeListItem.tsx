@@ -2,6 +2,7 @@ import { IonButton, IonButtons, IonContent, IonIcon, IonItem, useIonPopover } fr
 import { IEpisode } from 'data/types';
 import { addCircleOutline, chevronForward, playCircle } from 'ionicons/icons';
 import React, { useState, useMemo } from 'react'
+import Thumbnail from './Thumbnail';
 
 interface IEpisodeListItemProps {
   episode: IEpisode,
@@ -64,14 +65,14 @@ const EpisodeListItem = (props: IEpisodeListItemProps) => {
         })
       }}
     >
-      <img  src={episode.imageUrl} alt={episode._bookTitle} />
+      <Thumbnail  imageUrl={episode.imageUrl} size={40} />
     </div>
     <div className='flex flex-col'>
       <span className={`pl-3 line  ${weight}`}>{`Episode ${episode.number}`}</span>
-      <div className={`hidden xs:flex space-x-1 pl-3 text-medium font-medium text-xs items-center ${weight}`}>
+      <div className={`flex space-x-1 pl-3 text-medium font-medium text-xs items-center ${weight}`}>
         {props.customSubText && <span className="truncated line-clamp-1">{customSubComponent}</span>}
-        {!props.customSubText && <span className="truncated">{episode?._bookTitle}</span>}
-        {(episode?._chapterName && !props.customSubText) && <IonIcon icon={chevronForward} /> }
+        {!props.customSubText && <span className="truncated hidden xs:inline">{episode?._bookTitle}</span>}
+        {(episode?._chapterName && !props.customSubText) && <span className="hidden xs:inline"><IonIcon icon={chevronForward} /></span> }
         {(episode?._chapterName &&  !props.customSubText ) && <span className="truncated">{episode?._chapterName}</span>}
 
       </div>

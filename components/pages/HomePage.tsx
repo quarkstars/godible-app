@@ -8,18 +8,21 @@ import React, { useState, useContext, useEffect, useRef } from 'react'
 import Thumbnail from 'components/ui/Thumbnail';
 import { EpisodeCard } from 'components/ui/EpisodeCard';
 import { IEpisode } from 'data/types';
-import { sampleBooks, sampleEpisodes } from 'data/sampleEpisodes';
+import { sampleBooks, sampleEpisodes, sampleTopics } from 'data/sampleEpisodes';
 import { PlayerControls } from 'components/ui/PlayerControls';
-import { Player } from 'components/AppShell';
+import { Player, UserState } from 'components/AppShell';
 import useEpisodes from 'hooks/useEpisodes';
 import { BookCard } from 'components/ui/BookCard';
+import Copyright from 'components/ui/Copyright';
 
 const HomePage:React.FC = () => {
 
 
 	const router = useIonRouter();
 
+  const {user} = useContext(UserState);
   const [episodeWidth, setEpisodeWidth] = useState<number>(148);
+  const [topicWidth, setTopicWidth] = useState<number>(148);
   const [bookWidth, setBookWidth] = useState<number>(376);
   
   //TODO: Attempting to prevent reordering by the list reorderer
@@ -33,7 +36,6 @@ const HomePage:React.FC = () => {
 
       // Handle Click
       const handleListenClick = (e, index: number) => {
-        console.log("TEST", latestEpisodes, index)
           e.preventDefault();
           player.setIsAutoPlay(true);
           player.setList({episodes: latestEpisodes});
@@ -53,28 +55,30 @@ const HomePage:React.FC = () => {
       <IonContent>
       <div className="flex flex-col justify-start w-full min-h-full">
         <SlideList >
+          {!user.objectId && 
           <SwiperSlide>
-          <Hero 
-            title={"Let God's Word Be Heard"}
-            subtitle={"Playable Hoon Dok Hae"}
-            mainButtonText={"Sign Up"}
-            // mainButtonIcon={listener}
-            onClickMain={() => router.push("/signup")}
-            subButtonText={"Log in"}
-            subButtonIcon={arrowForwardOutline}
-            // isMainClear={} Listen To List
-            onClickSub={() => router.push("/signin")}
-            overlayColor={"linear-gradient(90deg, rgba(97,219,146,.2) 0%, rgba(0,255,239,.2) 100%)"}
-            bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
-            // postImageUrl={} 
-            // postText={}
-            // scrollIsHidden={}
-            // isQuote={}
-            preImageUrl={"/logo/godible-logo-white.png"}
-            postText={"Now available on Android, iOS, or on the web"}
-            // preText={}
-          />
+            <Hero 
+              title={"Let God's Word Be Heard"}
+              subtitle={"Playable Hoon Dok Hae"}
+              mainButtonText={"Sign Up"}
+              // mainButtonIcon={listener}
+              onClickMain={() => router.push("/signup")}
+              subButtonText={"Log in"}
+              subButtonIcon={arrowForwardOutline}
+              // isMainClear={} Listen To List
+              onClickSub={() => router.push("/signin")}
+              overlayColor={"linear-gradient(90deg, rgba(97,219,146,.2) 0%, rgba(0,255,239,.2) 100%)"}
+              bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
+              // postImageUrl={} 
+              // postText={}
+              // scrollIsHidden={}
+              // isQuote={}
+              preImageUrl={"/logo/godible-logo-white.png"}
+              postText={"Now available on Android, iOS, or on the web"}
+              // preText={}
+            />
           </SwiperSlide>
+          }
             {latestEpisodes.map((_episode, index) => {
         //TODO: Test again
               const episode = appendEpisodeStrings(_episode)
@@ -149,19 +153,19 @@ const HomePage:React.FC = () => {
             </IonButton>
           </div>
           
-          <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={225}>
-            {latestEpisodes.map((episode, index) => {
-              return (
-                <SwiperSlide key={"lateps-"+episode.objectId}>
-                  <Thumbnail 
-                    size={episodeWidth}
-                    imageUrl={episode.imageUrl}
-                    overlayColor='#000000'
-
-                  >
-                    <span className="text-2xl font-bold text-white">Topic</span>
-                  </Thumbnail>
-              </SwiperSlide>
+          <SlideList isCarousel spaceBetween={5} setItemWidth={setTopicWidth} idealWidth={170}>
+                {sampleTopics.map((topic, index) => {
+                  return (
+                    <SwiperSlide key={"topic-"+topic.name+"-"+index}>
+                      <Thumbnail 
+                        size={topicWidth}
+                        imageUrl={topic.imageUrl}
+                        overlayColor='#000000'
+                        key={index}
+                      >
+                      <span className="text-xl font-bold text-white w-full text-center px-2">{topic.name?.english}</span>
+                      </Thumbnail>
+                </SwiperSlide>
               )
             })
             }
@@ -198,6 +202,7 @@ const HomePage:React.FC = () => {
 
         </div>
       </div>
+      <Copyright />
       </IonContent>
       <IonFooter>
         <PlayerControls />

@@ -63,7 +63,7 @@ export interface IEpisode  extends ParseObjectToJson {
     number: number, 
     slug: string,
     book?: IBook,
-    customTitle?: string,
+    customTitle?: ILangString,
     audioPath?: ILangString,
     text?: ILangString,
     chapter?: number|string,
@@ -75,6 +75,8 @@ export interface IEpisode  extends ParseObjectToJson {
     quote?: ILangString,
     isForbidden?: boolean,
     metaData?: ILangString,
+    episodeTotal?: number,
+    topics: ITopic[]
 
     //Constructed client-side strings based on episode data
     _lang?: string,
@@ -114,9 +116,8 @@ export interface IBook extends ParseObjectToJson{
     buyLink?: ILangString,
 }
 
-//TODO: Do the languages mirror each other perfectly?
 export interface ISpeech extends IList {
-    // speechName?: ILangString,
+    title?: ILangString,
     slug?: string, //This would be book slug+speech name
     // book?: IBook, 
     metaData?: ILangString,
@@ -147,3 +148,8 @@ export interface IInspirationFeedback extends ParseObjectToJson {
     isFlagged: boolean,
 }
 
+export interface ITopic extends ParseObjectToJson  {
+    name?: ILangString,
+    slug?: string,
+    imageUrl?: string,
+}

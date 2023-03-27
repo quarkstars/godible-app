@@ -38,6 +38,8 @@ const ProfilePage:React.FC = () => {
   });
 
 
+  
+
   const [presentSettings, dismissSettings] = useIonModal(SettingsModal, {
     onDismiss: (data: string, role: string) => dismissSettings(data, role),
     isProfile: true,
@@ -48,12 +50,24 @@ const ProfilePage:React.FC = () => {
   useEffect(() => {
     if (swiperRef) setTabIndex(swiperRef.activeIndex)
   }, [swiperRef]);
-  
-  const slideTo = (index) => {
-    swiperRef.slideTo(index - 1, 0);
-  };
 
-  console.log(swiperRef)
+
+  const urlParams = new URLSearchParams(router.routeInfo.search)
+  const defaultTab = urlParams.get("tab");
+  useEffect(() => {
+    if (!swiperRef) return;
+    switch (defaultTab) {
+      case "calendar":
+        swiperRef.slideTo(0);
+        break;
+      case "lists":
+        swiperRef.slideTo(1);
+        break;
+      case "donation":
+        swiperRef.slideTo(2);
+        break;
+    }
+  }, [defaultTab, swiperRef])
 
   return (
     <IonPage>
@@ -195,29 +209,29 @@ const ProfilePage:React.FC = () => {
                         value="2023-03-20"
                         highlightedDates={[
                           {
-                            date: '2023-01-15',
-                            backgroundColor: '#c0ffd9',
+                            date: '2023-03-15',
+                            backgroundColor: '#91caa8',
                           },
                           {
-                            date: '2023-01-16',
-                            backgroundColor: '#c0ffd9',
+                            date: '2023-03-16',
+                            backgroundColor: '#91caa8',
                           },
                           {
-                            date: '2023-01-17',
-                            backgroundColor: '#c0ffd9',
+                            date: '2023-03-17',
+                            backgroundColor: '#91caa8',
                           },
                           {
-                            date: '2023-01-18',
-                            backgroundColor: '#c0ffd9',
+                            date: '2023-03-18',
+                            backgroundColor: '#91caa8',
                           },
                           {
-                            date: '2023-01-19',
-                            backgroundColor: '#c0ffd9',
+                            date: '2023-03-19',
+                            backgroundColor: '#91caa8',
                           },
                         ]}
                     ></IonDatetime>
                     </div>
-                    <div className="px-6 -mt-8 sm:mt-0">
+                    <div className="px-6 -mt-6 sm:mt-0">
                       <h5 className="text-center">Monday, March 20</h5>
                       <IonList>
                         <IonItem button>
@@ -242,7 +256,7 @@ const ProfilePage:React.FC = () => {
                       </IonList>
                     </div>
                   </div>
-                  <button className='sm:-mt-2 w-auto bg-dark p-4 rounded-full flex items-center space-x-3 hover:opacity-50 relative overflow-hidden shadow-lg pr-4 pl-6 mt-4 focus:outline-none ion-activatable ripple-parent '>
+                  <button className='sm:mt-4 w-auto bg-dark dark:bg-primary p-4 rounded-full flex items-center space-x-3 hover:opacity-50 relative overflow-hidden shadow-lg pr-4 pl-6 -mt-2 focus:outline-none ion-activatable ripple-parent '>
                     <IonRippleEffect></IonRippleEffect>
                     <span className='text-lg text-center'>Text, push, and email daily at <span className="font-bold">5AM</span></span>
                             <IonIcon size="small" icon={pencil} slot="icon-only" />

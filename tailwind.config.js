@@ -44,7 +44,7 @@ module.exports = {
       serif: ['"Noto Serif"', 'Georgia', 'Times New Roman'],
     },
     screens: {
-      mobile: '376px',
+      mobile: '425px',
 
       xs: '576px',
 

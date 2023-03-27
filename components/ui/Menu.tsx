@@ -11,12 +11,14 @@ import {
     IonMenuToggle,
     IonNote,
     IonToggle,
+    useIonModal,
   } from '@ionic/react';
 import { useContext } from 'react';
 import { useLocation } from 'react-router-dom';
-import { archiveOutline, archiveSharp, bookmark, bookmarkOutline, heartOutline, heartSharp, list, mailOutline, mailSharp, moonOutline, paperPlaneOutline, paperPlaneSharp, sunnyOutline, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
+import { archiveOutline, archiveSharp, bookmark, bookmarkOutline, heartOutline, heartSharp, list, mailOutline, mailSharp, moonOutline, paperPlaneOutline, paperPlaneSharp, settingsSharp, sunnyOutline, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
 import { Theme } from 'components/AppShell';
 import { pages } from 'components/Routes';
+import SettingsModal from './SettingsModal';
   
   interface AppPage {
     url: string;
@@ -25,7 +27,7 @@ import { pages } from 'components/Routes';
     title: string;
   }
 
-  const titles = ['Saved', 'Test List', ];
+  const titles = ['Saved', 'My List', ];
   
   const Menu: React.FC = () => {
     const location = useLocation();
@@ -36,7 +38,16 @@ import { pages } from 'components/Routes';
     }
     console.log(location.pathname, hideClass)
 
-    const theme = useContext(Theme);
+    
+    //Settings Modal
+    const [presentSettings, dimissSettings] = useIonModal(SettingsModal, {
+      onDismiss: (data: string, role: string) => dimissSettings(data, role),
+  });
+  function openSettingsModal() {
+      presentSettings({
+          initialBreakpoint:0.85,
+      })
+  }
   
     return (
         <IonMenu contentId="main" type="overlay" className={hideClass}>
@@ -72,7 +83,13 @@ import { pages } from 'components/Routes';
               <div className="items-start justify-start flex-grow w-full overflow-y-scroll min-h-[100px]">
                 <IonList id="labels-list">
                   {titles.map((listTitle, index) => (
-                    <IonItem lines="none" key={index} >
+                    <IonItem 
+                      lines="none" 
+                      key={index} 
+                      routerLink={"/profile?tab=lists"}
+                      routerDirection="none"  
+                      button 
+                    >
                       <IonIcon slot="start" icon={listTitle==="Saved" ? bookmark : list} />
                       <IonLabel>{listTitle}</IonLabel>
                     </IonItem>
@@ -80,8 +97,46 @@ import { pages } from 'components/Routes';
                 </IonList>
               </div>
               <span className="h-0.5 w-full border-t border-gray-400 block border-opacity-10"></span>
-              <div className="items-center justify-center w-full">
-                <IonItem>
+              <div className="flex items-center justify-center md:justify-start w-full">
+                <IonButton 
+                    onClick={()=> {
+                      openSettingsModal()
+                    }}
+                    routerDirection="none" 
+                    fill="clear"
+                    size="small" 
+                  >
+                    <IonIcon slot="icon-only" size="small" icon={settingsSharp} />
+                  </IonButton>
+                  <div className="border-r dark:border-gray-800 h-full" />
+                <IonButton 
+                    routerLink={"/profile?tab=donation"}
+                    routerDirection="none" 
+                    fill="clear"
+                    size="small" 
+                  >
+                    <span className="text-medium">Donate</span>
+                  </IonButton>
+                  <div className="border-r dark:border-gray-800 h-full" />
+                <IonButton 
+                    routerLink={"/faq"}
+                    routerDirection="none" 
+                    fill="clear"
+                    size="small" 
+                  >
+                    <span className="text-medium">FAQ</span>
+                  </IonButton>
+                  <div className="border-r dark:border-gray-800 h-full" />
+                <IonButton 
+                    routerLink={"/terms"}
+                    routerDirection="none" 
+                    fill="clear"
+                    size="small" 
+                  >
+                    <span className="text-medium">Terms</span>
+                  </IonButton>
+                  
+                {/* <IonItem>
                   <IonToggle
                     slot="start"
                     name="darkMode"
@@ -90,7 +145,7 @@ import { pages } from 'components/Routes';
                   />
                 <IonIcon slot={'start'} icon={theme.isDark ?  moonOutline : sunnyOutline} />
                 <IonButton color={"primary"} slot="end">English</IonButton>
-                </IonItem>
+                </IonItem> */}
               </div>
             </div>
           </IonContent>

@@ -178,7 +178,7 @@ export const PlayerControls = () => {
                                         onClick={()=>{player.jump(-30)}}
                                         disabled={!player.isReady}
                                     >
-                                        <IonIcon slot="start" icon={returnDownBack} />
+                                        <IonIcon slot="start" icon={returnDownBack} size="small"/>
                                         <span className='text-xs'>30</span>
                                     </IonButton>
                                 </IonButtons>
@@ -201,7 +201,7 @@ export const PlayerControls = () => {
                                             disabled={!player.isReady}
                                         >
                                             <span className='text-xs'>30</span>
-                                            <IonIcon slot="end" icon={returnUpForward} />
+                                            <IonIcon slot="end" icon={returnUpForward} size="small"/>
                                         </IonButton>
                                     </div>
                                 </IonButtons>

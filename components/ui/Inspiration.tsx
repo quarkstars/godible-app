@@ -3,8 +3,6 @@ import { ellipsisVertical, flag, flagOutline, heartOutline, pencil, trash } from
 import React, {useState} from 'react'
 
 
-const Popover = () => <IonContent className="ion-padding">Hello World!</IonContent>;
-
 
 const Inspiration = () => {
 
@@ -49,7 +47,7 @@ const Inspiration = () => {
 
             </IonPopover>
         </footer>
-        <p className="text-gray-600 dark:text-gray-300">I am so motivated to learn about church history from this Godible. This is an area I haven&apos;t spent enough time and is so important to pass to the next generation.
+        <p className="text-gray-600 dark:text-gray-300">Example: I am so motivated to learn about church history from this Godible. This is an area I haven&apos;t spent enough time and is so important to pass to the next generation.
             </p>
         <div className="flex items-center mt-4 space-x-4">
             {/* TODO: Click to scroll to other inspirations */}

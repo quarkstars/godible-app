@@ -64,7 +64,7 @@ export const BookCard = (props: IBookCardProps) => {
             </motion.div>
             <div className={`flex flex-col flex-grow w-full pl-0 pr-6 justify-evenly mobile:pl-4 mobile:w-2/3 ${(props?.size||768) > 500 ? "pr-10 space-y-4" : "pr-6"}`}>
                 <div 
-                    className={`pt-2 pb-0 block font-bold leading-tight ${(props?.size||768) > 500 ? "text-md xs:text-xl md:text-3xl lg:text:4xl" : "text-md line-clamp-2"}`}
+                    className={`pt-2 pb-0 block font-bold leading-tight ${(props?.size||768) > 500 ? "text-xl xs:text-2xl md:text-3xl lg:text:4xl" : "text-md line-clamp-2"}`}
                 >
                     {book.title[lang]}
                 </div>
@@ -92,10 +92,10 @@ export const BookCard = (props: IBookCardProps) => {
                 <div className="flex flex-wrap items-center justify-between">
                     {props.showAuthor && book.author && 
                     <div className="flex items-center pb-4 space-x-2">
-                            <div className="flex items-center justify-center w-12 h-12 pr-0 overflow-hidden rounded-full">
-                            <img alt={"by "+book.author?.[lang]} src={book.authorImageUrl} className="w-full" />
+                            <div className="flex items-center justify-center w-12 h-12 pr-0 overflow-hidden rounded-full min-w-12 min-h-12">
+                            <Thumbnail size={48} imageUrl={book.authorImageUrl} />
                             </div>
-                        <span className="font-medium text-light dark:text-dark">{"by "+book.author?.[lang]}</span>
+                        <span className="font-medium text-light dark:text-dark" style={{maxWidth: "85%"}}>{"by "+book.author?.[lang]}</span>
                     </div>
                     }
                     {props.showEpisodesLink && 
