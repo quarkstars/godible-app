@@ -134,7 +134,7 @@ const SignUpPage: React.FC = () => {
                     <IonItem>
                       <IonLabel position='floating'>Create Password</IonLabel>
                       <IonInput type={showPass ? "text" : "password"} onIonChange={(event) => setPassword(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
-                      <IonButton slot="end" fill='clear' size="large" color="light" onClick={()=>{setShowPass(!showPass)}}>
+                      <IonButton slot="end" fill='clear' size="large" color="medium" onClick={()=>{setShowPass(!showPass)}}>
                         <div className="p-2 pr-0">
                           <IonIcon icon={!showPass ? eyeOff : eye } />
                         </div>

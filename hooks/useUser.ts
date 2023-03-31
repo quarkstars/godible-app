@@ -367,16 +367,16 @@ const useUser = () => {
         //If user is logged in, save updates to the server or reverse them if failed.
         if (!user.objectId) return newUser;
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const currentParseUser: Parse.User|undefined|null = await Parse.User.current();
             if (!currentParseUser) throw "No User"
             const updatedParseUser = addParseObjectProperties(currentParseUser, updates)
             updatedParseUser.save()
-            setIsLoading(false);
+            // setIsLoading(false);
             setUpdateError(undefined);
             return newUser;
         } catch (error: any) {
-            setIsLoading(false);
+            // setIsLoading(false);
             setUpdateError(error);
             setUser(prevUser);
             return prevUser;
