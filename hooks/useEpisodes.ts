@@ -45,17 +45,17 @@ const useEpisodes = () => {
         const _path = "/episode/" + episode?.slug;
 
         //Chapter Name
-        let _hasChapter = (typeof episode?.chapter === "number")
-        let _chapterName = (_hasChapter) ? `${text["Chapter"][_lang]} ${episode?.chapter}` : undefined;
+        let _hasChapter = (typeof episode?.chapterNumber === "number")
+        let _chapterName = (_hasChapter) ? `${text["Chapter"][_lang]} ${episode?.chapterNumber}` : undefined;
         if (_chapterName && episode?.chapterName) _chapterName = _chapterName + ": " + episode?.chapterName;
         else if (episode?.chapterName) _chapterName = episode?.chapterName[_lang];
         
-        if (!_hasChapter && typeof episode?.chapter === "string") {
+        if (!_hasChapter && typeof episode?.chapterNumber === "string") {
             _hasChapter = true;
-            _chapterName = episode?.chapter
+            _chapterName = episode?.chapterNumber
         }
 
-        let _chapterPath = (_hasChapter) ? _bookPath+"?chapter="+episode?.chapter : _bookPath;
+        let _chapterPath = (_hasChapter) ? _bookPath+"?chapter="+episode?.chapterNumber : _bookPath;
 
         //Text
         const textInLanguage = episode?.text?.[_lang]; 

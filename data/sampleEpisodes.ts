@@ -20,7 +20,7 @@ export const sampleEpisodes = [
         authorImageUrl: "https://georgetowner.com/wp-content/uploads/2016/07/article_Rev.Moon_.jpg",
 
     },
-    chapter: "4-2-4",
+    chapterNumber: "4-2-4",
     metaData: {
         defaultLanguage: "english",
         english: "Book 4: Salvation through the Holy Marriage Blessing\nChapter 2: The History of the Marriage Blessing Ceremony\nSection 4: The 6500, 30,000 and\nSecond-Generation Couples, Paragraph 05 - 20"
@@ -60,7 +60,7 @@ export const sampleEpisodes = [
         authorImageUrl: "https://georgetowner.com/wp-content/uploads/2016/07/article_Rev.Moon_.jpg",
 
     },
-    chapter: "4-2-3",
+    chapterNumber: "4-2-3",
     metaData: {
         defaultLanguage: "english",
         english: "Book 4: Salvation through the Holy Marriage Blessing\nChapter 2: The History of the Marriage Blessing Ceremony\nSection 2: The 72 Couples, 124 Couples and 430 Couples, Paragraph 21\nSection 3: The 777, 1800, 2075 and 6000 Couples, Paragraph 04"
@@ -100,7 +100,7 @@ export const sampleEpisodes = [
         authorImageUrl: "https://georgetowner.com/wp-content/uploads/2016/07/article_Rev.Moon_.jpg",
 
     },
-    chapter: "4-2-3",
+    chapterNumber: "4-2-3",
     metaData: {
         defaultLanguage: "english",
         english: "Book 4: Salvation through the Holy Marriage Blessing\n Chapter 2: The History of the Marriage Blessing Ceremony\nSection 3: The 777, 1800, 2075 and 6000 Couples, Paragraph 06\nSection 4: The 6500, 30,000 and Second-Generation Couples, Paragraph 04"
@@ -141,7 +141,7 @@ export const sampleEpisodes = [
         authorImageUrl: "https://georgetowner.com/wp-content/uploads/2016/07/article_Rev.Moon_.jpg",
 
     },
-    chapter: "4-2-2",
+    chapterNumber: "4-2-2",
     metaData: {
         defaultLanguage: "english",
         english: "Book 4: Salvation through the Holy Marriage Blessing\nChapter 2: The History of the Marriage Blessing Ceremony\nSection 2: The 72 Couples, 124 Couples and 430 Couples, 43 Couples from 10 nations\nSection 2: The 72 Couples, 124 Couples and 430 Couples, Paragraph 20"
@@ -183,7 +183,7 @@ export const sampleEpisodes = [
         authorImageUrl: "https://georgetowner.com/wp-content/uploads/2016/07/article_Rev.Moon_.jpg",
 
     },
-    chapter: "4-2-2",
+    chapterNumber: "4-2-2",
     metaData: {
         defaultLanguage: "english",
         english: "Book 4: Salvation through the Holy Marriage Blessing\nChapter 2: The History of the Marriage Blessing Ceremony\nSection 2: The 72 Couples, 124 Couples and 430 Couples, The 72 Couples: Restoring Cain and Abel tribes\nSection 2: The 72 Couples, 124 Couples and 430 Couples, Paragraph 12"

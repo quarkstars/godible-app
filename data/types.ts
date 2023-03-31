@@ -45,8 +45,8 @@ export interface IList extends ParseObjectToJson {
     // If came from a speech, the metaData will be added here. 
     description?: string,
     
-    //public list for speeches
-    isPublic?: boolean,
+    //Perhaps used if the user can share it
+    // isPublic?: boolean,
 
     //Do I need this to make a relation?
     __type?: "Pointer", 
@@ -58,7 +58,7 @@ export interface IExactQuery {
     ["key"]?: string,
 }
 
-export interface IEpisode  extends ParseObjectToJson {
+export interface IEpisode extends ParseObjectToJson {
     objectId: string,
     number: number, 
     slug: string,
@@ -66,18 +66,20 @@ export interface IEpisode  extends ParseObjectToJson {
     customTitle?: ILangString,
     audioPath?: ILangString,
     text?: ILangString,
-    chapter?: number|string,
+    chapterNumber?: number|string,
     chapterName?: ILangString,
     speech?: ISpeech,
     publishedAt?: number,
     searchText?: string,
     imageUrl?: string,
+    thumbUrl?: string,
     quote?: ILangString,
-    isForbidden?: boolean,
     metaData?: ILangString,
     episodeTotal?: number,
-    topics: ITopic[]
+    topics?: ITopic[],
+    isFreeSample?: boolean,
 
+    isForbidden?: boolean, 
     //Constructed client-side strings based on episode data
     _lang?: string,
     _bookImageUrl?: string,
@@ -108,12 +110,14 @@ export interface IBook extends ParseObjectToJson{
     title: ILangString,
     slug?: string,
     imageUrl?: string,
+    thumbUrl?: string,
     authorImageUrl?: string,
     author?: ILangString,
     metaData?: ILangString,
     description?: ILangString,
     tagline?: ILangString,
     buyLink?: ILangString,
+    isPublic?: boolean,
 }
 
 export interface ISpeech extends IList {
@@ -121,8 +125,6 @@ export interface ISpeech extends IList {
     slug?: string, //This would be book slug+speech name
     // book?: IBook, 
     metaData?: ILangString,
-    // startIndex?: number,
-    // endIndex?: number,
     //If the speech is only available in a certain language
     language?: string,
 }
@@ -141,6 +143,7 @@ export interface IInspiration extends ParseObjectToJson {
     _isFlagged: boolean,
 }
 
+//TODO: Is this necessary to have on the client?
 export interface IInspirationFeedback extends ParseObjectToJson {
     userId?: string,
     inspirationId?: string,
