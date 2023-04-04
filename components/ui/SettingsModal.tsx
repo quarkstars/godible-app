@@ -59,7 +59,7 @@ const SettingsModal = (props: IPlayerListModalProps) => {
         <>
           <IonItem>               
             <div
-                  className="w-20 h-20 rounded-full overflow-hidden"
+                  className="w-20 h-20 overflow-hidden rounded-full"
                 >
                   {user.imageUrl ?
                       <img 
@@ -93,7 +93,7 @@ const SettingsModal = (props: IPlayerListModalProps) => {
               </IonButton>
             </IonButtons>
           </IonItem>
-            <div className="grid grid-cols-2 gap-4 w-full">
+            <div className="grid w-full grid-cols-2 gap-4">
               <div className="mb-6 form-group">
                   <IonItem>
                     <IonLabel position='floating'>First name</IonLabel>
@@ -255,8 +255,10 @@ const SettingsModal = (props: IPlayerListModalProps) => {
 
             </IonInput>
         </IonItem>
-        </>}
+        </>
+        }
         <IonItem><IonIcon slot="start"></IonIcon></IonItem>
+        {!props.isProfile && <>
         <IonItem> 
           <IonIcon icon={text} slot="start" />
           <IonButtons>
@@ -352,6 +354,7 @@ const SettingsModal = (props: IPlayerListModalProps) => {
             </IonButton>
           </IonButtons>
         </IonItem>
+        </>}
         </IonList>
       </IonContent>
     </IonPage>

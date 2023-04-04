@@ -1,6 +1,6 @@
 import { IonContent, IonFooter, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react'
 import Copyright from 'components/ui/Copyright'
-import Inspirations from 'components/ui/Inspirations'
+import Notes from 'components/ui/Note'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
 import React from 'react'

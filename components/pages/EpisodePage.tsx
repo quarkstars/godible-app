@@ -10,9 +10,9 @@ import React, { useContext, useEffect, useState } from 'react'
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import Thumbnail from 'components/ui/Thumbnail'
 import SettingsModal from 'components/ui/SettingsModal'
-import Inspiration from 'components/ui/Inspiration'
+import Note from 'components/ui/Note'
 import TextDivider from 'components/ui/TextDivider'
-import Inspirations from 'components/ui/Inspirations'
+import Notes from 'components/ui/Notes'
 import Copyright from 'components/ui/Copyright'
 
 
@@ -98,8 +98,8 @@ const EpisodePage:React.FC = () => {
       }
   }, [showMeta]);
 
-  const [presentInspirations, dismissInspirations] = useIonModal(EpisodeInspirations, {
-    onDismiss: (data: string, role: string) => dismissInspirations(data, role),
+  const [presentNotes, dismissNotes] = useIonModal(EpisodeNotes, {
+    onDismiss: (data: string, role: string) => dismissNotes(data, role),
     episode,
 });
 
@@ -109,19 +109,19 @@ const EpisodePage:React.FC = () => {
     <IonHeader>
       <Toolbar>
         {/* <IonTitle> */}
-          <div className='flex items-center justify-center flex-row w-full space-x-2'>
-            <div className="h-full flex items-center text-lg font-medium">{episode?._title}</div>
-            <IonButtons>
+          <div className='flex flex-row items-center justify-center w-full space-x-2'>
+            <div className="flex items-center h-full text-lg font-medium">{episode?._title}</div>
               <IonButton size="small"
                 onClick={((e:any) => {
-                  presentInspirations({
+                  presentNotes({
                     initialBreakpoint:0.85,
                 })
                 })}
+                color="primary"
               >
-                <IonIcon icon={documentTextOutline} slot="icon-only" />
+                <IonIcon icon={documentTextOutline} slot="start" size="small"/>
+                Notes
               </IonButton>
-            </IonButtons>
           </div>
         {/* </IonTitle> */}
       </Toolbar>
@@ -237,7 +237,7 @@ const EpisodePage:React.FC = () => {
           <div className="flex justify-center w-full pb-8">
               <IonButtons>
                 <IonButton fill="clear" size="small"  onClick={()=>{player.togglePlayPause()}} >
-                  <IonIcon icon={player.isPlaying ? pauseCircle : playCircle} color="medium" slot="icon-only" />
+                  <IonIcon icon={player.isPlaying ? pauseCircle : playCircle} color="primary" slot="icon-only" />
                 </IonButton>
               </IonButtons>
               <IonButtons>
@@ -328,22 +328,22 @@ const EpisodePage:React.FC = () => {
               <IonChip outline>Joy</IonChip>
             </div>
         </div>
-        <div id="inspirations" className="flex flex-col w-full pt-8">
+        <div id="Notes" className="flex flex-col w-full pt-8">
           <div className="flex items-center justify-between w-full space-x-2">
-              <h4 className="leading-none">Inspirations</h4>
+              <h4 className="leading-none">Notes</h4>
               <IonChip>0</IonChip>
           </div>
           <form className="mb-6">
           <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg rounded-t-lg dark:bg-gray-800 dark:border-gray-700">
-              <IonTextarea placeholder="Write an inspiration..." autoGrow></IonTextarea>
+              <IonTextarea placeholder="Write an note..." autoGrow></IonTextarea>
           </div>
-          <div className='w-full items-center flex justify-between'>
-            <div className="font-bold  space-x-2 flex items-center text-primary ">
+          <div className='flex items-center justify-between w-full'>
+            <div className="flex items-center space-x-2 font-bold text-primary ">
               <IonIcon icon={checkmarkCircle} />
               <span className="italic font-medium">Saved to Device</span>
             </div>
-            <div className="flex justify-end items-center space-x-2">
-              <span className="text-medium italic">Private</span>
+            <div className="flex items-center justify-end space-x-2">
+              <span className="italic text-medium">Private</span>
               <IonButton color="medium" fill="clear">
                 <IonIcon icon={send} slot="end"/>
                 Publish
@@ -352,10 +352,10 @@ const EpisodePage:React.FC = () => {
           </div>
           </form>
         </div>
-        <Inspiration />
-        <TextDivider>Public Inspirations</TextDivider>
+        <Note />
+        <TextDivider>Public Notes</TextDivider>
         <div id="trending"></div>
-        <Inspiration />
+        <Note />
         </div>
       </div>
       </IonContent>
@@ -366,7 +366,7 @@ const EpisodePage:React.FC = () => {
   )
 }
 
-const EpisodeInspirations = ({onDismiss, inspirations, episode}) => {
+const EpisodeNotes = ({onDismiss, notes, episode}) => {
 
   return (    
     <IonPage>
@@ -379,7 +379,7 @@ const EpisodeInspirations = ({onDismiss, inspirations, episode}) => {
               <IonIcon icon={close} slot="icon-only" />
             </IonButton>
           </IonButtons>
-          <IonTitle>Inspirations</IonTitle>
+          <IonTitle>Notes</IonTitle>
           {/* <IonButtons slot="end">
             <IonButton onClick={() => {}}>
               <IonIcon icon={calendar} slot="icon-only" />
@@ -388,7 +388,7 @@ const EpisodeInspirations = ({onDismiss, inspirations, episode}) => {
         </IonToolbar>
       </IonHeader>
     <IonContent class="ion-padding">
-    <Inspirations inspirations={inspirations} isTitleHidden episode={episode} />
+    <Notes notes={notes} isTitleHidden episode={episode} />
   </IonContent>  
   </IonPage>
   )

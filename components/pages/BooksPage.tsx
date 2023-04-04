@@ -19,28 +19,32 @@ const BooksPage:React.FC = () => {
         </Toolbar>
       </IonHeader>
       <IonContent>
-        <div className="flex flex-col p-4 pt-4 space-y-4 sm:p-10 sm:pt-6">
-        {sampleBooks.map((book, index) => {
-              return (
-                <BookCard 
-                  book={book} 
-                  key={book.objectId}
-                  isFullWidth
-                  showTagline
-                  showDescription
-                  showBuyLink
-                  showEpisodesLink
-                  showReaders
-                  onClick={() => {
-                    if (book?.slug) router.push("/book/"+book?.slug)
-                  }}
-                />
+        <div className='flex justify-center w-full'>
+          <div className="flex flex-col p-4 pt-4 space-y-4 sm:p-10 sm:pt-6" style={{maxWidth: "1200px"}}>
+          {sampleBooks.map((book, index) => {
+                return (
+                  <BookCard 
+                    book={book} 
+                    key={book.objectId}
+                    isFullWidth
+                    showTagline
+                    showDescription
+                    showBuyLink
+                    showEpisodesLink
+                    showReaders
+                    onClick={() => {
+                      if (book?.slug) router.push("/book/"+book?.slug)
+                    }}
+                  />
 
-              )
-            })
-            }
+                )
+              })
+              }          
+              <div className='w-full py-5 text-center text-medium'>{`Copyright © ${new Date().getFullYear()}, FFWPU USA. All Rights Reserved.`}</div>
+
+              </div>        
             </div>
-        <div className='text-medium w-full text-center py-5'>{`Copyright © ${new Date().getFullYear()}, FFWPU USA. All Rights Reserved.`}</div>
+
       </IonContent>
       <IonFooter>
         <PlayerControls />

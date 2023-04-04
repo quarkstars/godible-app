@@ -1,6 +1,6 @@
 import { IonButton, IonButtons, IonContent, IonIcon, IonItem, IonLabel, IonReorder, useIonPopover } from '@ionic/react';
 import { IEpisode, IList } from 'data/types';
-import { addCircleOutline, arrowForward, bookmark, chevronForward, ellipsisVertical, list as listIcon, listCircle, playCircle, pencil, trash } from 'ionicons/icons';
+import { addCircleOutline, arrowForward, bookmark, chevronForward, ellipsisVertical, list as listIcon, listCircle, playCircle, pencil, trash, swapVertical } from 'ionicons/icons';
 import React, { useState, useMemo, useContext } from 'react'
 import Thumbnail from './Thumbnail';
 import { UserState } from 'components/AppShell';
@@ -9,6 +9,7 @@ import { userDefaultLanguage } from 'data/translations';
 interface IListListItemProps {
   list: IList,
   onPlay?: (e: any) => void,
+  isReordering?: boolean
 }
 
 const ListListItem = (props: IListListItemProps) => {
@@ -41,10 +42,10 @@ const ListListItem = (props: IListListItemProps) => {
         e.preventDefault();
         if (props.onPlay) props.onPlay(e)
       }}
-      button
+      button={props.isReordering ? false : true}
     >
     <div 
-      className='flex items-center cursor-pointer py-1'
+      className='flex items-center py-1 cursor-pointer'
       onClick={(e: any) => {
           e.stopPropagation();
           presentDetails({
@@ -58,8 +59,8 @@ const ListListItem = (props: IListListItemProps) => {
       size={64}
       overlayColor='#000000'
      >
-      <div className="flex flex-col font-bold text-white items-center">
-        {list.name === "Saved" ?
+      <div className="flex flex-col items-center font-bold text-white">
+        {list.name === "Bookmarked Episodes" ?
           <IonIcon icon={bookmark} size="large" />
         :
           <IonIcon icon={listIcon}  size="large" />
@@ -68,39 +69,46 @@ const ListListItem = (props: IListListItemProps) => {
      </Thumbnail>
     </div>
     <div className='flex flex-col'>
-      <div className='flex space-x-1 items-center'>
-        <span className='pl-3 line text-light dark:text-dark font-medium text-md'>{list.name === "Saved" ? "Saved" : `List`}</span>
+      <div className='flex items-center space-x-1'>
+        <span className='pl-3 font-medium line text-light dark:text-dark text-md'>{list.name === "Saved" ? "Saved" : `List`}</span>
       
         
-        <span className='line text-medium italic text-sm hidden sm:block pl-4'>{`${list.episodes.length} Episodes `}</span>
+        <span className='hidden pl-4 text-sm italic line text-medium sm:block'>{`${list.episodes.length} Episodes `}</span>
 
       </div>
       {list.name !== "Saved" &&
-        <div className="leading-tight line-clamp-2 flex space-x-1 pl-3 font-medium text-md items-center">
+        <div className="flex items-center pl-3 space-x-1 font-medium leading-tight line-clamp-2 text-md">
           {list.name}
         </div>
       }
     </div>
-    <IonReorder slot="end"></IonReorder>
-    <IonButtons slot="end">
-        <div className= "hidden xs:block">
-          <IonButton>
-            <IonIcon icon={playCircle} slot="icon-only" />
-          </IonButton>
-        </div>
-        <IonButton
-          onClick={(e: any) => {
-              e.stopPropagation();
-              presentMenu({
-              event: e,
-              onDidDismiss: (e: CustomEvent) => {},
-            })
-          }}
-        
-        >
-          <IonIcon icon={ellipsisVertical} slot="icon-only" />
-        </IonButton>
-    </IonButtons>
+    {props.isReordering ? 
+      <IonIcon icon={swapVertical} color="primary" slot="end" />
+    :
+
+      <IonButtons slot="end">
+          <div className= "hidden xs:block">
+            <IonButton>
+              <IonIcon icon={playCircle} slot="icon-only" />
+            </IonButton>
+          </div>
+          {list.name !== "Bookmarked Episodes" &&
+            <IonButton
+              onClick={(e: any) => {
+                  e.stopPropagation();
+                  presentMenu({
+                  event: e,
+                  onDidDismiss: (e: CustomEvent) => {},
+                  side: "left",
+                })
+              }}
+            
+            >
+              <IonIcon icon={ellipsisVertical} slot="icon-only" />
+            </IonButton>
+          }
+      </IonButtons>
+    }
   </IonItem>
   )
 }
@@ -136,7 +144,7 @@ const ListMenu = ({list}) => {
                 </IonButton>
                 </li>
                 <li>
-                <div className="flex-grow  py-2"></div>
+                <div className="flex-grow py-2"></div>
                 <IonButton fill="clear" expand="block" >
                     <div className="flex items-center justify-start w-full space-x-2">
                         <IonIcon icon={trash} color="danger" />

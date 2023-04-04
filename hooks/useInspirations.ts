@@ -1,4 +1,4 @@
-import { IExactQuery, IInspiration } from './../data/types';
+import { IExactQuery, INote } from './../data/types';
 import { UserState } from 'components/AppShell';
 import { text, userDefaultLanguage } from 'data/translations';
 import { IEpisode } from 'data/types';
@@ -8,14 +8,14 @@ import React, {useContext, useState, useRef} from 'react'
 //Construct useful strings based on episode data and append them to the episode
 
 
-const useInspirations = () => {
+const useNotes = () => {
     const {
       language
     } = useContext(UserState);
 
     const [error, setError] = useState<any>();
     const [isLoading, setIsLoading] = useState<boolean>();
-    const [inspirations, setInspirations] = useState<IInspiration[]|undefined>();
+    const [Notes, setNotes] = useState<INote[]|undefined>();
 
     
     const page = useRef<number|undefined>(1);
@@ -25,23 +25,23 @@ const useInspirations = () => {
     const query = useRef <IExactQuery|undefined>();
     const sortedBy = useRef <string|undefined>();
     
-    //Gets inspirations, 24 at a time
-    const getInspirations = (query?: IExactQuery) => {
+    //Gets Notes, 24 at a time
+    const getNotes = (query?: IExactQuery) => {
 
     }
     
-    //Update an inspiration or add a new (if objectId not included)
-    const upsertInspiration = (inspiration?: IInspiration) => {
+    //Update an note or add a new (if objectId not included)
+    const upsertNote = (note?: INote) => {
 
     }
 
     //Gets episodes up to 24 at a time
-    const deleteInspiration = (inspirationId?: string) => {
+    const deleteNote = (noteId?: string) => {
 
     }
 
     //returns true if episode is saved by user
-    const appendInspirationHearts = (inspirations?: IInspiration[]) => {
+    const appendNoteHearts = (Notes?: INote[]) => {
 
     }
 
@@ -52,10 +52,10 @@ const useInspirations = () => {
         setError,
         isLoading,
         setIsLoading,
-        inspirations,
-        getInspirations,
-        upsertInspiration,
+        Notes,
+        getNotes,
+        upsertNote,
     }
 }
 
-export default useInspirations
+export default useNotes

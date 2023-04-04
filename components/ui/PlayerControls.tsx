@@ -1,5 +1,5 @@
 import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonModal, IonPopover, IonProgressBar, IonRange, IonRippleEffect, IonTitle, IonToolbar, useIonModal, useIonRouter } from '@ionic/react'
-import { bookmarkOutline, chevronDown, chevronUp, heartOutline, list, pauseCircle, play, playCircle, playSkipBack, playSkipForward, radio, returnDownBack, returnUpForward, volumeHigh, volumeLow, volumeMedium, volumeOff } from 'ionicons/icons'
+import { arrowBack, bookmarkOutline, chevronBack, chevronDown, chevronUp, heartOutline, list, pause, pauseCircle, play, playCircle, playSkipBack, playSkipForward, radio, returnDownBack, returnUpForward, volumeHigh, volumeLow, volumeMedium, volumeOff } from 'ionicons/icons'
 import React, { useEffect, useRef } from 'react'
 import { Player } from 'components/AppShell';
 import { useContext, useState } from 'react';
@@ -85,8 +85,9 @@ export const PlayerControls = () => {
             >
                 { player.list?.episodes &&<>
                 <IonFab slot="fixed" vertical="bottom" horizontal="end" onClick={()=>{player.setIsVisible(true)}}>
-                    <IonFabButton color="light">
-                        <IonIcon icon={radio}></IonIcon>
+                    <IonFabButton color="primary">
+                        <IonIcon icon={chevronBack} size="small" color="fullwhite"></IonIcon>
+                        <IonIcon icon={player.isPlaying ? volumeMedium : play} size="large" color="fullwhite"></IonIcon>
                     </IonFabButton>
                 </IonFab>
                 <IonProgressBar value={(player.currentSeconds)/(player.duration||100)}></IonProgressBar>
@@ -102,8 +103,8 @@ export const PlayerControls = () => {
             >
                 {player.list?.episodes && <>
                 <IonToolbar color={"light"}>
-                    <div className="flex flex-row items-center justify-center w-full px-4 space-x-4">   
-                        <div className="justify-start hidden xs:flex sm:w-full">    
+                    <div className="flex flex-row items-center justify-between w-full px-4 space-x-4">   
+                        <div className="justify-start hidden xs:flex">    
                             <div className="flex-shrink-0 hidden w-28 h-28 xs:block">
                                 <Thumbnail 
                                     size={112}
@@ -138,7 +139,7 @@ export const PlayerControls = () => {
                                 </IonButtons>
                             </div>
                         </div> 
-                        <div className="flex flex-col items-center justify-center w-full h-auto max-w-lg">
+                        <div className="flex flex-col items-center justify-center w-full h-auto max-w-2xl">
                             <div className="flex items-center content-center justify-between w-full mt-4">
                                 
                                 <div className="block xs:hidden">
@@ -298,7 +299,7 @@ export const PlayerControls = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex-row items-center justify-center hidden w-full h-auto max-w-xs sm:flex">
+                        <div className="flex-row items-center justify-center hidden w-full h-auto max-w-xs sm:flex" style={{maxWidth: "200px"}}>
                             {/* TODO: VOLUME ONLY ON WEB? Capacitor control?  */}
                             <IonButtons>
                                 <IonButton onClick={()=>openSettingsModal()}>
@@ -318,27 +319,6 @@ export const PlayerControls = () => {
             </motion.div>
             }
         </AnimatePresence>
-
-        {/* <IonModal ref={modal} trigger="open-modal" onWillDismiss={(ev) => onWillDismiss(ev)}>
-        <IonHeader>
-        <IonToolbar>
-            <IonButtons slot="start">
-            <IonButton onClick={() => modal.current?.dismiss()}>Cancel</IonButton>
-            </IonButtons>
-            <IonTitle>Welcome</IonTitle>
-            <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => confirm()}>
-                Confirm
-            </IonButton>
-            </IonButtons>
-        </IonToolbar>
-        </IonHeader>
-        <IonContent className="ion-padding">
-        <IonItem>
-            Hi
-        </IonItem>
-        </IonContent>
-        </IonModal> */}
         </>
     )
 }

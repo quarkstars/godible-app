@@ -4,17 +4,13 @@ import React, {useState} from 'react'
 
 
 
-const Inspiration = () => {
+const Note = () => {
 
-    //Inspiration Ellipsis Menu
-    const [present, dismiss] = useIonPopover(InspirationMenu, {
+    //Note Ellipsis Menu
+    const [present, dismiss] = useIonPopover(NoteMenu, {
         onDismiss: (data: any, role: string) => dismiss(data, role),
     });
 
-    // const [present, dismiss] = useIonPopover(Popover, {
-    //     onDismiss: (data: any, role: string) => dismiss(data, role),
-    //   });
-    //   const [roleMsg, setRoleMsg] = useState('');
 
 
     return (
@@ -36,6 +32,7 @@ const Inspiration = () => {
                     present({
                         event: e,
                         onDidDismiss: (e: CustomEvent) => {},
+                        side: "left",
                     })
                     }
                 >
@@ -50,7 +47,7 @@ const Inspiration = () => {
         <p className="text-gray-600 dark:text-gray-300">Example: I am so motivated to learn about church history from this Godible. This is an area I haven&apos;t spent enough time and is so important to pass to the next generation.
             </p>
         <div className="flex items-center mt-4 space-x-4">
-            {/* TODO: Click to scroll to other inspirations */}
+            {/* TODO: Click to scroll to other Notes */}
             <IonButtons>
                 <IonButton size="small">
                     <IonIcon slot="start" icon={flagOutline} />
@@ -73,7 +70,7 @@ const Inspiration = () => {
   )
 }
 
-const InspirationMenu = () => {
+const NoteMenu = () => {
   return (    
     <IonContent className="ion-padding">
             <ul className="py-1 text-sm text-gray-700 dark:text-gray-200">
@@ -107,4 +104,4 @@ const InspirationMenu = () => {
 }
 
 
-export default Inspiration
+export default Note

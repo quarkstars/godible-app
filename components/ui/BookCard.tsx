@@ -6,7 +6,7 @@ import { text, userDefaultLanguage } from 'data/translations'
 import { IonAvatar, IonButton, IonChip, IonIcon, IonLabel, IonRippleEffect, useIonRouter } from '@ionic/react'
 import useBooks from 'hooks/useBooks'
 import { motion, useAnimationControls } from "framer-motion"
-import { arrowForward } from 'ionicons/icons'
+import { arrowForward, chevronDown, chevronUp } from 'ionicons/icons'
 
 interface IBookCardProps {
     size?: number,
@@ -33,6 +33,7 @@ export const BookCard = (props: IBookCardProps) => {
     const book = props.book;
 
     const [hovering, setHovering] = useState<boolean>(false)
+    const [showMore, setShowMore] = useState<boolean>(false)
 
     const controls = useAnimationControls()
     
@@ -54,7 +55,7 @@ export const BookCard = (props: IBookCardProps) => {
                 if (props.onClick) props.onClick(e);
             }}
         >
-            <motion.div className='w-full overflow-hidden mobile:w-1/3' animate={controls}>
+            <motion.div className='w-full overflow-hidden mobile:w-1/3' animate={controls} style={{maxWidth:"350px"}}>
                 <div className='w-full h-auto overflow-hidden rounded-lg '>
                     <img 
                         className="w-full"
@@ -76,10 +77,20 @@ export const BookCard = (props: IBookCardProps) => {
                 </div>
                 }
                 {(props.showDescription && book.description?.[lang]) && 
-                <div 
-                    className={`pt-2 pb-0 block text-light dark:text-dark ${(props?.size||768) > 500 ? "text-md" : "text-sm"}`}
-                >
-                    {book.description?.[lang]}
+                <div className="flex flex-col items-start w-full">
+                    <div 
+                        className={`pt-2 pb-0 block text-light dark:text-dark ${(props?.size||768) > 500 ? "text-md" : "text-sm"} ${showMore ? "" : "line-clamp-4"}`}
+                    >
+                        {book.description?.[lang]}
+                    </div>
+                    {!props.onClick &&
+                    <div className="-ml-2">
+                        <IonButton size="small" color="medium" fill="clear" onClick={() => setShowMore(prev=>!prev)}>
+                            <IonIcon icon={showMore ? chevronUp: chevronDown} />
+                            {!showMore ? "More": "Less"} 
+                        </IonButton>
+                    </div>
+                    }
                 </div>
                 }
                 {(props.showMetaData && book.metaData?.[lang]) && 
@@ -104,8 +115,8 @@ export const BookCard = (props: IBookCardProps) => {
                     </IonButton>
                     }
                     {props.showBuyLink && book.buyLink && 
-                    <IonButton color="primary">
-                        Buy Physical Book
+                    <IonButton color="dark" fill="clear">
+                        <span className="-ml-2 sm:ml-0">Buy Physical Book</span>
                         <IonIcon slot="end" icon={arrowForward} />
                     </IonButton>
                     }

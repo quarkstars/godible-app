@@ -12,7 +12,7 @@ import HomePage from './pages/HomePage';
 import BooksPage from './pages/BooksPage';
 import SpeechesPage from './pages/SpeechesPage';
 import SearchPage from './pages/SearchPage';
-import InspirationsPage from './pages/InspirationsPage';
+import NotesPage from './pages/NotesPage';
 import ProfilePage from './pages/ProfilePage';
 import PlaylistPage from './pages/PlaylistPage';
 import BookPage from './pages/BookPage';
@@ -89,9 +89,9 @@ export const pages:IPage[] = [
         isRedirect: false,
     }, 
     {
-        label: "Inspirations",
-        path: "/inspirations", //InspirationsPage
-        component: InspirationsPage,
+        label: "Notes",
+        path: "/Notes", //NotesPage
+        component: NotesPage,
         icon: documentText,
         iosIcon: documentTextOutline,
         isNav: true,

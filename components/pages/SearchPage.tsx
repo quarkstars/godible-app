@@ -67,7 +67,7 @@ const SearchPage = (props: ISearchPageProps) => {
   <IonPage>
     <IonHeader>
       <Toolbar>
-        {/* <div className="w-full flex justify-center"> */}
+        {/* <div className="flex justify-center w-full"> */}
         <IonButton 
           fill="clear" 
           color="dark"
@@ -89,11 +89,11 @@ const SearchPage = (props: ISearchPageProps) => {
       <IonContent>
         <div className="flex flex-col p-4 pt-4 sm:p-10 sm:pt-6">
         
-          <div className='w-full flex justify-center'>
+          <div className='flex justify-center w-full'>
               <div className="flex flex-col w-full" style={{maxWidth:"768px"}}>
                 <div>
-                  <div className="flex items-center space-x-2 flex-wrap">
-                    <span className="italic text-medium text-sm">By Book</span>
+                  <div className="flex flex-wrap items-center space-x-2">
+                    <span className="text-sm italic text-medium">By Book</span>
                     <IonChip outline>
                       <IonLabel>Selected Book</IonLabel>
                       <IonIcon icon={closeCircle}></IonIcon>
@@ -107,8 +107,8 @@ const SearchPage = (props: ISearchPageProps) => {
                 </div>
                 <div>
 
-                  <div className="flex items-center space-x-2 flex-wrap">
-                      <span className="italic text-medium text-sm">By Topic</span>
+                  <div className="flex flex-wrap items-center space-x-2">
+                      <span className="text-sm italic text-medium">By Topic</span>
                       <IonChip outline>
                         <IonLabel>Selected Topic</IonLabel>
                         <IonIcon icon={closeCircle}></IonIcon>
@@ -127,12 +127,32 @@ const SearchPage = (props: ISearchPageProps) => {
               </div>
             </div>
           </div>
+          {mode !== "speeches" && <TextDivider>Topics</TextDivider>}
+          {mode !== "speeches" && <div className='flex justify-center w-full'>
+            <div className="flex flex-col items-center w-full" style={{maxWidth:"768px"}}>
+              <CardList spaceBetween={10} setItemWidth={setTopicWidth} idealWidth={150}>
+                {sampleTopics.map((topic, index) => {
+                  return (
+                    <Thumbnail 
+                      size={topicWidth}
+                      imageUrl={topic.imageUrl}
+                      overlayColor='#000000'
+                      key={index}
+                    >
+                      <span className="w-full px-2 text-2xl font-bold text-center text-white">{topic.name?.english}</span>
+                    </Thumbnail>
+                  )
+                })
+                }
+              </CardList>
+            </div>
+          </div>}
           {mode !== "speeches" && 
           <TextDivider>Books</TextDivider>
           }
           {mode !== "speeches" && 
-          <div className='w-full flex justify-center'>
-            <div className="flex flex-col w-full items-center" style={{maxWidth:"768px"}}>
+          <div className='flex justify-center w-full'>
+            <div className="flex flex-col items-center w-full" style={{maxWidth:"768px"}}>
               <CardList spaceBetween={10} setItemWidth={setBookWidth} idealWidth={376}>
                 {sampleBooks.map((book, index) => {
                   return (
@@ -152,26 +172,6 @@ const SearchPage = (props: ISearchPageProps) => {
             </div>
           </div>
           }
-          {mode !== "speeches" && <TextDivider>Topics</TextDivider>}
-          {mode !== "speeches" && <div className='w-full flex justify-center'>
-            <div className="flex flex-col w-full items-center" style={{maxWidth:"768px"}}>
-              <CardList spaceBetween={10} setItemWidth={setTopicWidth} idealWidth={150}>
-                {sampleTopics.map((topic, index) => {
-                  return (
-                    <Thumbnail 
-                      size={topicWidth}
-                      imageUrl={topic.imageUrl}
-                      overlayColor='#000000'
-                      key={index}
-                    >
-                      <span className="text-2xl font-bold text-white w-full text-center px-2">{topic.name?.english}</span>
-                    </Thumbnail>
-                  )
-                })
-                }
-              </CardList>
-            </div>
-          </div>}
           {mode !== "speeches" && <TextDivider>
             <div className="flex items-center">
               <span>Episodes</span>
@@ -190,8 +190,8 @@ const SearchPage = (props: ISearchPageProps) => {
           </TextDivider>
           }
           {mode !== "speeches" && 
-          <div className='w-full flex justify-center'>
-            <div className="flex flex-col w-full items-stretch" style={{maxWidth:"768px"}}>
+          <div className='flex justify-center w-full'>
+            <div className="flex flex-col items-stretch w-full" style={{maxWidth:"768px"}}>
                 {sampleEpisodes.map((_episode, index) => {
                 let episode = appendEpisodeStrings(_episode)
                   return (
@@ -207,8 +207,8 @@ const SearchPage = (props: ISearchPageProps) => {
           </div>
           }
           <TextDivider>Speeches</TextDivider>
-          <div className='w-full flex justify-center'>
-            <div className="flex flex-col w-full items-stretch" style={{maxWidth:"768px"}}>
+          <div className='flex justify-center w-full'>
+            <div className="flex flex-col items-stretch w-full" style={{maxWidth:"768px"}}>
               <SpeechListItem 
                 list={{name: "How to Gain Spiritual Help", episodes: sampleEpisodes, metaData: {defaultLanguage: "english", english: "1975\nWashington Monument\nSun Myung Moon"}}}
               />

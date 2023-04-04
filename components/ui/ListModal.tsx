@@ -2,7 +2,7 @@ import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonImg, IonItem,
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
 import { IEpisode, IList } from 'data/types';
 import useEpisodes from 'hooks/useEpisodes';
-import { add, addCircle, addCircleOutline, bookmarkOutline, chevronForward, ellipsisVertical, eye, pauseCircle, playCircle, trash } from 'ionicons/icons';
+import { add, addCircle, addCircleOutline, bookmarkOutline, chevronForward, close, ellipsisVertical, eye, pauseCircle, playCircle, reorderTwo, swapVertical, trash } from 'ionicons/icons';
 import React, {useRef, useMemo, useState, useContext} from 'react'
 import TextDivider from './TextDivider';
 import { Player } from 'components/AppShell';
@@ -32,6 +32,7 @@ const ListModal = (props: IPlayerListModalProps) => {
     })
   }, [props.list?.episodes, props.list, props.index])
   
+  const [isReordering, setIsReordering] = useState(false);
   function handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
     // Sync location of current Index
     if (props.index === event.detail.from) {
@@ -59,7 +60,7 @@ const ListModal = (props: IPlayerListModalProps) => {
     });
     const [presentMenu, dismissMenu] = useIonPopover(EpisodeMenu, {
         onDismiss: (data: any, role: string) => dismissMenu(data, role),
-        episode: inspectedEpisode
+        episode: inspectedEpisode,
     });
 
 
@@ -69,73 +70,100 @@ const ListModal = (props: IPlayerListModalProps) => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton color="medium" onClick={() => props.onDismiss(null, 'close')}>
-              Close
+            <IonButton 
+              color="dark" 
+              onClick={() => {
+                setIsReordering(false);
+                props.onDismiss(null, 'close');
+              }}
+            >
+              <IonIcon icon={close} slot="icon-only" />
             </IonButton>
           </IonButtons>
-          <IonTitle>Listening Now</IonTitle>
           <IonButtons slot="end">
-            <IonButton onClick={() => props.onDismiss(null, 'save')}>New List</IonButton>
+            <IonButton onClick={() => props.onDismiss(null, 'save')}  size="small">
+            <IonIcon icon={addCircleOutline} slot="start" />
+              Save as List
+            </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
+        
+        <div className="flex items-center justify-between w-full">
+          <span className="font-medium text-light dark:text-dark">Listening Now</span>
+          <IonButton size="small" fill="clear" color={isReordering ? "primary" : "medium"}
+            onClick={()=>{setIsReordering(prev=>!prev)}}
+          >
+            <IonIcon icon={swapVertical} slot="start" color={isReordering ? "primary" : "medium"} />
+            {isReordering ? "Done" : "Reorder"}
+          </IonButton>
+        </div>
         <IonList>
         {/* The reorder gesture is disabled by default, enable it to drag and drop items */}
-        <IonReorderGroup disabled={false} onIonItemReorder={handleReorder}>
+        <IonReorderGroup disabled={!isReordering} onIonItemReorder={handleReorder}>
         {episodes.map((episode, index) => {
           let weight = (index === props.index) ? "font-bold" : "font-medium";
           let highlight = (index === props.index) ? "light" : undefined;
           let isCurrent = (player.index === index);
           let isPlaying = (isCurrent && player.isPlaying)
           return(
-            <IonItem 
-              key={"list-"+episode.objectId} 
-              color={highlight}
-              onClick={(e: any) => {
-                  props.onDismiss(episode.slug, "read")
-              }}
-              button
-            >
-              <IonReorder slot="start"></IonReorder>
-              <div className="w-10 h-10 overflow-hidden rounded-lg cursor-pointer" 
+            <IonReorder key={"list-"+episode.objectId} >
+              <IonItem 
+                // key={"list-"+episode.objectId} 
+                color={highlight}
                 onClick={(e: any) => {
-                    e.stopPropagation();
-                    setInspectedEpisode(episode);
-                    presentDetails({
-                    event: e,
-                    onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
-                  })
+                    if (isReordering) return;
+                    props.onDismiss(episode.slug, "read");
                 }}
+                button={isReordering ? false : true}
               >
-                <img  src={episode._bookImageUrl ? episode._bookImageUrl : episode.imageUrl} alt={episode._bookTitle} />
-              </div>
-              <div className='flex flex-col'>
-                <span className={`pl-3 truncated ${weight}`}>{`Episode ${episode.number}`}</span>
-                <div className={`hidden xs:flex space-x-1 pl-3 text-medium font-medium text-xs items-center ${weight}`}>
-                  <span className="truncated">{episode?._bookTitle}</span>
-                   {episode?._chapterName && <IonIcon icon={chevronForward} /> }
-                   {episode?._chapterName && <span className="truncated">{episode?._chapterName}</span>}
-                  </div>
-              </div>
-              <IonButtons slot="end">
-                <IonButton>
-                  <IonIcon icon={isPlaying ? pauseCircle : playCircle} slot="icon-only" />
-                </IonButton>
-                <IonButton
+                {/* <IonReorder slot="start"></IonReorder> */}
+                <div className="w-10 h-10 overflow-hidden rounded-lg cursor-pointer" 
                   onClick={(e: any) => {
                       e.stopPropagation();
                       setInspectedEpisode(episode);
-                      presentMenu({
+                      presentDetails({
                       event: e,
                       onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
+                      side: "right",
                     })
                   }}
                 >
-                  <IonIcon icon={ellipsisVertical} slot="icon-only" />
-                </IonButton>
-              </IonButtons>
-            </IonItem>
+                  <img  src={episode._bookImageUrl ? episode._bookImageUrl : episode.imageUrl} alt={episode._bookTitle} />
+                </div>
+                <div className='flex flex-col'>
+                  <span className={`pl-3 truncated ${weight}`}>{`Episode ${episode.number}`}</span>
+                  <div className={`hidden xs:flex space-x-1 pl-3 text-medium font-medium text-xs items-center ${weight}`}>
+                    <span className="truncated">{episode?._bookTitle}</span>
+                    {episode?._chapterName && <IonIcon icon={chevronForward} /> }
+                    {episode?._chapterName && <span className="truncated">{episode?._chapterName}</span>}
+                    </div>
+                </div>
+                {isReordering ? 
+                  <IonIcon icon={swapVertical} color="primary" slot="end" />
+                :
+                <IonButtons slot="end">
+                  <IonButton>
+                    <IonIcon icon={isPlaying ? pauseCircle : playCircle} slot="icon-only" />
+                  </IonButton>
+                  <IonButton
+                    onClick={(e: any) => {
+                        e.stopPropagation();
+                        setInspectedEpisode(episode);
+                        presentMenu({
+                        event: e,
+                        onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
+                        side: "left",
+                      })
+                    }}
+                  >
+                    <IonIcon icon={ellipsisVertical} slot="icon-only" />
+                  </IonButton>
+                </IonButtons>
+                }
+              </IonItem>
+            </IonReorder>
           )
         })
         }

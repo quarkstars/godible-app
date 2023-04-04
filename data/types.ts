@@ -129,7 +129,7 @@ export interface ISpeech extends IList {
     language?: string,
 }
 
-export interface IInspiration extends ParseObjectToJson {
+export interface INote extends ParseObjectToJson {
     episodeId?: IEpisode, //name, slug, number, image
     userId?: string,
     bookId?: string,
@@ -144,9 +144,9 @@ export interface IInspiration extends ParseObjectToJson {
 }
 
 //TODO: Is this necessary to have on the client?
-export interface IInspirationFeedback extends ParseObjectToJson {
+export interface INoteFeedback extends ParseObjectToJson {
     userId?: string,
-    inspirationId?: string,
+    noteId?: string,
     isHearted: boolean,
     isFlagged: boolean,
 }

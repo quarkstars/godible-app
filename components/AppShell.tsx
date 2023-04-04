@@ -112,7 +112,7 @@ const AppShell: React.FC = () => {
             <IonReactRouter>
               <IonSplitPane contentId="main">
                 <Menu />
-                  <Routes />
+                <Routes />
               </IonSplitPane>
             </IonReactRouter>
           </IonApp>

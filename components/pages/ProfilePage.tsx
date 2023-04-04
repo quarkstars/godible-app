@@ -1,12 +1,12 @@
-import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonTitle, IonToolbar, useIonModal, useIonPopover, useIonRouter } from '@ionic/react'
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonTitle, IonToolbar, useIonModal, useIonPopover, useIonRouter } from '@ionic/react'
 import { UserState } from 'components/AppShell'
 import ListListItem from 'components/ui/ListListItem'
 import SettingsModal from 'components/ui/SettingsModal'
 import TextDivider from 'components/ui/TextDivider'
 import Toolbar from 'components/ui/Toolbar'
 import { sampleEpisodes } from 'data/sampleEpisodes'
-import { arrowForward, calendar, card, cardOutline, documentText, chevronForward, checkmarkCircle, today, pencil, play, flame, settingsSharp, person } from 'ionicons/icons'
-import React, { useContext, useEffect, useState } from 'react'
+import { arrowForward, calendar, card, cardOutline, documentText, chevronForward, checkmarkCircle, today, pencil, play, flame, settingsSharp, person, swapVertical } from 'ionicons/icons'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import InitialsAvatar from 'react-initials-avatar';
 import { FreeMode, Navigation, Thumbs }  from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -37,8 +37,13 @@ const ProfilePage:React.FC = () => {
       max: 10,
   });
 
-
-  
+  //Because sliders are different sizes, on switch, use scroller
+  const goToTop = () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+  };
 
   const [presentSettings, dismissSettings] = useIonModal(SettingsModal, {
     onDismiss: (data: string, role: string) => dismissSettings(data, role),
@@ -48,13 +53,19 @@ const ProfilePage:React.FC = () => {
   const [swiperRef, setSwiperRef] = useState<any>(null);
   const [tabIndex, setTabIndex] = useState<number>(0);
   useEffect(() => {
-    if (swiperRef) setTabIndex(swiperRef.activeIndex)
-  }, [swiperRef]);
+    if (!swiperRef) return;
+    setTabIndex(swiperRef.activeIndex);
+    contentRef.current && contentRef.current.scrollToTop();
+  }, [swiperRef?.activeIndex]);
 
+
+  const [isReordering, setIsReordering] = useState(false);
 
   const urlParams = new URLSearchParams(router.routeInfo.search)
   const defaultTab = urlParams.get("tab");
+  const contentRef = useRef<HTMLIonContentElement | null>(null);
   useEffect(() => {
+    window.scroll(0, 0);
     if (!swiperRef) return;
     switch (defaultTab) {
       case "calendar":
@@ -66,8 +77,10 @@ const ProfilePage:React.FC = () => {
       case "donation":
         swiperRef.slideTo(2);
         break;
-    }
+    }  
   }, [defaultTab, swiperRef])
+
+  
 
   return (
     <IonPage>
@@ -89,18 +102,19 @@ const ProfilePage:React.FC = () => {
                           // initialBreakpoint:0.85,
                       })
                       }
+                      size="small"
                     >
                   <IonIcon icon={person} slot="start" />
-                  Edit
+                  Settings
                 </IonButton>
             </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className='ion-padding'>
+      <IonContent className='ion-padding' ref={contentRef}>
         
-        <div className='w-full flex justify-center'>
-          <div className="flex flex-col w-full items-center" style={{maxWidth:"768px"}}>
-            <div className='w-full bg-dark dark:bg-light p-4 rounded-lg flex items-center justify-between'>
+        <div className='flex justify-center w-full'>
+          <div className="flex flex-col items-center w-full" style={{maxWidth:"768px"}}>
+            <div className='flex items-center justify-between w-full p-4 rounded-lg bg-dark dark:bg-light'>
               
               <IonAvatar
                     onClick={()=>{router.push("/profile");}}
@@ -121,8 +135,8 @@ const ProfilePage:React.FC = () => {
                   }
               </IonAvatar>
               <div className='flex flex-col justify-start'>
-                <div className="flex justify-start items-center">
-                  <span className="w-full font-medium text-lg pl-3 xs:text-2xl">{`${user.firstName} ${user.lastName}`}</span>
+                <div className="flex items-center justify-start">
+                  <span className="w-full pl-3 text-lg font-medium xs:text-2xl">{`${user.firstName} ${user.lastName}`}</span>
                   <div className="block xs:hidden">
                     <IonChip color="primary"
                     onClick={(e: any) =>
@@ -137,9 +151,17 @@ const ProfilePage:React.FC = () => {
                     </IonChip>   
                   </div>
                 </div>
-                <IonButton size="small" fill="clear">
-                  Continue to Episode 6
-                  <IonIcon size="small" icon={arrowForward} slot="end" />
+                <IonButton fill="clear">
+                  <div className="flex flex-col justify-start w-full -ml-2 text-sm tracking-tight normal-case">
+                    <div className="flex items-center gap-x-1">
+                      My Next Episode
+                      <IonIcon size="small" icon={arrowForward} slot="end" />
+                    </div>
+                    <div className="flex items-center text-xs text-medium">
+                      Chambumo Gyeong Ep 3 
+                      {/* <IonIcon size="small" icon={arrowForward} slot="end" /> */}
+                    </div>
+                  </div>
                 </IonButton>
               </div>
               <div className="hidden xs:block">
@@ -157,7 +179,7 @@ const ProfilePage:React.FC = () => {
               </div>
               <div className="block xs:hidden"></div>
             </div>
-            <div className='w-full mb-6 border-b flex justify-evenly'>
+            <div className='flex w-full mb-6 border-b justify-evenly'>
               {/* <IonTabBar slot="bottom"> */}
 
                     <IonButton fill="clear" onClick={() => swiperRef.slideTo(0)}>
@@ -201,8 +223,8 @@ const ProfilePage:React.FC = () => {
               className="mySwiper2"
             >
               <SwiperSlide>
-                <div className="flex w-full flex-col items-center pb-8">
-                  <div className='grid gap-4 grid-cols-1 sm:grid-cols-2'>
+                <div className="flex flex-col items-center w-full pb-8">
+                  <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                     <div className='flex justify-center'>
                       <IonDatetime
                         presentation="date"
@@ -245,7 +267,7 @@ const ProfilePage:React.FC = () => {
                         </IonItem>
                         <IonItem button>
                           <IonIcon icon={documentText} size="small" color="secondary" slot="start" />
-                          <span className="line-clamp-1"><span>Inspiration </span><span className="italic text-medium">I really love that True Parents work covers business</span></span>
+                          <span className="line-clamp-1"><span>Note </span><span className="italic text-medium">I really love that True Parents work covers business</span></span>
                           <IonIcon icon={chevronForward} size="small" color="medium" slot="end" />
                         </IonItem>
                         <IonItem button>
@@ -256,9 +278,9 @@ const ProfilePage:React.FC = () => {
                       </IonList>
                     </div>
                   </div>
-                  <button className='sm:mt-4 w-auto bg-dark dark:bg-primary p-4 rounded-full flex items-center space-x-3 hover:opacity-50 relative overflow-hidden shadow-lg pr-4 pl-6 -mt-2 focus:outline-none ion-activatable ripple-parent '>
+                  <button className='relative flex items-center w-auto p-4 pl-6 pr-4 mt-10 space-x-3 overflow-hidden rounded-full shadow-lg text-light sm:mt-4 bg-primary hover:opacity-50 focus:outline-none ion-activatable ripple-parent '>
                     <IonRippleEffect></IonRippleEffect>
-                    <span className='text-lg text-center'>Text, push, and email daily at <span className="font-bold">5AM</span></span>
+                    <span className='text-lg text-center'>Text, Push, and Email daily at <span className="font-bold">5AM</span></span>
                             <IonIcon size="small" icon={pencil} slot="icon-only" />
                   </button>
                 </div>
@@ -266,50 +288,128 @@ const ProfilePage:React.FC = () => {
               <SwiperSlide>
                 <IonList>
                   <ListListItem
-                    list={{name: "Saved", episodes: sampleEpisodes, description: "Your bookmarked episodes"}}
+                    list={{name: "Bookmarked Episodes", episodes: sampleEpisodes}}
                   />
-                  <IonReorderGroup disabled={false} onIonItemReorder={() => {}}>
-                    <ListListItem
-                      list={{name: "How to Gain Spiritual Help", episodes: sampleEpisodes, description: "1975\nWashington Monument\nSun Myung Moon"}}
-                    />
-                  </IonReorderGroup>
+                  <div className="flex items-center justify-between w-full pt-8">
+                    <span className="font-medium text-medium">My Saved Lists</span>
+                    <IonButton size="small" fill="clear" color={isReordering ? "primary" : "medium"}
+                      onClick={()=>{setIsReordering(prev=>!prev)}}
+                    >
+                      <IonIcon icon={swapVertical} slot="start" color={isReordering ? "primary" : "medium"} />
+                      {isReordering ? "Done" : "Reorder"}
+                    </IonButton>
+                  </div>
+                  </IonList>
+                  <IonList>
+                    <IonReorderGroup disabled={!isReordering} onIonItemReorder={() => {}}>
+                        <IonReorder>
+                          <ListListItem
+                            list={{name: "How to Gain Spiritual Help", episodes: sampleEpisodes, description: "1975\nWashington Monument\nSun Myung Moon"}}
+                            isReordering={isReordering}
+                          />
+                        </IonReorder>
+                        <IonReorder>
+                          <ListListItem
+                            list={{name: "How to Gain Spiritual Help", episodes: sampleEpisodes, description: "1975\nWashington Monument\nSun Myung Moon"}}
+                            isReordering={isReordering}
+                          />
+                      </IonReorder>
+                    </IonReorderGroup>
+
                 </IonList>
               </SwiperSlide>
               <SwiperSlide>
-                <div className="flex w-full flex-col items-center pb-8">
-                  <h2 className="w-full text-left text-3xl font-bold dark:text-primary text-light">Become a Godible Donor</h2>
-                  <div className='w-full flex justify-between items-center'>
-                    <div className='w-full flex justify-between items-center'>
-                      <div className='font-medium text-lg justify-center items-center flex space-x-2'>
+                <div className="flex flex-col items-center w-full pb-8">
+                  <h2 className="w-full text-3xl font-bold text-left dark:text-primary text-light">Become a Godible Donor</h2>
+                  <div className='flex items-center justify-between w-full'>
+                    <div className='flex items-center justify-between w-full'>
+                      <div className='flex items-center justify-center space-x-2 text-lg font-medium'>
                         <span className='text-2xl font-bold'>$365</span>
-                        <span className='text-medium text-sm'>from 26 donors</span> 
+                        <span className='text-sm text-medium'>from 26 donors</span> 
                       </div>
-                      <span className='text-medium text-sm font-medium'>
-                        $2.5k in March <span className="hidden xs:inline">covers expenses</span>
+                      <span className='text-sm font-medium text-medium'>
+                        $2.5k March goal <span className="hidden xs:inline">covers expenses</span>
                       </span>
                     </div>
                   </div>
-                  <div className="w-full bg-gray-200 h-8 border dark:bg-gray-600 rounded-lg p-1 overflow-hidden">
+                  <div className="w-full h-8 p-1 overflow-hidden bg-gray-200 border rounded-lg dark:bg-gray-600">
                     <div
                       className="bg-primary flex justify-center items-center p-0.5 h-6 rounded-md text-xs font-medium leading-none overflow-hidden text-dark"
                       style={{width: "21%"}}
                       >
                     </div>
                   </div>
-                  <h5 className="text-left w-full">Godible is made possible by listeners like you</h5>
-                  <div className="w-full flex justify-start">
+                  <h5 className="w-full text-left"><span className="font-bold">Let God&apos;s Word Be Heard!</span> Godible is only made possible by listeners like you.</h5>
+                  <div className="flex justify-start w-full">
                     <IonButton color="primary">
                       Donate Now
                     </IonButton>
                   </div>
-                  <h2 className="w-full text-center text-xl font-bold pt-12 dark:text-dark">Get Unlimited Access</h2>
-                  <div className="w-full grid grid-cols-1 xs:grid-cols-2 gap-6 mx-auto">
-                    <div className="shadow p-5 rounded-lg border-t-4 border-primary bg-white dark:bg-gray-800">
-                      <p className="uppercase text-sm font-medium text-gray-500">
+                  <h2 className="w-full pt-12 text-2xl font-bold dark:text-dark">And Upgrade to Unlimited Access</h2>
+                  <div className="grid w-full grid-cols-1 gap-6 mx-auto xs:grid-cols-2">
+                    
+                  <div className="p-5 bg-white border border-t-4 rounded-lg shadow border-medium dark:bg-gray-800">
+                      <p className="text-sm font-medium text-gray-500 uppercase">
+                        Free Account
+                      </p>
+
+                      <p className="mt-4 text-3xl font-medium text-gray-700 dark:text-gray-100">
+                        $0 <span className="text-base font-normal"></span>
+                      </p>
+
+                      <p className="mt-4 font-medium text-gray-700 dark:text-gray-100">
+                        Not yet supporting Godible
+                      </p>
+
+                      <div className="mt-8">
+                        <ul className="grid grid-cols-1 gap-4">
+                          <li className="flex items-start text-gray-600 dark:text-gray-200">
+                            <div className="w-6 pt-1 pr-2">
+                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
+                            </div>
+                            1 newest episode daily
+                          </li>
+
+                          <li className="flex items-start text-gray-600 dark:text-gray-200">
+                            <div className="w-6 pt-1 pr-2">
+                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
+                            </div>
+
+                            Email and push daily reminders
+                          </li>
+
+                          <li className="flex items-start text-gray-600 dark:text-gray-200">
+                            <div className="w-6 pt-1 pr-2">
+                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
+                            </div>
+
+                            Save lists of episodes
+                          </li>
+                          <li className="flex items-start text-gray-600 dark:text-gray-200">
+                            <div className="w-6 pt-1 pr-2">
+                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
+                            </div>
+
+                            Note your Notes
+                          </li>
+                          <li className="flex items-start text-gray-600 dark:text-gray-200">
+                            <div className="w-6 pt-1 pr-2">
+                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
+                            </div>
+
+                            Spiritual life calendar
+                          </li>
+                        </ul>
+                      </div>
+
+
+                    </div>
+                    <div className="p-5 bg-white border border-t-4 rounded-lg shadow border-primary dark:bg-gray-800">
+                      <p className="text-sm font-medium text-gray-500 uppercase">
                         Donor Account
                       </p>
 
-                      <p className="mt-4 text-3xl text-gray-700 dark:text-gray-100 font-medium">
+                      <p className="mt-4 text-3xl font-medium text-gray-700 dark:text-gray-100">
                         $Any <span className="text-base font-normal">/month</span>
                       </p>
 
@@ -322,23 +422,23 @@ const ProfilePage:React.FC = () => {
 
 
                           <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pr-2 pt-1">
+                            <div className="w-6 pt-1 pr-2">
                               <IonIcon icon={checkmarkCircle} color="primary" size="small" />
                             </div>
-                              <span><span className="font-bold inline">Full access to all episodes</span> 
-                              <span className="text-sm block">500+ episodes with 100+ speeches & 5 Holy Books</span>
+                              <span><span className="inline font-bold">Full access to all episodes</span> 
+                              <span className="block text-sm">500+ episodes with 100+ speeches & 5 Holy Books</span>
                             </span>
                           </li>
 
                           <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pr-2 pt-1">
+                            <div className="w-6 pt-1 pr-2">
                               <IonIcon icon={checkmarkCircle} color="primary" size="small" />
                             </div>
 
                             Text daily reminders
                           </li>                          
                           <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pr-2 pt-1">
+                            <div className="w-6 pt-1 pr-2">
                               <IonIcon icon={checkmarkCircle} color="medium" size="small" />
                             </div>
 
@@ -354,70 +454,14 @@ const ProfilePage:React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="shadow p-5 rounded-lg border-t-4 border-medium bg-white dark:bg-gray-800">
-                      <p className="uppercase text-sm font-medium text-gray-500">
-                        Free Account
-                      </p>
-
-                      <p className="mt-4 text-3xl text-gray-700 dark:text-gray-100 font-medium">
-                        $0 <span className="text-base font-normal"></span>
-                      </p>
-
-                      <p className="mt-4 font-medium text-gray-700 dark:text-gray-100">
-                        Not yet supporting
-                      </p>
-
-                      <div className="mt-8">
-                        <ul className="grid grid-cols-1 gap-4">
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pr-2 pt-1">
-                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
-                            </div>
-                            1 newest episode daily
-                          </li>
-
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pr-2 pt-1">
-                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
-                            </div>
-
-                            Email and push daily reminders
-                          </li>
-
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pr-2 pt-1">
-                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
-                            </div>
-
-                            Save lists of episodes
-                          </li>
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pr-2 pt-1">
-                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
-                            </div>
-
-                            Note your inspirations
-                          </li>
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pr-2 pt-1">
-                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
-                            </div>
-
-                            Spiritual life calendar
-                          </li>
-                        </ul>
-                      </div>
-
-
-                    </div>
                   </div>
-                <div className="w-full flex flex-col items-start">
-                  <h2>Select your donation <span className="border-b-4 border-primary pb-1">monthly</span></h2>
+                <div className="flex flex-col items-start w-full">
+                  <h2>Select your donation <span className="pb-1 border-b-4 border-primary">monthly</span></h2>
                   <div>
-                    <IonChip><span className="text-light text-xs pr-1">$</span><span className="font-bold text-lg">7</span></IonChip>
-                    <IonChip><span className="text-light text-xs pr-1">$</span><span className="font-bold text-lg">12</span></IonChip>
-                    <IonChip><span className="text-light text-xs pr-1">$</span><span className="font-bold text-lg tracking-tighter">21</span></IonChip>
-                    <IonChip><span className="text-light text-xs pr-1">$</span><span className="font-bold text-lg">40</span></IonChip>
+                    <IonChip><span className="pr-1 text-xs text-light">$</span><span className="text-lg font-bold">7</span></IonChip>
+                    <IonChip><span className="pr-1 text-xs text-light">$</span><span className="text-lg font-bold">12</span></IonChip>
+                    <IonChip><span className="pr-1 text-xs text-light">$</span><span className="text-lg font-bold tracking-tighter">21</span></IonChip>
+                    <IonChip><span className="pr-1 text-xs text-light">$</span><span className="text-lg font-bold">40</span></IonChip>
                     <IonChip>Enter an amount</IonChip>
                   </div>
                 </div>
@@ -437,7 +481,7 @@ const StreakDetails = ({streak, max}) => {
     
     <IonContent className="ion-padding">
     <div className="flex flex-col items-center space-x-1">
-      <div className="flex items-center font-medium space-x-2">
+      <div className="flex items-center space-x-2 font-medium">
         <IonIcon size="small" icon={flame} color="primary" />
           {`${streak ? streak : 0}-Day Streak`}
       </div>

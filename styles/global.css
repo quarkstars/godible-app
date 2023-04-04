@@ -308,6 +308,10 @@ body.dark ::-webkit-scrollbar-thumb {
 }
 
 /* Menu.tsx */
+ion-split-pane {
+  --side-max-width: 325px;
+}
+
 ion-menu ion-content {
   --background: var(--ion-item-background, var(--ion-background-color, #fff));
 }
