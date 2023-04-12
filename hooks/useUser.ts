@@ -1,6 +1,6 @@
-import { IUser } from 'data/types';
+import { IDateMap, IListening, IUser } from 'data/types';
 import { IList } from 'data/types';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 //Used in AppShell to create a UserContext and interact with the logged in User on the server
 
 import { checkmarkCircle } from 'ionicons/icons';
@@ -26,8 +26,6 @@ export interface IUserState {
     setReroutePath: React.Dispatch<SetStateAction<string | undefined>>,
     notice?: INotice,
     setNotice: React.Dispatch<SetStateAction<INotice | undefined>>,
-    language: string,
-    setLanguage: React.Dispatch<SetStateAction<string>>,
     isOnboarding: boolean,
     setIsOnboarding: React.Dispatch<SetStateAction<boolean>>,
 
@@ -35,6 +33,7 @@ export interface IUserState {
     updateUser: (update: IUser) => Promise<IUser>,
     setUpdateError: React.Dispatch<any>,
     updateError: any,
+    getCurrentUser: Function,
 
 
     //SIGN UP
@@ -57,6 +56,10 @@ export interface IUserState {
     resetError: any,
     setResetError: React.Dispatch<any>,
     reset: Function,
+
+    getMonth: Function,
+    highlightedDates: any[],
+    dateMap: IDateMap,
 }
 
 
@@ -76,6 +79,7 @@ const useUser = () => {
 
     //Logged in user
     const [user, setUser] = useState<IUser>({}); 
+    
 
     //language preference. Should be lowercase
     const [language, setLanguage] = useState<string>("english");
@@ -383,6 +387,76 @@ const useUser = () => {
         }
     };
 
+    //Get Calendar
+
+    //Get latest listening and next episode
+    const getNextEpisode = async (month: string,) => {
+        if (!user.objectId) return;
+        
+        try {
+
+            //Get most recent listen
+            // Submit the delete request to the server
+        } catch (error) {
+            // error can occur in background
+            console.error(error);
+            return undefined;
+        } 
+    }
+
+
+    //Calendar, get month
+    const fetchedMonths = useRef<string[]>([]);
+    const [highlightedDates, setHighlightedDates] = useState<any[]>([]);
+    const [dateMap, setDateMap] = useState<IDateMap>({});
+    const getMonth = async (month: string,) => {
+        if (!user.objectId) return;
+        if (fetchedMonths.current.includes(month)) return;
+        try {
+            //Listenings
+            let listenings = await Parse.Cloud.run("getListenings", {options: {month, hasValidSession: true}}) as IListening[];     
+            let newHighlightedDates:any[] = [];
+            let newDateMap:IDateMap = {};
+            listenings.map((listening) => {
+                if (!listening.date) return;
+                newHighlightedDates = [
+                    ...highlightedDates,
+                    {
+                        date: listening.date,
+                        backgroundColor: '#91caa8',
+                    }
+                ];
+                const pastListenings = dateMap[listening.date]?.listenings || [];
+                newDateMap[listening.date] = {
+                    ...dateMap[listening.date],
+                    listenings: [...pastListenings, listening]
+                }
+            });
+            //Notes (specify the user's notes only)
+            const notes = await Parse.Cloud.run("getNotes", {options: {month, userId: user.objectId}});     
+            notes.map((note) => {
+                if (!note.date) return;
+                const pastNotes = dateMap[note.date]?.notes || [];
+                newDateMap[note.date] = {
+                    ...dateMap[note.date],
+                    ...newDateMap[note.date],
+                    notes: [...pastNotes, note]
+                }
+            });
+            setHighlightedDates(newHighlightedDates);
+            setDateMap(newDateMap);
+            fetchedMonths.current = [...fetchedMonths.current, month]
+            
+            // Submit the delete request to the server
+        } catch (error) {
+            // error can occur in background
+            console.error(error);
+        } 
+    }
+
+    //update streak if logging in
+
+
     //TODO: Get next episode based on criteria
     //lastEpisode?: IEpisode, //For link and episode number
     //lastListId?: string, //Check what's next on the list and load the whole list or just check the next on in the book exists if not, just start that one over.
@@ -399,8 +473,6 @@ const useUser = () => {
         setNotice,
 
         //Preferences
-        language,
-        setLanguage,
         getCurrentUser,
         isOnboarding,
         setIsOnboarding,
@@ -431,6 +503,11 @@ const useUser = () => {
         updateUser,
         updateError,
         setUpdateError,
+
+        //CALENDAR
+        getMonth,
+        highlightedDates,
+        dateMap,
     }
 }
 

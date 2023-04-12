@@ -10,10 +10,16 @@ import { EpisodeCard } from 'components/ui/EpisodeCard';
 import { IEpisode } from 'data/types';
 import { sampleBooks, sampleEpisodes, sampleTopics } from 'data/sampleEpisodes';
 import { PlayerControls } from 'components/ui/PlayerControls';
-import { Player, UserState } from 'components/AppShell';
+import { Player } from 'components/AppShell';
 import useEpisodes from 'hooks/useEpisodes';
-import { BookCard } from 'components/ui/BookCard';
+import { BookCard } from 'components/ui/BookCard'; 
 import Copyright from 'components/ui/Copyright';
+import useBooks from 'hooks/useBooks';
+import useTopics from 'hooks/useTopics'; 
+import useLists from 'hooks/useLists';
+import useNotes from 'hooks/useNotes';
+import { UserState } from 'components/UserStateProvider';
+import { TopicCard } from 'components/ui/TopicCard';
 
 const HomePage:React.FC = () => {
 
@@ -27,28 +33,132 @@ const HomePage:React.FC = () => {
   
   //TODO: Attempting to prevent reordering by the list reorderer
   const player = useContext(Player);
-  const {appendEpisodeStrings} = useEpisodes();
+  const {
+    appendEpisodeStrings, 
+    getEpisodes, 
+    isLoading: episodesIsLoading,
+    error: episodesError,
+    episodes,
+  } = useEpisodes();
+  const {getBooks, books} = useBooks();
+  const {getTopics, topics} = useTopics();
+  const {getLists, lists, postList, reorderEpisodes, reorderLists, addEpisodeToList, deleteList, removeEpisodeFromList} = useLists();
+  const {getNotes, postNote, deleteNote, postNoteFeedback} = useNotes();
+  //Get episodes
   useEffect(() => {
-    setLatestEpisodes(JSON.parse(latestEpisodesString.current));
-  }, [player.list])
-  const [latestEpisodes, setLatestEpisodes] = useState(sampleEpisodes);
-  const latestEpisodesString = useRef(JSON.stringify(sampleEpisodes));
+    // if (!user.objectId) return;
+    console.log("GET EPISODES AGAIN!")
+    getEpisodes(undefined, {limit: 12, exclude: ["text"]});
+    // quickTest();
+  }, [user.objectId]);
 
-      // Handle Click
-      const handleListenClick = (e, index: number) => {
-          e.preventDefault();
-          player.setIsAutoPlay(true);
-          player.setList({episodes: latestEpisodes});
-          player.setIndex(index);
-          router.push(appendEpisodeStrings(latestEpisodes[index])._path!);
-      }
+  //Get topics
+  useEffect(() => {
+    if (topics) return;
+    getTopics(undefined, {limit: 12, sort: "+index"});
+  }, []);
+  //Get Books
+  useEffect(() => {
+    if (books) return;
+    getBooks(undefined, {limit: 12, sort: "+index"});
+  }, []);
+  console.log("BOOKS TOPICS", books, topics)
 
+  // useEffect(() => {
+  //   setLatestEpisodes(JSON.parse(latestEpisodesString.current));
+  // }, [player.list])
+  // const latestEpisodesString = useRef(JSON.stringify(sampleEpisodes));
+
+  // Handle Click
+  const handleListenClick = (e, index: number) => {
+    if (!episodes) return;
+    if (episodes.length < 1) return;
+    //Reverse episodes because playlist should be incremental
+      e.preventDefault();
+      const reversedEpisodes = [...episodes].reverse();
+      const reversedIndex = Math.abs(episodes.length - 1 - index);
+      player.setIsAutoPlay(true);
+      player.setList({episodes: reversedEpisodes});
+      player.setIndex(reversedIndex);
+      router.push(appendEpisodeStrings(episodes[index])._path!);
+  }
+
+  console.log("EPISODES", episodes);
+  async function quickTest() {
+    await getBooks();
+    console.log("BOOKS ALL", books);
+    // await getBooks(["GB8WMxtDTx"]); 
+    // console.log("BOOKS", books);
+    // await getEpisodes();
+    // console.log("EPISODE ALL", episodes); 
+    // console.log("EPISODES only number", episodes); 
+    // await getEpisodes({include: ["number", "text", "quote", "book"]});
+    // console.log("EPISODES only number", episodes);
+    // await getEpisodes({include: ["number"], sort: "-number"});
+    // console.log("EPISODES only -number", episodes);
+    // await getEpisodes({include: ["number"], sort: "+number"});
+    // console.log("EPISODES only +number", episodes);
+    // await getEpisodes({search: "spiritual"});
+    // console.log("EPISODES search spiritual", episodes);
+    // await getEpisodes({search: "spiritual", limit: 1, skip: 1});
+    // console.log("EPISODES search limit 1, skip 1", episodes);
+    // await getEpisodes({bookIds: ["xQUvSz4VSJ"], include: ["book"]});
+    // console.log("EPISODES book filter", episodes)
+    // await getEpisodes({topicIds: ["NtS19tf8UC"]});
+    // console.log("EPISODES topic filter", episodes); 
+    // await getEpisodes(undefined, {limit: 1, skip: 1}); 
+    // console.log("EPISODES get limit 1 skip 1", episodes); 
+    // await getEpisodes({limit: 1, skip: 2});
+    // console.log("EPISODES get limit 1 skip 2", episodes);
+    // await getBooks();
+    // console.log("BOOKS ALL", books);
+    // await getBooks(["GB8WMxtDTx"]);
+    // console.log("BOOKS ID", books);
+    // await postList({name: "Mike's Other List", index: 2});
+    // console.log("USER ID", user);
+    // await getLists(undefined, {userId: user.objectId, sort: "+index"});
+    // await removeEpisodeFromList(3, "vUgJiuslyU") 
+    // await getLists(undefined, {userId: user.objectId, sort: "+index"})
+    // setTimeout(async() => {console.log("NEW ALL", lists)}, 100); 
+    // setTimeout(async() => {await reorderLists(1, 2);}, 500); 
+    // setTimeout(async() => {await postList({name: "New List", index: lists?.length||1});}, 6500); 
+    // setTimeout(async() => {await getLists(undefined, {userId: user.objectId, sort: "+index"})}, 1000); 
+    // setTimeout(async() => {console.log("NEW ALL", lists)}, 2500); 
+    // await postList({name: "Bookmarks", index: 0});  
+    // setTimeout(async() => {await getLists(undefined, {userId: user.objectId, sort: "+index"})}, 7000); 
+    // setTimeout(async() => {console.log("NEW ALL", lists)}, 7500); 
+    // setTimeout(async() => {await removeEpisodeFromList(3, "vUgJiuslyU")}, 8500);  
+    // setTimeout(async() => {await addEpisodeToList(2, "vUgJiuslyU")}, 8500);
+    // setTimeout(async() => {await getLists(undefined, {userId: user.objectId, sort: "+index"})}, 9000); 
+    // setTimeout(async() => {console.log("NEW ALL UPDATE", lists)}, 9500); 
+    // setTimeout(async() => {await deleteList(2)}, 3000); 
+    // setTimeout(async() => {await getLists(undefined, {userId: user.objectId, sort: "+index"})}, 3200); 
+    // setTimeout(async() => {console.log("NEW ALL DELETED", lists)}, 3500);  
+    // console.log("LISTS ID", lists);  
+    // await getTopics();
+    // console.log("TOPICS ALL", topics); 
+    // await getTopics(["NtS19tf8UC"]);
+    // console.log("TOPICS ID", topics);
+    // await postNote({text: "my note", isPublic: true});
+    // await postNoteFeedback({noteId: "hTr5xMpzNa", isHearted: null, isFlagged: null, report: "Hey"}) ;
+    // await getLists(undefined, {userId: user.objectId, sort: "+index"})
+    // await deleteNote("K4gTFvxAEJ");
+  }
+  
+  console.log("EPISODE ALL", episodes); 
   return (
     <IonPage>
     <IonHeader>
       <Toolbar>
         <IonTitle>
-          Welcome
+          <div className="flex items-center justify-center w-full py-2 md:hidden">
+            {user.objectId ? 
+              <img src='/logo/godible-logo.png' className='w-24'/>
+            :
+              <span>Welcome</span>
+            }
+          </div>
+          <div className="hidden md:inline">Welcome</div>
         </IonTitle>
       </Toolbar>
       </IonHeader>
@@ -61,34 +171,24 @@ const HomePage:React.FC = () => {
               title={"Let God's Word Be Heard"}
               subtitle={"Playable Hoon Dok Hae"}
               mainButtonText={"Sign Up"}
-              // mainButtonIcon={listener}
               onClickMain={() => router.push("/signup")}
               subButtonText={"Log in"}
               subButtonIcon={arrowForwardOutline}
-              // isMainClear={} Listen To List
               onClickSub={() => router.push("/signin")}
               overlayColor={"linear-gradient(90deg, rgba(97,219,146,.2) 0%, rgba(0,255,239,.2) 100%)"}
               bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
-              // postImageUrl={} 
-              // postText={}
-              // scrollIsHidden={}
-              // isQuote={}
               preImageUrl={"/logo/godible-logo-white.png"}
               postText={"Now available on Android, iOS, or on the web"}
-              // preText={}
             />
           </SwiperSlide>
           }
-            {latestEpisodes.map((_episode, index) => {
+            {episodes && episodes.map((episode, index) => {
         //TODO: Test again
-              const episode = appendEpisodeStrings(_episode)
-              let createdAt = episode.createdAt || Date.now();
-              const createdTime = Math.floor(new Date(createdAt).getTime());
-              const day = new Date(createdAt).getDay();
-              const oneWeekAgo = Date.now() - createdTime > 6.048e+8;
-              let pretext = (!index && Date.now() - createdTime < 8.64e+7) ? "Today's Episode" : `${oneWeekAgo ? "Last": ""} ${new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(day)}'s Episode`
+              const publishedAt = episode.publishedAt!;
+              const oneWeekAgo = Date.now() - publishedAt > 6.048e+8;
+              let pretext = (!index && Date.now() - publishedAt < 8.64e+7) ? "Today's Episode" : `${oneWeekAgo ? "Last": ""} ${new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(publishedAt)}'s Episode`
               return (
-              <SwiperSlide key={"lateps-"+episode.objectId}>
+              <SwiperSlide key={"ephero-"+episode.objectId}>
                 <Hero 
                   // title={"Let God's Word Be Heard"}
                   subtitle={episode._quote}
@@ -121,20 +221,22 @@ const HomePage:React.FC = () => {
             <h2 className="mt-0 text-2xl">
               Latest Episodes
             </h2>
-            <IonButton fill="clear" color="medium">
+            <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=episodes")}>
               Show All
             </IonButton>
           </div>
           
-          <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={225}>
-            {latestEpisodes.map((episode, index) => {
+          <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={200}>
+            {episodes && episodes.map((episode, index) => {
               return (
-                <SwiperSlide key={"lateps-"+episode.objectId}>
+                <SwiperSlide key={"epcard-"+episode.objectId}>
                   <EpisodeCard 
                     size={episodeWidth}
-                    list={{episodes: sampleEpisodes}}
+                    
+                    list={{episodes}}
                     index={index}
                     episode={episode}
+                    customClickHandler={(e) => {handleListenClick(e, index)}}
                   />
               </SwiperSlide>
               )
@@ -148,23 +250,21 @@ const HomePage:React.FC = () => {
             <h2 className="mt-0 text-2xl">
               Topics
             </h2>
-            <IonButton fill="clear" color="medium">
+            <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=topics")}>
               Show All
             </IonButton>
           </div>
           
-          <SlideList isCarousel spaceBetween={5} setItemWidth={setTopicWidth} idealWidth={170}>
-                {sampleTopics.map((topic, index) => {
+          <SlideList isCarousel spaceBetween={5} setItemWidth={setTopicWidth} idealWidth={180}>
+                {topics && topics.map((topic, index) => {
                   return (
                     <SwiperSlide key={"topic-"+topic.name+"-"+index}>
-                      <Thumbnail 
+                      <TopicCard 
                         size={topicWidth}
-                        imageUrl={topic.imageUrl}
-                        overlayColor='#000000'
-                        key={index}
-                      >
-                      <span className="text-xl font-bold text-white w-full text-center px-2">{topic.name?.english}</span>
-                      </Thumbnail>
+                        topic={topic}
+                        index={index}
+                        key={topic?.objectId}
+                      />
                 </SwiperSlide>
               )
             })
@@ -177,13 +277,13 @@ const HomePage:React.FC = () => {
             <h2 className="mt-0 text-2xl">
               Books
             </h2>
-            <IonButton fill="clear" color="medium">
+            <IonButton fill="clear" color="medium" onClick={() => router.push("/books")}>
               Show All
             </IonButton>
           </div>
           
           <SlideList isCarousel spaceBetween={5} setItemWidth={setBookWidth} idealWidth={376}>
-            {sampleBooks.map((book, index) => {
+            {books && books.map((book, index) => {
               return (
                 <SwiperSlide key={"lateps-"+book.objectId}>
                   <BookCard 

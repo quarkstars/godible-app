@@ -1,9 +1,13 @@
 import { useIonRouter } from '@ionic/react';
-import { UserState } from './../components/AppShell';
 //Used in AppShell to create a PlayerContext and interact with a consistent player while browsing the app
 
 import { IEpisode, IList } from 'data/types';
 import React, { useContext, useEffect, useRef, useState } from 'react'
+import { Pointer } from 'parse';
+import { UserState, UserStateDefault } from 'components/UserStateProvider';
+import { IUserState } from './useUser';
+import { toIsoString } from 'utils/toIsoString';
+import useEpisodes from './useEpisodes';
 
 interface IProgressBar {
     value: number,
@@ -39,6 +43,7 @@ export interface IPlayer {
         switchEpisode: Function,
         rewind: Function,
         next: Function,
+        userState: React.MutableRefObject<IUserState>|undefined,
 }
 
 export const calculateTime = (secs: number) => {
@@ -64,18 +69,22 @@ const usePlayer = ():IPlayer => {
     const _audio = useRef(new Audio()) 
     const [isAutoPlay, setIsAutoPlay] = useState<boolean>(false);
 
-    const {language,} = useContext(UserState);
+    //User needed to save position
+    const userState = useRef<IUserState>(UserStateDefault);
+    const { user } = userState.current;
+
+    
+    const invalidPositionEpisodeIds= useRef<string[]>([]);
 
     //Update audio element everytime the episode list changes, the index, or the userState (which indicates language)
-    useEffect(() => {
+    const initializeAudio = () => {
         const audio = _audio.current;
         if (!audio) return;
         if (!list?.episodes || typeof index !== "number") return;
-        const episode = list?.episodes[index];
+        const episode = list?.episodes[index] as IEpisode;
         if (!episode) return;
 
-        let audioPath = episode.audioPath?.[language];
-        if (!audioPath) audioPath = episode.audioPath?.[episode.audioPath.defaultLanguage];
+        let audioPath = episode._audioPath;
         if (!audioPath)  {
             setMessage("Become a donor to access this audio");
             togglePlayPause(false);
@@ -86,6 +95,10 @@ const usePlayer = ():IPlayer => {
         if (audioPath === audio.src) return;
         //Found Audio, set it
         audio.src = audioPath;
+        //Set the audio to play from the last valid saved position if available and the episode is not completed already
+        if (episode.position && !invalidPositionEpisodeIds.current.includes(episode.objectId) && !episode.position.isComplete) {
+            audio.currentTime = episode.position.seconds || 0;
+        }
         audio?.load();
         let timer:NodeJS.Timeout;
         if (isPlaying || isAutoPlay) timer = setTimeout(() => {
@@ -99,11 +112,23 @@ const usePlayer = ():IPlayer => {
         setIsVisible(true);
 
         return () => {if (timer) clearTimeout(timer);}
+    }
+    useEffect(() => {
+        console.log("INITIALIZING AUDIO")
+        initializeAudio();
+    }, [_audio.current, list?.episodes, index]);
+    useEffect(() => {
+        console.log("INITIALIZING AUDIO CURRENT", _audio.current)
+    }, [_audio.current]);
+    useEffect(() => {
+        console.log("INITIALIZING AUDIO LIST", list?.episodes)
+    }, [list?.episodes]);
+    useEffect(() => {
+        console.log("INITIALIZING AUDIO INDEX", index)
+    }, [index]);
 
-    }, [_audio.current, list?.episodes, index, language]);
+
     //Start Audio when audio loads if autoplay is on
-
-
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [timeTilNext, setTimeTilNext] = useState<number|undefined>();
     const [currentSeconds, setCurrentSeconds] = useState(0);
@@ -150,16 +175,61 @@ const usePlayer = ():IPlayer => {
             return;
         }
         if (!isReady) setIsReady(true);
+
     }, [_audio, _audio.current?.readyState, currentSeconds]);
 
+
+
     //Check every time updating
-    //The duration last passed to server
-    const savedDuration = useRef<number|undefined>();
+    //The seconds last passed to server
+    const savedSeconds = useRef<number>(0);
     //The total time from the server history + accumulated locally (can continue in state offline)
-    const listenedSeconds = useRef<number|undefined>();
+    const listenedSeconds = useRef<number>(0);
+    const postListening = async (params) => {
+        try {
+             const listening = await  Parse.Cloud.run("postListening", params);
+             console.log("LISTEINING", listening)
+            } catch (err) {
+                console.error(err)
+            }
+    }
     useEffect(() => {
 
-        //TODO: if saved duration is 10 seconds older than current duration, save to server (on server check how many seconds from end and less than 10, consider it complete)
+        //save Listening and Position every 10 seconds
+        if (user.objectId && duration && !isNaN(duration) && currentSeconds > savedSeconds.current + 10) {
+            let episode = list?.episodes[index];
+            if (!episode) return;
+            let episodePointer:Pointer|undefined;
+            episodePointer = {objectId: episode.objectId!, __type: "Pointer", className: "Episode"}
+            const date = toIsoString(new Date()).split("T")[0]; // get YYYY-MM-DD
+            let progress = currentSeconds/duration;
+            let isComplete = progress >= .95;
+            let isValidSession = (listenedSeconds.current >= 50) ? true : false;
+            const updatedTime = Date.now();
+            const listening = {
+                date: date,
+                month: date.slice(0, 7),
+            }
+            const position = {
+                isComplete, 
+                isValidSession,
+                seconds: currentSeconds,
+                listId: list?.objectId,
+                index: index,
+                updatedTime,
+                episode: episodePointer,
+                episodeId: episode.objectId,
+                progress
+            }
+            listenedSeconds.current += 10;
+            savedSeconds.current = currentSeconds;
+            postListening({listening, position});
+            //Invalidate position of episode when first fetched because the user has listened to another position
+            if (!invalidPositionEpisodeIds.current.includes(episode.objectId)) {
+                invalidPositionEpisodeIds.current = [...invalidPositionEpisodeIds.current, episode.objectId]
+            }
+            
+        }
 
         // when you get to the end
         if ((duration && !isNaN(duration)) && duration > 1 && currentSeconds >= duration) {
@@ -170,7 +240,7 @@ const usePlayer = ():IPlayer => {
             }
             
         }
-    }, [currentSeconds, duration]);
+    }, [currentSeconds, duration, user]);
 
 
 
@@ -312,6 +382,7 @@ const usePlayer = ():IPlayer => {
         isReady,
         rewind,
         next,
+        userState,
     }
 }
 

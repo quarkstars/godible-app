@@ -3,11 +3,18 @@ import { BookCard } from 'components/ui/BookCard'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
 import { sampleBooks } from 'data/sampleEpisodes'
-import React from 'react'
+import useBooks from 'hooks/useBooks'
+import React, {useEffect} from 'react'
 
 const BooksPage:React.FC = () => {
 	const router = useIonRouter();
-
+  const {getBooks, books} = useBooks();
+  //Get Books
+  useEffect(() => {
+    if (books) return;
+    getBooks(undefined, {sort: "+index"});
+  }, []);
+  
   let book = sampleBooks[0]
   return (
     <IonPage>
@@ -21,7 +28,7 @@ const BooksPage:React.FC = () => {
       <IonContent>
         <div className='flex justify-center w-full'>
           <div className="flex flex-col p-4 pt-4 space-y-4 sm:p-10 sm:pt-6" style={{maxWidth: "1200px"}}>
-          {sampleBooks.map((book, index) => {
+          {books && books.map((book, index) => {
                 return (
                   <BookCard 
                     book={book} 

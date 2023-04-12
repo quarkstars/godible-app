@@ -2,11 +2,25 @@ import { IBook, IEpisode, ITopic } from "./types";
 
 export const sampleEpisodes = [
     {
-    objectId: "3p1s0de83",
-    number: 83, 
-    slug: "cbmg-83",
-    publishedAt: 1679668752000,
-    
+        objectId: "3p1s0de83",
+        number: 83, 
+        slug: "cbmg-83",
+        publishedAt: 1679668752000,
+        position: {
+            ACL: {role:"moderator"},
+            createdAt : "2023-04-11T02:04:57.789Z",
+            createdTime: 1681178697785,
+            episode:  {className: 'Episode', objectId: 'nYjksrGwDU'},
+            episodeId : "nYjksrGwDU",
+            isComplete : false,
+            isValidSession :  true,
+            objectId: "XIZ0KE3AeB",
+            progress:  0.10855675452196381,
+            seconds:  84.022928,
+            updateTime:  1681178697786,
+            updatedAt:  "2023-04-11T02:10:46.341Z",
+            userId: "qYFwlkMxRW",
+        },
     imageUrl: "https://images.unsplash.com/photo-1679597454618-d1ae16573606?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80",
     book: {
         title: {

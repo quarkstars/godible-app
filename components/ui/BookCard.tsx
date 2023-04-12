@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Thumbnail from './Thumbnail'
 import { IBook, IList } from 'data/types'
-import { Player, UserState } from 'components/AppShell'
+import { Player } from 'components/AppShell'
 import { text, userDefaultLanguage } from 'data/translations'
 import { IonAvatar, IonButton, IonChip, IonIcon, IonLabel, IonRippleEffect, useIonRouter } from '@ionic/react'
-import useBooks from 'hooks/useBooks'
 import { motion, useAnimationControls } from "framer-motion"
 import { arrowForward, chevronDown, chevronUp } from 'ionicons/icons'
+import { UserState } from 'components/UserStateProvider'
+import { resolveLangString } from 'utils/resolveLangString'
 
 interface IBookCardProps {
     size?: number,
@@ -27,10 +28,12 @@ export const BookCard = (props: IBookCardProps) => {
 	const router = useIonRouter();
 
     const {
-        language
+        user
       } = useContext(UserState);
-    const lang = (language) ? language : userDefaultLanguage;
+    const lang = (user.language) ? user.language : userDefaultLanguage;
     const book = props.book;
+    const buyLink = resolveLangString(book?.buyLink, lang)
+    console.log("BUY LINKS", buyLink)
 
     const [hovering, setHovering] = useState<boolean>(false)
     const [showMore, setShowMore] = useState<boolean>(false)
@@ -115,7 +118,14 @@ export const BookCard = (props: IBookCardProps) => {
                     </IonButton>
                     }
                     {props.showBuyLink && book.buyLink && 
-                    <IonButton color="dark" fill="clear">
+                    <IonButton 
+                        color="dark" 
+                        fill="clear" 
+                        onClick={(e) => {
+                            e.stopPropagation;
+                            window.open(buyLink, '_system' /*, 'location=yes' */); 
+                        }}
+                    >
                         <span className="-ml-2 sm:ml-0">Buy Physical Book</span>
                         <IonIcon slot="end" icon={arrowForward} />
                     </IonButton>

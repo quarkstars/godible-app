@@ -1,5 +1,5 @@
-import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonTitle, IonToolbar, useIonModal, useIonPopover, useIonRouter } from '@ionic/react'
-import { UserState } from 'components/AppShell'
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonTitle, IonToolbar, useIonModal, useIonPopover, useIonRouter, useIonViewDidEnter } from '@ionic/react'
+import { UserState } from 'components/UserStateProvider'
 import ListListItem from 'components/ui/ListListItem'
 import SettingsModal from 'components/ui/SettingsModal'
 import TextDivider from 'components/ui/TextDivider'
@@ -10,6 +10,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import InitialsAvatar from 'react-initials-avatar';
 import { FreeMode, Navigation, Thumbs }  from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { toIsoString } from 'utils/toIsoString'
 //https://chrisgriffith.wordpress.com/2019/05/14/ionic-design-profile-page/
 const ProfilePage:React.FC = () => {
 
@@ -27,7 +28,11 @@ const ProfilePage:React.FC = () => {
     logOutError,
     reroutePath,
     logInWithGoogle,
-    setReroutePath
+    setReroutePath,
+    getMonth,
+    highlightedDates,
+    dateMap,
+
   } = useContext(UserState);
 
   //Modal
@@ -64,6 +69,9 @@ const ProfilePage:React.FC = () => {
   const urlParams = new URLSearchParams(router.routeInfo.search)
   const defaultTab = urlParams.get("tab");
   const contentRef = useRef<HTMLIonContentElement | null>(null);
+
+
+
   useEffect(() => {
     window.scroll(0, 0);
     if (!swiperRef) return;
@@ -80,7 +88,27 @@ const ProfilePage:React.FC = () => {
     }  
   }, [defaultTab, swiperRef])
 
-  
+  useEffect(() => {
+    console.log("DID ENTER");
+    const now = new Date();
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; 
+      // suppose the date is 12:00 UTC
+    var invdate = new Date(now.toLocaleString('en-US', {
+      timeZone
+    }));
+
+  // then invdate will be 07:00 in Toronto
+  // and the diff is 5 hours
+  var diff = now.getTime() - invdate.getTime();
+
+  // so 12:00 in Toronto is 17:00 UTC
+    const date = toIsoString(new Date()); // get YYYY-MM-DD
+    
+    const month = date.slice(0, 7);  
+    console.log("DATE", now, invdate, date, month, new Date(new Date().toLocaleString('en', {timeZone})).toISOString(), timeZone);
+    getMonth();
+  }, []);
+  console.log("highlightedDates", highlightedDates, dateMap, user)
 
   return (
     <IonPage>

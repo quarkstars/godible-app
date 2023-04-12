@@ -27,7 +27,7 @@ import SettingsModal from './SettingsModal';
     title: string;
   }
 
-  const titles = ['Saved', 'My List', ];
+  const titles = ['Bookmarks', 'My List', ];
   
   const Menu: React.FC = () => {
     const location = useLocation();
@@ -90,14 +90,14 @@ import SettingsModal from './SettingsModal';
                       routerDirection="none"  
                       button 
                     >
-                      <IonIcon slot="start" icon={listTitle==="Saved" ? bookmark : list} />
+                      <IonIcon slot="start" icon={listTitle==="Bookmarks" ? bookmark : list} />
                       <IonLabel>{listTitle}</IonLabel>
                     </IonItem>
                   ))}
                 </IonList>
               </div>
               <span className="h-0.5 w-full border-t border-gray-400 block border-opacity-10"></span>
-              <div className="flex items-center justify-center md:justify-start w-full">
+              <div className="flex items-center justify-center w-full md:justify-start">
                 <IonButton 
                     onClick={()=> {
                       openSettingsModal()
@@ -108,7 +108,7 @@ import SettingsModal from './SettingsModal';
                   >
                     <IonIcon slot="icon-only" size="small" icon={settingsSharp} />
                   </IonButton>
-                  <div className="border-r dark:border-gray-800 h-full" />
+                  <div className="h-full border-r dark:border-gray-800" />
                 <IonButton 
                     routerLink={"/profile?tab=donation"}
                     routerDirection="none" 
@@ -117,7 +117,7 @@ import SettingsModal from './SettingsModal';
                   >
                     <span className="text-medium">Donate</span>
                   </IonButton>
-                  <div className="border-r dark:border-gray-800 h-full" />
+                  <div className="h-full border-r dark:border-gray-800" />
                 <IonButton 
                     routerLink={"/faq"}
                     routerDirection="none" 
@@ -126,7 +126,7 @@ import SettingsModal from './SettingsModal';
                   >
                     <span className="text-medium">FAQ</span>
                   </IonButton>
-                  <div className="border-r dark:border-gray-800 h-full" />
+                  <div className="h-full border-r dark:border-gray-800" />
                 <IonButton 
                     routerLink={"/terms"}
                     routerDirection="none" 

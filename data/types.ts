@@ -3,7 +3,11 @@ export interface ParseObjectToJson {
     id?: string;
     createdAt?: string;
     updatedAt?: string;
+    createdTime?: number;
+    updatedTime?: number;
     className?: string;
+    ACL?: any,
+    __type?: string,
 }
 
 export interface IUser extends ParseObjectToJson {
@@ -14,7 +18,7 @@ export interface IUser extends ParseObjectToJson {
     fontStyle?: string, //serif, sanserif
 
     //Simple list of all pointers
-    lists?: IList[]
+    lists?: IList[],
     savedListId?: string,
 
     email?: string,
@@ -22,25 +26,20 @@ export interface IUser extends ParseObjectToJson {
     firstName?: string,
     lastName?: string,
 
-    //
-    heartCount?: number,
-    flagCount?: number,
+    // //
+    // heartCount?: number,
+    // flagCount?: number,
 
     
     currentStreak?: number,
     maxStreak?: number,
-    listeningSecondsTotal?: number,
-
-    lastEpisode?: IEpisode,
-    lastListId?: string,
-    lastEpisodePercent?: number,
-    lastEpisodeSeconds?: number,
 }
 
 export interface IList extends ParseObjectToJson {
     name?: string,
     user?: IUser,
     episodes: IEpisode[],
+    slug?: string, //This would be book slug+speech name
 
     // If came from a speech, the metaData will be added here. 
     description?: string,
@@ -48,8 +47,6 @@ export interface IList extends ParseObjectToJson {
     //Perhaps used if the user can share it
     // isPublic?: boolean,
 
-    //Do I need this to make a relation?
-    __type?: "Pointer", 
     //The user's lists will be ordered by the index. "Saved" list will always be index 0
     index?: number
 }
@@ -78,6 +75,7 @@ export interface IEpisode extends ParseObjectToJson {
     episodeTotal?: number,
     topics?: ITopic[],
     isFreeSample?: boolean,
+    position?: IListeningPosition,
 
     isForbidden?: boolean, 
     //Constructed client-side strings based on episode data
@@ -95,6 +93,7 @@ export interface IEpisode extends ParseObjectToJson {
     _authorImageUrl?: string,
     _metaDataBlocks?: string[],
     _quote?: string,
+    _audioPath?: string,
 
 
 }
@@ -122,37 +121,76 @@ export interface IBook extends ParseObjectToJson{
 
 export interface ISpeech extends IList {
     title?: ILangString,
-    slug?: string, //This would be book slug+speech name
     // book?: IBook, 
     metaData?: ILangString,
     //If the speech is only available in a certain language
     language?: string,
 }
 
-export interface INote extends ParseObjectToJson {
-    episodeId?: IEpisode, //name, slug, number, image
+export interface IListening extends ParseObjectToJson {
+    date?: string,
+    month?: string,
     userId?: string,
-    bookId?: string,
+    hasValidSession?: boolean, //If true, session shows
+    positions: IListeningPosition[],
+}
+
+export interface IListeningPosition extends ParseObjectToJson {
+    episode?: IEpisode,
+    isComplete?: boolean,
+    isValidSession?: boolean,
+    seconds?: number,
+    listId?: string,
+    index?: number,
+    updatedTime?: number,
+    createdTime?: number, 
+    progress?: number,
+ }
+
+export interface INote extends ParseObjectToJson {
+    episode?: IEpisode, //name, slug, number, image
     isPublic?: boolean,
     text?: string,
+    userId?: string,
     user?: IUser,
     flagCount?: number,
     heartCount?: number,
     //Appended when delivered to client
-    _isHearted: boolean,
-    _isFlagged: boolean,
+    isHearted?: boolean,
+    isFlagged?: boolean,
 }
 
 //TODO: Is this necessary to have on the client?
 export interface INoteFeedback extends ParseObjectToJson {
     userId?: string,
     noteId?: string,
-    isHearted: boolean,
-    isFlagged: boolean,
+    report?: string,
+    isHearted?: boolean|null,
+    isFlagged?: boolean|null,
 }
 
 export interface ITopic extends ParseObjectToJson  {
     name?: ILangString,
     slug?: string,
     imageUrl?: string,
+    _name?: string,
+}
+
+export interface IGetObjectOptions {
+    limit?: number,
+    skip?: number
+    sort?: string, //Must be preceeded by either - or + (descending or ascending)
+    userId?: string,
+    isPublic?: boolean,
+    include?: string[],
+    exclude?: string[],
+}
+
+
+export interface IDateMap {
+    [date: string]: IDate,
+}
+export interface IDate {
+    listenings?: IListening[],
+    notes?: INote[],
 }

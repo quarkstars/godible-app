@@ -1,5 +1,5 @@
 import { IonAvatar, IonBackButton, IonButton, IonButtons, IonIcon, IonLabel, IonMenuButton, IonToolbar, useIonRouter } from '@ionic/react'
-import { UserState } from 'components/AppShell';
+import { UserState } from 'components/UserStateProvider';
 import { arrowForward } from 'ionicons/icons';
 import React, { useContext } from 'react'
 import InitialsAvatar from 'react-initials-avatar';

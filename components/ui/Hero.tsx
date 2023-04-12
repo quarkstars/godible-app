@@ -81,12 +81,12 @@ const {
                     </h2>
                     }
                     {isQuote && 
-                    <span className="-mb-10 font-serif text-4xl leading-none text-white dark:text-white sm:text-5xl">
+                    <div className="w-full font-serif text-4xl leading-none text-center text-white dark:text-white sm:text-5xl">
                     “
-                    </span>
+                    </div>
                     }
                     {subtitle &&
-                    <p className="font-serif text-center text-white text-md mobile:text-lg dark:text-white xs:text-2xl" style={{marginTop: isQuote ? "-15px" : "0px"}}>
+                    <p className={`font-serif  text-white text-md mobile:text-lg dark:text-white xs:text-2xl ${isQuote ? "text-left xs:text-center" : "text-center"}`} style={{marginTop: isQuote ? "-15px" : "0px"}}>
                       {`${subtitle}${isQuote?"”":""}`}
                     </p>
                     }
@@ -118,7 +118,7 @@ const {
             </div>
         </div>
         {!scrollIsHidden &&
-          <div className="flex items-start justify-center w-full h-10 sm:hidden opacity-50">
+          <div className="flex items-start justify-center w-full h-10 opacity-50 sm:hidden">
             <div className='flex flex-col items-center justify-start'>
               <span className="w-full text-xs uppercase text-dark">Scroll</span>
               <IonIcon icon={chevronDown} color="light" size="small" />

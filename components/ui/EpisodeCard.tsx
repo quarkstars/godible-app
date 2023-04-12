@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import Thumbnail from './Thumbnail'
 import { IEpisode, IList } from 'data/types'
-import { Player, UserState } from 'components/AppShell'
+import { Player } from 'components/AppShell'
 import { text, userDefaultLanguage } from 'data/translations'
 import { IonRippleEffect, useIonRouter } from '@ionic/react'
 import useEpisodes from 'hooks/useEpisodes'
@@ -11,6 +11,7 @@ interface IEpisodeCardProps {
     episode: IEpisode,
     index: number,
     list: IList,
+    customClickHandler?: Function,
 }
 
 export const EpisodeCard = (props: IEpisodeCardProps) => {
@@ -22,11 +23,12 @@ export const EpisodeCard = (props: IEpisodeCardProps) => {
       appendEpisodeStrings
     } = useEpisodes();
 
-    const episode = appendEpisodeStrings(props.episode)
+    const episode = props.episode;
     
     // Handle Click
     const player = useContext(Player);
     const handleEpisodeClick = (e) => {
+        if (props.customClickHandler) {props.customClickHandler(e); return}
         e.preventDefault();
         player.setIsAutoPlay(true);
         player.setList(props.list);
@@ -42,7 +44,7 @@ export const EpisodeCard = (props: IEpisodeCardProps) => {
     return (
         <div 
             className='flex flex-col items-center justify-start py-4 cursor-pointer bg-dark dark:bg-light rounded-xl hover:opacity-80' 
-            style={{width: props.size}}
+            style={{width: props.size, minHeight: "230px"}}
             onMouseEnter={()=>setHovering(true)}
             onMouseLeave={()=>setHovering(false)}
             onClick={handleEpisodeClick}
@@ -54,7 +56,7 @@ export const EpisodeCard = (props: IEpisodeCardProps) => {
                 onCornerClick = {() => {
                     if (episode._bookPath) router.push(episode._bookPath)
                 }}
-                imageUrl={episode.imageUrl}
+                imageUrl={episode.thumbUrl}
                 onClick = {() => {/* Handle Episode click on parent */}}
                 scale={hovering ? 1.05 : 1}
             >

@@ -13,11 +13,22 @@ import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-com
 import ListModal from './ListModal';
 import useEpisodes from 'hooks/useEpisodes';
 import SettingsModal from './SettingsModal';
+import { UserState } from 'components/UserStateProvider';
 
 export const PlayerControls = () => {
 
     const player = useContext(Player);
-        
+    
+    //Pass user state to the usePlayer context because useUser cannot
+    const userState = useContext(UserState);
+    useEffect(() => {
+        console.log("userState update", userState)
+        if (!player.userState) return;
+        player.userState.current = userState;
+    }, [userState]);
+
+    
+
     //Player Functions
 
     //List Modal
@@ -105,9 +116,9 @@ export const PlayerControls = () => {
                 <IonToolbar color={"light"}>
                     <div className="flex flex-row items-center justify-between w-full px-4 space-x-4">   
                         <div className="justify-start hidden xs:flex">    
-                            <div className="flex-shrink-0 hidden w-28 h-28 xs:block">
+                            <div className="flex-shrink-0 hidden w-22 h-22 xs:block">
                                 <Thumbnail 
-                                    size={112}
+                                    size={88}
                                     imageUrl={episode?.imageUrl}
                                     onCornerClick={() => {if (episode?._bookPath) router.push(episode._bookPath)}}
                                     cornerImageUrl={episode?._bookImageUrl}
@@ -184,7 +195,7 @@ export const PlayerControls = () => {
                                     </IonButton>
                                 </IonButtons>
                                     <button 
-                                        className="flex items-center justify-center w-10 h-10 rounded-full shadow-md xs:w-16 xs:h-16 ion-activatable ripple-parent circle bg-primary hover:bg-primary-shade focus:outline-none"
+                                        className="flex items-center justify-center rounded-full shadow-md w-9 h-9 xs:w-12 xs:h-12 ion-activatable ripple-parent circle bg-primary hover:bg-primary-shade focus:outline-none"
                                         onClick={() => player.togglePlayPause()}
                                         style={{opacity: player.audio?.src ? 1 : .5}}
                                     >   

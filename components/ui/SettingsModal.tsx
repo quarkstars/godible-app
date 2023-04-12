@@ -1,11 +1,12 @@
 import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail } from '@ionic/react'
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
-import { Player, Theme, UserState } from 'components/AppShell';
+import { Player, Theme } from 'components/AppShell';
 import { IEpisode, IList } from 'data/types';
 import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send } from 'ionicons/icons';
 import React, {useRef, useContext} from 'react'
 import TextDivider from './TextDivider';
 import InitialsAvatar from 'react-initials-avatar';
+import { UserState } from 'components/UserStateProvider';
 
 interface IPlayerListModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;

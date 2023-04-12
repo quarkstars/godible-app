@@ -33,7 +33,6 @@ const Thumbnail = (props: IThumbnailProps) => {
         controls.start({ scale: props.scale });
     }, [props.scale])
 
-    console.log("backgroundSize", backgroundSize);
 
     return (
         <motion.div 
@@ -46,7 +45,7 @@ const Thumbnail = (props: IThumbnailProps) => {
                 cursor: props.onClick? "pointer" : "default",
             }}
             onClick={(e) => {
-                if (props.onClick) props.onClick();
+                if (props.onClick) props.onClick(e);
             }}
 
         >

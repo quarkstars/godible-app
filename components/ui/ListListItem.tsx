@@ -3,8 +3,8 @@ import { IEpisode, IList } from 'data/types';
 import { addCircleOutline, arrowForward, bookmark, chevronForward, ellipsisVertical, list as listIcon, listCircle, playCircle, pencil, trash, swapVertical } from 'ionicons/icons';
 import React, { useState, useMemo, useContext } from 'react'
 import Thumbnail from './Thumbnail';
-import { UserState } from 'components/AppShell';
 import { userDefaultLanguage } from 'data/translations';
+import { UserState } from 'components/UserStateProvider';
 
 interface IListListItemProps {
   list: IList,
@@ -16,11 +16,11 @@ const ListListItem = (props: IListListItemProps) => {
   const list = props.list;
 
   const {
-    language
+    user
   } = useContext(UserState);
-  const lang = (language) ? language : userDefaultLanguage;
+  const lang = (user?.language) ? user.language : userDefaultLanguage;
   // const bookImageUrl = list.episodes[0]?.book?.imageUrl;
-  const lastEpisode = list.episodes[list.episodes.length-1];
+  const lastEpisode = list.episodes[list.episodes.length-1] as IEpisode;
   const episodes = list.episodes;
   const description = list.description;
   const descriptionBlocks:string[]|undefined = (description) ? description.split(/\r?\n/) : undefined;

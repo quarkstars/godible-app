@@ -1,12 +1,12 @@
-import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonLabel, IonPage, IonRippleEffect, IonTextarea, IonTitle, IonToggle, IonToolbar, useIonModal, useIonViewWillEnter } from '@ionic/react'
-import { Player, UserState } from 'components/AppShell'
+import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonLabel, IonPage, IonRippleEffect, IonSkeletonText, IonTextarea, IonTitle, IonToggle, IonToolbar, useIonModal, useIonViewWillEnter } from '@ionic/react'
+import { Player } from 'components/AppShell'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
 import { text, userDefaultLanguage } from 'data/translations'
 import { IEpisode } from 'data/types'
 import useEpisodes from 'hooks/useEpisodes'
 import { add, bookOutline, bookmark,  documentTextOutline, chevronDown, chevronUp, language, pauseCircle,  playCircle, settings, settingsOutline, documentText, megaphone, send, checkmarkCircle, calendar, close, addCircleOutline } from 'ionicons/icons'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import Thumbnail from 'components/ui/Thumbnail'
 import SettingsModal from 'components/ui/SettingsModal'
@@ -14,6 +14,7 @@ import Note from 'components/ui/Note'
 import TextDivider from 'components/ui/TextDivider'
 import Notes from 'components/ui/Notes'
 import Copyright from 'components/ui/Copyright'
+import { UserState } from 'components/UserStateProvider'
 
 
 
@@ -33,7 +34,8 @@ const EpisodePage:React.FC = () => {
     }
   
   const {
-    appendEpisodeStrings,
+    getEpisodes,
+    episodes,
   } = useEpisodes();
 
   const [episode, setEpisode] = useState<IEpisode|undefined>()
@@ -62,15 +64,28 @@ const EpisodePage:React.FC = () => {
         //set a preliminary episode lite only once from player if it matches
         const currentPlayerEpisode = (typeof player.index === "number") ? player.list?.episodes[player.index] : undefined;
         if (episode?.slug !== currentSlug && currentPlayerEpisode && currentPlayerEpisode.slug === currentSlug) {
-          setEpisode(appendEpisodeStrings(currentPlayerEpisode));
+          setEpisode(currentPlayerEpisode);
         }
+        getEpisodes(undefined, {slug: currentSlug})
   }, [player.list?.episodes[player.index], location.pathname])
+
+  //Update the episode when episodes is updated
+  useEffect(() => {
+    if (!episodes) return;
+    setEpisode(episodes[0]);
+  }, [episodes]);
   
 
   const [showQuote, setShowQuote] = useState(false);  
   useEffect(() => {
     if (!episode) return;
-    //TODO: If episode is not in the player, load it.
+    //If episode from the episode page is not in the player, load it.
+    const currentPlayerEpisode = (typeof player.index === "number") ? player.list?.episodes[player.index] : undefined;
+    //only load it if the currently playing episode is different and we are on an episode page 
+    if (currentPlayerEpisode?.objectId !== episode.objectId && location.pathname.includes("episode")) {
+      player.setList({episodes: [episode]});
+      player.setIndex(0);
+    }
 
     
     if (showQuote === false && episode.isForbidden) setShowQuote(true);
@@ -98,10 +113,70 @@ const EpisodePage:React.FC = () => {
       }
   }, [showMeta]);
 
-  const [presentNotes, dismissNotes] = useIonModal(EpisodeNotes, {
-    onDismiss: (data: string, role: string) => dismissNotes(data, role),
-    episode,
-});
+    const [presentNotes, dismissNotes] = useIonModal(EpisodeNotes, {
+      onDismiss: (data: string, role: string) => dismissNotes(data, role),
+      episode,
+  });
+
+  const episodeText = useMemo(() => {
+    return episode?._textBlocks && episode._textBlocks.map((line, index) => {
+        // if (index === 0) return;
+        const fontWeight = line[0] === '#' ? 'bold' : 'normal';
+        let hCount = 0;
+        if (line[0] === "#") hCount=1;
+        if (line[1] === "#") hCount=2;
+        if (line[2] === "#") hCount=3;
+        if (line[3] === "#") hCount=4;
+        switch (hCount) {
+          case 1:
+            return(
+              <h1
+                className=""
+                key={line}
+              >
+                {line.replace(/#/g,'')}
+              </h1>
+            )
+            break;
+          case 2:
+            return(
+              <h2
+                className=""
+              >
+                {line.replace(/#/g,'')}
+              </h2>
+            )
+            break;
+          case 3:
+            return(
+              <h3
+                className=""
+              >
+                {line.replace(/#/g,'')}
+              </h3>
+            )
+            break;
+          case 4:
+            return(
+              <h4
+                className=""
+              >
+                {line.replace(/#/g,'')}
+              </h4>
+            )
+            break;
+          default:
+            return(
+              <p
+                className={`pb-2 leading-relaxed ${fontStyle} ${fontSize} ${fontContrast}`}
+              >
+                {line.replace(/#/g,'')}
+              </p>
+          )
+        }
+      })
+  }, [episode,fontStyle, fontSize, fontContrast])
+
 
 
   return (
@@ -110,7 +185,13 @@ const EpisodePage:React.FC = () => {
       <Toolbar>
         {/* <IonTitle> */}
           <div className='flex flex-row items-center justify-center w-full space-x-2'>
-            <div className="flex items-center h-full text-lg font-medium">{episode?._title}</div>
+            <div className="flex items-center h-full text-lg font-medium">
+              {episode ? 
+                episode._title
+                :
+                <IonSkeletonText animated={true} style={{ 'width': '100px' }}></IonSkeletonText>
+              }
+            </div>
               <IonButton size="small"
                 onClick={((e:any) => {
                   presentNotes({
@@ -199,10 +280,19 @@ const EpisodePage:React.FC = () => {
           <div className="flex flex-wrap justify-center w-full pb-8">
             <div className={`flex items-start justify-center sm:items-center w-auto`}>
               <motion.div className="overflow-hidden rounded-md pointer-cursor" onClick={()=>setShowMeta(prev => !prev)} animate={metaControls}>
-                <img 
-                  src={episode?._bookImageUrl}
-                  className="w-full cursor-pointer"
-                />
+                
+                {episode ? 
+                  <img 
+                    src={episode?._bookImageUrl}
+                    className="w-full cursor-pointer"
+                  />
+                  :
+                  <div className="flex flex-col w-full">
+                    <IonSkeletonText animated={true} style={{ 'width': '180px', }}></IonSkeletonText>
+                    <IonSkeletonText animated={true} style={{ 'width': '90px','height': '90px' }}></IonSkeletonText>
+                    <IonSkeletonText animated={true} style={{ 'width': '150px', }}></IonSkeletonText>
+                  </div>
+                }
               </motion.div>
                               
               <AnimatePresence>
@@ -257,63 +347,11 @@ const EpisodePage:React.FC = () => {
               </IonButtons>
           </div>    
 
-          {episode?._textBlocks && episode._textBlocks.map((line, index) => {
-            // if (index === 0) return;
-            const fontWeight = line[0] === '#' ? 'bold' : 'normal';
-            let hCount = 0;
-            if (line[0] === "#") hCount=1;
-            if (line[1] === "#") hCount=2;
-            if (line[2] === "#") hCount=3;
-            if (line[3] === "#") hCount=4;
-            switch (hCount) {
-              case 1:
-                return(
-                  <h1
-                    className=""
-                    key={line}
-                  >
-                    {line.replace(/#/g,'')}
-                  </h1>
-                )
-                break;
-              case 2:
-                return(
-                  <h2
-                    className=""
-                  >
-                    {line.replace(/#/g,'')}
-                  </h2>
-                )
-                break;
-              case 3:
-                return(
-                  <h3
-                    className=""
-                  >
-                    {line.replace(/#/g,'')}
-                  </h3>
-                )
-                break;
-              case 4:
-                return(
-                  <h4
-                    className=""
-                  >
-                    {line.replace(/#/g,'')}
-                  </h4>
-                )
-                break;
-              default:
-                return(
-                  <p
-                    className={`pb-2 leading-relaxed ${fontStyle} ${fontSize} ${fontContrast}`}
-                  >
-                    {line.replace(/#/g,'')}
-                  </p>
-                )
-            } 
-          })
-        }
+          {(episode && episode.text) ? 
+              episodeText
+            :
+            new Array(20).fill(undefined).map((item, index) => { return <IonSkeletonText key={"skel-"+index} animated={true} style={{ 'width': '100%' }}></IonSkeletonText>})
+          }
         <Copyright />
         <div id="topics" className="flex flex-col w-full p-8 py-4 rounded-lg bg-dark dark:bg-light">
             <h4 className="leading-relaxed">Godible is possible because of the support of listeners like you</h4>

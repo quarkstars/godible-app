@@ -17,44 +17,10 @@ import Routes from "./Routes";
 import useUser, { IUserState } from "hooks/useUser";
 import { initializeParse } from "@parse/react";
 import { PlayerControls } from "./ui/PlayerControls";
+import UserStateProvider from "./UserStateProvider";
 
 setupIonicReact({});
 
-//Setup Contexts
-export const UserState = createContext<IUserState>({
-  user: {},
-  isLoading: false,
-  reroutePath: undefined,
-  setReroutePath: () => null,
-  notice: undefined,
-  setNotice: () => null,
-  language: "",
-  setLanguage: () => null,
-  isOnboarding: false,
-  setIsOnboarding: () => null,
-
-  //SIGN UP
-  signUpError: undefined,
-  setSignUpError: () => null,
-  signUp: async () => null,
-  
-  logInError: undefined,
-  setLogInError: () => null,
-  logIn: async () => null,
-  logInWithGoogle: async () => null,
-
-  logOutError: undefined,
-  setLogOutError: () => null,
-  logOut: async () => null,
-
-  resetError: undefined,
-  setResetError: () => null,
-  reset: async () => null,
-
-  updateUser: async (update: IUser) => { return update},
-  updateError: undefined,
-  setUpdateError: () => null,
-})
 export const Theme = createContext<ITheme>({
   isDark: false,
   setIsDark: () => null,
@@ -89,6 +55,7 @@ export const Player = createContext<IPlayer>({
     rewind: () => null,
     next: () => null,
     setIsAutoPlay: () => null,
+    userState: undefined,
 })
 
 initializeParse(
@@ -101,11 +68,10 @@ initializeParse(
 const AppShell: React.FC = () => {
 
   const theme = useTheme();
-  const userState = useUser();
   const player = usePlayer();
 
   return (
-    <UserState.Provider value={userState}>
+    <UserStateProvider>
       <Theme.Provider value={theme}>
         <Player.Provider value={player}>
           <IonApp>
@@ -118,7 +84,7 @@ const AppShell: React.FC = () => {
           </IonApp>
         </Player.Provider>
       </Theme.Provider>
-    </UserState.Provider>
+    </UserStateProvider>
   );
 };
 

@@ -1,5 +1,5 @@
 import { IonBackButton, IonButton, IonButtons, IonCardTitle, IonCheckbox, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRouterLink, IonRow, IonText, IonTitle, IonToolbar, useIonLoading, useIonRouter } from '@ionic/react';
-import { Theme, UserState } from 'components/AppShell';
+import { UserState } from 'components/UserStateProvider';
 import AlertInline from 'components/ui/AlertInline';
 import LoggedInAlready from 'components/ui/LoggedInAlready';
 import TextDivider from 'components/ui/TextDivider';

@@ -1,10 +1,11 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonRange, IonReorder, IonReorderGroup, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail } from '@ionic/react'
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
-import { Player, Theme, UserState } from 'components/AppShell';
+import { Player, Theme } from 'components/AppShell';
 import { IEpisode, IList } from 'data/types';
 import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close } from 'ionicons/icons';
 import React, {useRef, useContext} from 'react'
 import TextDivider from './TextDivider';
+import { UserState } from 'components/UserStateProvider';
 
 interface IOnboardingModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
