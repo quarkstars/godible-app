@@ -219,7 +219,8 @@ const usePlayer = ():IPlayer => {
                 updatedTime,
                 episode: episodePointer,
                 episodeId: episode.objectId,
-                progress
+                progress,
+                // duration,
             }
             listenedSeconds.current += 10;
             savedSeconds.current = currentSeconds;

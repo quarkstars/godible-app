@@ -21,6 +21,7 @@ interface IBookCardProps {
     showBuyLink?: boolean,
     showEpisodesLink?: boolean,
     showReaders?: boolean,
+    breakpoint?: string,
 }
 
 export const BookCard = (props: IBookCardProps) => {
@@ -50,7 +51,7 @@ export const BookCard = (props: IBookCardProps) => {
 
     return (
         <div 
-            className={`flex flex-row flex-wrap items-stretch justify-start p-4 mobile:flex-row bg-dark dark:bg-light rounded-xl ${props.onClick ? "hover:opacity-80 cursor-pointer" : ""}`} 
+            className={`flex flex-row flex-wrap items-stretch justify-center ${props.breakpoint ? props.breakpoint: "mobile"}:justify-start p-4 mobile:flex-row bg-dark dark:bg-light rounded-xl ${props.onClick ? "hover:opacity-80 cursor-pointer" : ""}`} 
             style={{width: props.isFullWidth? "100%" : props.size}}
             onMouseEnter={()=>setHovering(true)}
             onMouseLeave={()=>setHovering(false)}
@@ -58,8 +59,8 @@ export const BookCard = (props: IBookCardProps) => {
                 if (props.onClick) props.onClick(e);
             }}
         >
-            <motion.div className='w-full overflow-hidden mobile:w-1/3' animate={controls} style={{maxWidth:"350px"}}>
-                <div className='w-full h-auto overflow-hidden rounded-lg '>
+            <motion.div className={`w-full overflow-hidden ${props.breakpoint ? props.breakpoint: "mobile"}:w-1/3`} animate={controls} style={{maxWidth:"320px"}}>
+                <div className='w-full h-auto overflow-hidden rounded-lg'>
                     <img 
                         className="w-full"
                     src={book.imageUrl}     
@@ -70,21 +71,21 @@ export const BookCard = (props: IBookCardProps) => {
                 <div 
                     className={`pt-2 pb-0 block font-bold leading-tight ${(props?.size||768) > 500 ? "text-xl xs:text-2xl md:text-3xl lg:text:4xl" : "text-md line-clamp-2"}`}
                 >
-                    {book.title[lang]}
+                    {resolveLangString(book?.title, lang)}
                 </div>
-                {(props.showTagline && book.tagline?.[lang]) && 
+                {(props.showTagline && resolveLangString(book.tagline, lang)) && 
                 <div 
                     className={`pt-2 pb-0 block font-medium leading-tight text-light dark:text-dark line-clamp-2 ${(props?.size||768) > 500 ? "text-xl" : "text-sm"}`}
                 >
-                    {book.tagline?.[lang]}
+                    {resolveLangString(book.tagline, lang)}
                 </div>
                 }
-                {(props.showDescription && book.description?.[lang]) && 
+                {(props.showDescription && resolveLangString(book.description, lang)) && 
                 <div className="flex flex-col items-start w-full">
                     <div 
                         className={`pt-2 pb-0 block text-light dark:text-dark ${(props?.size||768) > 500 ? "text-md" : "text-sm"} ${showMore ? "" : "line-clamp-4"}`}
                     >
-                        {book.description?.[lang]}
+                        {resolveLangString(book.description, lang)}
                     </div>
                     {!props.onClick &&
                     <div className="-ml-2">
@@ -96,11 +97,11 @@ export const BookCard = (props: IBookCardProps) => {
                     }
                 </div>
                 }
-                {(props.showMetaData && book.metaData?.[lang]) && 
+                {(props.showMetaData && resolveLangString(book.metaData, lang)) && 
                 <div 
                     className={'pt-2 pb-0 block text-medium text-sm'}
                 >
-                    {book.metaData?.[lang]}
+                    {resolveLangString(book.metaData, lang)}
                 </div>
                 }
                 <div className="flex flex-wrap items-center justify-between">

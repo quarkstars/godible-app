@@ -76,6 +76,8 @@ export interface IEpisode extends ParseObjectToJson {
     topics?: ITopic[],
     isFreeSample?: boolean,
     position?: IListeningPosition,
+    hitCount?: number,
+    // duration?: number,
 
     isForbidden?: boolean, 
     //Constructed client-side strings based on episode data
@@ -117,6 +119,7 @@ export interface IBook extends ParseObjectToJson{
     tagline?: ILangString,
     buyLink?: ILangString,
     isPublic?: boolean,
+    episodeCount?: number,
 }
 
 export interface ISpeech extends IList {
@@ -145,6 +148,7 @@ export interface IListeningPosition extends ParseObjectToJson {
     updatedTime?: number,
     createdTime?: number, 
     progress?: number,
+    // duration?: number,
  }
 
 export interface INote extends ParseObjectToJson {
@@ -174,6 +178,7 @@ export interface ITopic extends ParseObjectToJson  {
     slug?: string,
     imageUrl?: string,
     _name?: string,
+    episodeCount?: number,
 }
 
 export interface IGetObjectOptions {
@@ -184,6 +189,7 @@ export interface IGetObjectOptions {
     isPublic?: boolean,
     include?: string[],
     exclude?: string[],
+    slug?: string,
 }
 
 

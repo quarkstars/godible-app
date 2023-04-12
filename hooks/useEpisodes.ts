@@ -34,24 +34,23 @@ const useEpisodes = () => {
         include?: string[],
         exclude?: string[],
         slug?: string,
+        number?: number,
     }
 
     const getEpisodeOptions = useRef <IGetEpisodeOptions|undefined>();
 
 
-    const getEpisodes = async (episodeIds?: string[], _options?: IGetEpisodeOptions, isAppending = false) => {
+    const getEpisodes = async (episodeIds?: string[], _options?: IGetEpisodeOptions, isAppending = false, max = -1) => {
         setIsLoading(true);
         try {
             let options = _options || getEpisodeOptions.current;
             getEpisodeOptions.current = { ...getEpisodeOptions.current, ...options};
             const limit = options?.limit || 24;
             const skip = options?.skip || 0;
-            // const displayCount = limit + (skip*limit);
+            const displayCount = limit + (skip*limit);
+            if (max > 0 && displayCount >= max) return setIsLoading(false);
             const results = await Parse.Cloud.run("getEpisodes", {episodeIds, options});
-            // let newEpisodes = results.slice(0, displayCount).map((episode: any) => {
-            //     // const jsonEpisode = episode.toJSON();
-            //     return appendEpisodeStrings(episode);
-            // });
+
             let newEpisodes = results.map((episode: any) => {
                     // const jsonEpisode = episode.toJSON();
                     return appendEpisodeStrings(episode);
@@ -68,7 +67,7 @@ const useEpisodes = () => {
         }
     };
     
-
+    
 
     
     const appendEpisodeStrings = (episode: IEpisode): IEpisode => {
@@ -163,6 +162,7 @@ const useEpisodes = () => {
         setIsLoading,
         episodes,
         getEpisodes,
+        setEpisodes,
         skip: getEpisodeOptions.current?.skip
     }
 }

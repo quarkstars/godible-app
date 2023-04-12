@@ -62,7 +62,6 @@ const HomePage:React.FC = () => {
     if (books) return;
     getBooks(undefined, {limit: 12, sort: "+index"});
   }, []);
-  console.log("BOOKS TOPICS", books, topics)
 
   // useEffect(() => {
   //   setLatestEpisodes(JSON.parse(latestEpisodesString.current));
@@ -80,7 +79,7 @@ const HomePage:React.FC = () => {
       player.setIsAutoPlay(true);
       player.setList({episodes: reversedEpisodes});
       player.setIndex(reversedIndex);
-      router.push(appendEpisodeStrings(episodes[index])._path!);
+      router.push(episodes[index]._path!);
   }
 
   console.log("EPISODES", episodes);
@@ -232,7 +231,6 @@ const HomePage:React.FC = () => {
                 <SwiperSlide key={"epcard-"+episode.objectId}>
                   <EpisodeCard 
                     size={episodeWidth}
-                    
                     list={{episodes}}
                     index={index}
                     episode={episode}

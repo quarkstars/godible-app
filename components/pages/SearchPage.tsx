@@ -1,5 +1,6 @@
-import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover, IonFooter } from '@ionic/react'
+import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover, IonFooter, useIonRouter, IonSelect, IonSelectOption } from '@ionic/react'
 import { Player } from 'components/AppShell'
+import { UserState } from 'components/UserStateProvider'
 import { BookCard } from 'components/ui/BookCard'
 import CardList from 'components/ui/CardList'
 import Copyright from 'components/ui/Copyright'
@@ -9,10 +10,16 @@ import SpeechListItem from 'components/ui/SpeechListItem'
 import TextDivider from 'components/ui/TextDivider'
 import Thumbnail from 'components/ui/Thumbnail'
 import Toolbar from 'components/ui/Toolbar'
+import { TopicCard } from 'components/ui/TopicCard'
 import { sampleBooks, sampleEpisodes, sampleTopics } from 'data/sampleEpisodes'
+import { userDefaultLanguage } from 'data/translations'
+import { IBook, ITopic } from 'data/types'
+import useBooks from 'hooks/useBooks'
 import useEpisodes from 'hooks/useEpisodes'
+import useTopics from 'hooks/useTopics'
 import { bulb, card, chevronDown, closeCircle, filter, grid, list } from 'ionicons/icons'
-import React, {useRef, useState, useContext} from 'react'
+import React, {useRef, useState, useContext, useEffect} from 'react'
+import { resolveLangString } from 'utils/resolveLangString'
 
 interface ISearchPageProps {
   //"all" (undefined) will only show topics in thumbnails and books in thumbnails
@@ -32,9 +39,15 @@ interface ISearchPageProps {
 
 const SearchPage = (props: ISearchPageProps) => {
 
+	const router = useIonRouter();
   
   const player = useContext(Player);
-  const {appendEpisodeStrings} = useEpisodes();
+
+  const {
+    user
+  } = useContext(UserState);
+  const lang = (user.language) ? user.language : userDefaultLanguage;
+
 
   const [episodeWidth, setEpisodeWidth] = useState<number>(148);
   const [topicWidth, setTopicWidth] = useState<number>(148);
@@ -44,13 +57,146 @@ const SearchPage = (props: ISearchPageProps) => {
   if (display === "card") displayIcon = grid;
   if (display === "quote") displayIcon = bulb;
 
+  //Get topics
+  const {getTopics, topics} = useTopics();
+  useEffect(() => {
+    if (topics) return;
+    getTopics(undefined, {sort: "+index"});
+  }, []);
+
+  //Selected Topic
+  const [topicFilter, setTopicFilter] = useState<ITopic|undefined>();
+  //Get the topics on the first load
+  useEffect(() => {  
+    console.log("TOPIC CHANGED", topics, router.routeInfo, !router.routeInfo)
+    if (!topics || !router.routeInfo.search) return;
+    if (topics.length < 1) return;
+    const urlParams = new URLSearchParams(router.routeInfo.search)
+    const topicSlug = urlParams.get("topic");
+    let currentTopic = topics.find((top) => {
+      return topicSlug === top.slug;
+    });
+    setTopicFilter(currentTopic);
+  }, [topics, router.routeInfo.search]);
+  // console.log("TOPIC CHANGED", topics, router.routeInfo.search, routeChecks)
+  
+  //Set topic to the url param (keeping book param if it exists)
+  const topicClickHandler = (e, topic:ITopic) => {
+    e.preventDefault();
+    const urlParams = new URLSearchParams(router.routeInfo.search)
+    const bookSlug = urlParams.get("book");
+    let bookParam = (bookSlug) ? `&book=${bookSlug}` : "";
+    router.push("/search?topic="+topic.slug+bookParam);
+    setTopicFilter(topic);
+  }
+    //Set topic to the url param (keeping book param if it exists)
+    const removeTopicHandler = (e) => {
+      e.preventDefault();
+      const urlParams = new URLSearchParams(router.routeInfo.search)
+      const bookSlug = urlParams.get("book");
+      let bookParam = (bookSlug) ? `&book=${bookSlug}` : "";
+      router.push("/search?"+bookParam);
+      setTopicFilter(undefined);
+    }
+
+
+  //Get books
+  const {getBooks, books} = useBooks();
+  useEffect(() => {
+    if (books) return;
+    getBooks(undefined, {sort: "+index"});
+  }, []);
+
+  //Selected Book
+  const [bookFilter, setBookFilter] = useState<IBook|undefined>();
+  //Get the books on the first load
+  useEffect(() => {  
+    console.log("BOOK CHANGED", books, router.routeInfo, !router.routeInfo)
+    if (!books || !router.routeInfo.search) return;
+    if (books.length < 1) return;
+    const urlParams = new URLSearchParams(router.routeInfo.search)
+    const bookSlug = urlParams.get("book");
+    let currentBook = books.find((top) => {
+      return bookSlug === top.slug;
+    });
+    setBookFilter(currentBook);
+  }, [books, router.routeInfo.search]);
+  // console.log("TOPIC CHANGED", books, router.routeInfo.search, routeChecks)
+  
+  //Set book to the url param (keeping book param if it exists)
+  const bookClickHandler = (e, book:IBook) => {
+    e.preventDefault();
+    const urlParams = new URLSearchParams(router.routeInfo.search)
+    const topicSlug = urlParams.get("topic");
+    let topicParam = (topicSlug) ? `&topic=${topicSlug}` : "";
+    router.push("/search?book="+book.slug+topicParam);
+    setBookFilter(book);
+  }
+    //Set book to the url param (keeping book param if it exists)
+    const removeBookHandler = (e) => {
+      e.preventDefault();
+      const urlParams = new URLSearchParams(router.routeInfo.search)
+      const topicSlug = urlParams.get("topic");
+      let topicParam = (topicSlug) ? `&topic=${topicSlug}` : "";
+      router.push("/search?"+topicParam);
+      setBookFilter(undefined);
+    }
+
+
+  //Focus search bar when entering the page
   const searchBar = useRef<HTMLIonSearchbarElement>(null)
   useIonViewDidEnter(async () => {
     if (!searchBar.current) return;
-    // await searchBar.current!.setFocus()
-    let timeout = setTimeout(async () => {await searchBar.current!.setFocus()}, 200);
-    // return clearTimeout(timeout)
+    setTimeout(async () => {await searchBar.current!.setFocus()}, 200);
   }, [searchBar.current]);
+
+  //Search bar query
+  const [search, setSearch] = useState<string|undefined>();
+  const searchChangeHandler = (e) => {
+    const query = e.target.value as string|undefined;
+    if (!query || query.length < 3) return setSearch(undefined);
+    setSearch(query);
+  }
+
+  const [max, setMax] = useState<number|undefined>();
+  const [reachedMax, setReachedMax] = useState<boolean>(false);
+  const {
+    getEpisodes, 
+    setEpisodes,
+    isLoading: episodesIsLoading,
+    error: episodesError,
+    episodes,
+    skip,
+  } = useEpisodes();
+  //Update episode list everytime parameters change
+  useEffect(() => {
+    const bookIds = bookFilter ? [bookFilter.objectId] : undefined;
+    const topicIds = topicFilter ? [topicFilter.objectId!] : undefined;
+    setMax(undefined);
+    setReachedMax(false);
+    setEpisodes(undefined);
+    getEpisodes(undefined, {search, bookIds, topicIds, limit: 12,  exclude: ["text"]});
+    
+  }, [search, bookFilter, topicFilter])
+  
+  //get the max count
+  useEffect(() => {
+    if (!episodes) return setMax(undefined);
+    if (bookFilter && !topicFilter && !search) return setMax(bookFilter.episodeCount);
+    if (!bookFilter && topicFilter && !search) return setMax(topicFilter.episodeCount);
+    setMax(episodes[0]?.hitCount)
+  }, [episodes]);
+  console.log("RESULTS", max)
+  
+  const fetchMoreEpisodes = (e) => {
+    e.preventDefault();
+    if (!max) return setReachedMax(true);
+    const displayCount = 12 + ((skip||0)*12);
+    if (displayCount >= max) return setReachedMax(true);
+    const bookIds = bookFilter ? [bookFilter.objectId] : undefined;
+    const topicIds = topicFilter ? [topicFilter.objectId!] : undefined;
+    getEpisodes(undefined,{limit: 12, search, bookIds, topicIds, skip: (skip||0)+1, exclude: ["text"]}, true);
+  }
   
   
   const [presentDisplay, dismissDisplay] = useIonPopover(EpisodeDisplay, {
@@ -62,6 +208,14 @@ const SearchPage = (props: ISearchPageProps) => {
     onDismiss: (data: any, role: string) => dismissMode(data, role),
   });
 
+  let modeName = "Search All";
+  if (mode === "topics") modeName = "Select a Topic";
+  if (mode === "episodes") modeName = "Search Episodes";
+  if (mode === "speeches") modeName = "Search Speeches";
+  let hasFilter = false;
+  if (topicFilter) hasFilter = true;
+  else if (bookFilter) hasFilter = true;
+  else if (search) hasFilter = true;
 
   return (
   <IonPage>
@@ -77,12 +231,20 @@ const SearchPage = (props: ISearchPageProps) => {
           })}
         >
           <IonIcon icon={filter} slot={'start'} />
-          Search All
+          {modeName}
         </IonButton>
         {/* </div> */}
       </Toolbar>
       <IonToolbar>
-        <IonSearchbar ref={searchBar} animated show-clear-button="focus" placeholder={'Search...'} debounce={500} mode={'ios'} />
+          <IonSearchbar 
+          ref={searchBar} 
+          animated 
+          show-clear-button="focus" 
+          placeholder={'Search...'} 
+          debounce={500} 
+          mode={'ios'} 
+          onIonChange={(e)=>searchChangeHandler(e)}
+        />
 
       </IonToolbar>
       </IonHeader>
@@ -92,77 +254,120 @@ const SearchPage = (props: ISearchPageProps) => {
           <div className='flex justify-center w-full'>
               <div className="flex flex-col w-full" style={{maxWidth:"768px"}}>
                 <div>
+                  {hasFilter &&
                   <div className="flex flex-wrap items-center space-x-2">
                     <span className="text-sm italic text-medium">By Book</span>
-                    <IonChip outline>
-                      <IonLabel>Selected Book</IonLabel>
-                      <IonIcon icon={closeCircle}></IonIcon>
-                    </IonChip>
-                  
-                  {/* <IonChip outline>ChamBumo Gyeong</IonChip>
-                  <IonChip outline>As a Peace Loving Global Citizen</IonChip>
-                  <IonChip outline>Cheon Seong Gyeong</IonChip>
-                  <IonChip outline>Cheon Seong Gyeong</IonChip> */}
-                  </div>
-                </div>
-                <div>
-
-                  <div className="flex flex-wrap items-center space-x-2">
-                      <span className="text-sm italic text-medium">By Topic</span>
-                      <IonChip outline>
-                        <IonLabel>Selected Topic</IonLabel>
+                    {bookFilter ?
+                      <IonChip outline onClick={(e) => removeBookHandler(e)}>
+                        <IonLabel>{resolveLangString(bookFilter.title, lang)}</IonLabel>
                         <IonIcon icon={closeCircle}></IonIcon>
                       </IonChip>
-                      
-                    <IonChip outline>Heavenly Parent</IonChip>
-                    <IonChip outline>Love</IonChip>
-                    <IonChip outline>Joy</IonChip>
-                    <IonChip outline>Love</IonChip>
-                    <IonChip outline>True Parents</IonChip>
-                    <IonChip outline>History</IonChip>
-                    <IonChip outline>Faith</IonChip>
+                      :
+                      <IonSelect 
+                        interface="action-sheet" 
+                        value={"All Books"}
+                        onIonChange={(e)=>{
+                          if (typeof e.detail.value !== "string") return;
+                          if (e.detail.value === "All Books") return removeBookHandler(e);
+                          const book = books?.find(b => b.objectId === e.detail.value)
+                          if (book) bookClickHandler(e, book);
+                        }}
+                      >
+                        
+                        <IonSelectOption value="All Books">All Books</IonSelectOption>
+                        {books && books.map((book) => { 
+                          return (
+                            <IonSelectOption 
+                              key={book.objectId} 
+                              value={book.objectId}
+                            >
+                              {resolveLangString(book.title, lang)}
+                            </IonSelectOption>
+                            )
+                          })
+                        }
+                      </IonSelect>
+                    }
                   </div>
+                  }
+                </div>
+                <div>
+                  {hasFilter &&
+                  <div className="flex flex-wrap items-center space-x-2">
+                      <span className="text-sm italic text-medium">By Topic</span>
+                      {topicFilter ?
+                        <IonChip outline onClick={(e) => removeTopicHandler(e)}>
+                          <IonLabel>{resolveLangString(topicFilter.name, lang)}</IonLabel>
+                          <IonIcon icon={closeCircle}></IonIcon>
+                        </IonChip>
+                      :
+                      <IonSelect 
+                        interface="action-sheet" 
+                        value={"All Topics"}
+                        onIonChange={(e)=>{
+                          if (typeof e.detail.value !== "string") return;
+                          if (e.detail.value === "All Topics") return removeTopicHandler(e);
+                          const topic = topics?.find(b => b.objectId === e.detail.value)
+                          if (topic) topicClickHandler(e, topic);
+                        }}
+                      >
+                        
+                        <IonSelectOption value="All Topics">All Topics</IonSelectOption>
+                        {topics && topics.map((topic) => { 
+                          return (
+                            <IonSelectOption 
+                              key={topic.objectId} 
+                              value={topic.objectId}
+                            >
+                              {resolveLangString(topic.name, lang)}
+                            </IonSelectOption>
+                            )
+                          })
+                        }
+                      </IonSelect>
+                    }
+                  </div>
+                  }
                 </div>
                 <div className="-ml-3">
               </div>
             </div>
           </div>
-          {mode !== "speeches" && <TextDivider>Topics</TextDivider>}
-          {mode !== "speeches" && <div className='flex justify-center w-full'>
+          {(mode !== "speeches" && !hasFilter) && <TextDivider>Topics</TextDivider>}
+          {(mode !== "speeches" && !hasFilter) && <div className='flex justify-center w-full'>
             <div className="flex flex-col items-center w-full" style={{maxWidth:"768px"}}>
-              <CardList spaceBetween={10} setItemWidth={setTopicWidth} idealWidth={150}>
-                {sampleTopics.map((topic, index) => {
+              <CardList spaceBetween={10} setItemWidth={setTopicWidth} idealWidth={180}>
+                {topics && topics.map((topic, index) => {
                   return (
-                    <Thumbnail 
+                    <TopicCard 
                       size={topicWidth}
-                      imageUrl={topic.imageUrl}
-                      overlayColor='#000000'
-                      key={index}
-                    >
-                      <span className="w-full px-2 text-2xl font-bold text-center text-white">{topic.name?.english}</span>
-                    </Thumbnail>
+                      topic={topic}
+                      index={index}
+                      key={topic?.objectId}
+                      customOnClick={(e) => {topicClickHandler(e, topic)}}
+                    />
                   )
                 })
                 }
               </CardList>
             </div>
           </div>}
-          {mode !== "speeches" && 
+          {(mode !== "speeches" && !hasFilter) && 
           <TextDivider>Books</TextDivider>
           }
-          {mode !== "speeches" && 
+          {(mode !== "speeches" && !hasFilter) && 
           <div className='flex justify-center w-full'>
             <div className="flex flex-col items-center w-full" style={{maxWidth:"768px"}}>
               <CardList spaceBetween={10} setItemWidth={setBookWidth} idealWidth={376}>
-                {sampleBooks.map((book, index) => {
+                {books && books.map((book, index) => {
                   return (
                       <BookCard 
                         key={"lateps-"+book.objectId}
                         size={bookWidth}
                         book={book}
                         showTagline
-                        onClick={() => {
-
+                        onClick={(e) => {
+                          bookClickHandler(e, book);
                         }}
                       />
                   )
@@ -174,7 +379,7 @@ const SearchPage = (props: ISearchPageProps) => {
           }
           {mode !== "speeches" && <TextDivider>
             <div className="flex items-center">
-              <span>Episodes</span>
+              <span>{`${max ? max +" ": ""}Episodes`}</span>
               <IonButton 
               fill="clear" 
               color="dark" 
@@ -192,8 +397,8 @@ const SearchPage = (props: ISearchPageProps) => {
           {mode !== "speeches" && 
           <div className='flex justify-center w-full'>
             <div className="flex flex-col items-stretch w-full" style={{maxWidth:"768px"}}>
-                {sampleEpisodes.map((_episode, index) => {
-                let episode = appendEpisodeStrings(_episode)
+                {episodes && episodes.map((_episode, index) => {
+                let episode = _episode
                   return (
                       <EpisodeListItem 
                         episode={episode}  
@@ -203,6 +408,18 @@ const SearchPage = (props: ISearchPageProps) => {
                       />
                   )
                 })}
+                {(!reachedMax && max) &&
+                <IonButton
+                  onClick={(ev) => {
+                    fetchMoreEpisodes(ev);
+                  }}
+                  disabled={reachedMax}
+                  color="medium"
+                  fill="clear"
+                >
+                  Load More
+                </IonButton>
+                }
             </div>
           </div>
           }
