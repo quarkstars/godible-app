@@ -1,4 +1,4 @@
-import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonMenuButton, IonPage, IonText, IonTitle, IonToolbar, useIonRouter } from '@ionic/react'
+import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonMenuButton, IonPage, IonText, IonTitle, IonToolbar, useIonModal, useIonRouter } from '@ionic/react'
 import Hero from 'components/ui/Hero';
 import SlideList from 'components/ui/SlideList';
 import Toolbar from 'components/ui/Toolbar';
@@ -20,6 +20,7 @@ import useLists from 'hooks/useLists';
 import useNotes from 'hooks/useNotes';
 import { UserState } from 'components/UserStateProvider';
 import { TopicCard } from 'components/ui/TopicCard';
+import ListModal from 'components/ui/ListModal';
 
 const HomePage:React.FC = () => {
 
@@ -48,7 +49,7 @@ const HomePage:React.FC = () => {
   useEffect(() => {
     // if (!user.objectId) return;
     console.log("GET EPISODES AGAIN!")
-    getEpisodes(undefined, {limit: 12, exclude: ["text"]});
+    getEpisodes(undefined, {limit: 12, sort:"-publishedAt", exclude: ["text"]});
     // quickTest();
   }, [user.objectId]);
 
@@ -143,7 +144,15 @@ const HomePage:React.FC = () => {
     // await getLists(undefined, {userId: user.objectId, sort: "+index"})
     // await deleteNote("K4gTFvxAEJ");
   }
-  
+    //List modal trigger
+  const [inspectedEpisode, setInspectedEpisode] = useState<IEpisode|undefined>();
+  const [presentList, dimissList] = useIonModal(ListModal, {
+      onDismiss: (data: string, role: string) => dimissList(data, role),
+        router,
+        isAddingEpisode: true,
+        addEpisodeId: inspectedEpisode?.objectId,
+    });
+
   console.log("EPISODE ALL", episodes); 
   return (
     <IonPage>
@@ -196,7 +205,13 @@ const HomePage:React.FC = () => {
                   onClickMain={(e) => handleListenClick(e, index)}
                   subButtonText={"List"}
                   subButtonIcon={addCircleOutline}
-                  onClickSub={() => router.push("/")}
+                  onClickSub={(e:any) => {
+                    if (!user.objectId) return router.push("/signin?message=Log in to save lists")
+                    setInspectedEpisode(episode)
+                    presentList({
+                      onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
+                    })
+                  }}
                   overlayColor={"rgba(0,0,0,.6)"}
                   bgImageUrl={episode.imageUrl}
                   postImageUrl={episode._bookImageUrl} 
@@ -204,16 +219,14 @@ const HomePage:React.FC = () => {
                   isQuote
                   // preImageUrl={"/logo/godible-logo-white.png"}
                   preText={pretext}
+                  
                 />
               </SwiperSlide>
               )
             })
             }
 
-          <SwiperSlide>
-            <Hero></Hero>
 
-          </SwiperSlide>
         </SlideList>
         <div className="flex flex-col p-4 sm:p-10">
           <div className="flex flex-row items-center w-full space-x-5">
@@ -225,7 +238,7 @@ const HomePage:React.FC = () => {
             </IonButton>
           </div>
           
-          <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={200}>
+          <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={220}>
             {episodes && episodes.map((episode, index) => {
               return (
                 <SwiperSlide key={"epcard-"+episode.objectId}>

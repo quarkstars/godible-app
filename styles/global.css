@@ -506,3 +506,11 @@ ion-datetime.ion-color.ion-color-primary.md.datetime-presentation-date.datetime-
   border-radius: 10px;
 }
 /* END CALENDAR RADIUS */
+
+/* CENTER BREADCRUMBS */
+
+ion-breadcrumbs {
+  justify-content: center;
+}
+
+/* END CENTER BREADCRUMBS */

@@ -12,10 +12,6 @@ const NotFoundPage: React.FC = () => {
 	const router = useIonRouter();
 
   const { name } = useParams<{ name: string; }>();
-  useEffect(() => {
-    const hello = Parse.Cloud.run('hello');
-    console.log(hello)
-  }, [])
   
 
   return (

@@ -35,30 +35,39 @@ const useEpisodes = () => {
         exclude?: string[],
         slug?: string,
         number?: number,
+        token?:string,
     }
 
-    const getEpisodeOptions = useRef <IGetEpisodeOptions|undefined>();
+    const [episodeOptions, setEpisodeOptions] = useState <IGetEpisodeOptions|undefined>();
+    useEffect(() => {
+      if(episodeOptions) console.log("FETCH WHAT")
+      if (!episodeOptions) console.log("FETCH THE FUCK?")
+    }, [episodeOptions])
+    
 
 
     const getEpisodes = async (episodeIds?: string[], _options?: IGetEpisodeOptions, isAppending = false, max = -1) => {
         setIsLoading(true);
         try {
-            let options = _options || getEpisodeOptions.current;
-            getEpisodeOptions.current = { ...getEpisodeOptions.current, ...options};
+            let options = _options || episodeOptions ;
             const limit = options?.limit || 24;
             const skip = options?.skip || 0;
             const displayCount = limit + (skip*limit);
             if (max > 0 && displayCount >= max) return setIsLoading(false);
+            console.log("FETCH with fetch more NOW: ", options?.skip, options?.limit)
             const results = await Parse.Cloud.run("getEpisodes", {episodeIds, options});
 
             let newEpisodes = results.map((episode: any) => {
                     // const jsonEpisode = episode.toJSON();
                     return appendEpisodeStrings(episode);
                 });
-            if (isAppending && episodes) {
+            if (isAppending && episodes) {        
+
                 setEpisodes(prevEpisodes => [...prevEpisodes!, ...newEpisodes]);
+                setEpisodeOptions(prev => {return { ...(prev || {}), ...(options||{})}});
             } else {
                 setEpisodes(newEpisodes);
+                setEpisodeOptions(options);
             }
             setIsLoading(false);
         } catch (error) {
@@ -90,15 +99,18 @@ const useEpisodes = () => {
 
         //Chapter Name
         let _hasChapter = (typeof episode?.chapterNumber === "number")
-        let _chapterName = (_hasChapter) ? `${text["Chapter"][_lang]} ${episode?.chapterNumber}` : undefined;
-        if (_chapterName && episode?.chapterName) _chapterName = _chapterName + ": " + episode?.chapterName;
-        else if (episode?.chapterName) _chapterName = episode?.chapterName[_lang];
+        let _chapterName = "";
+        // let _chapterName = (_hasChapter) ? `${text["Chapter"][_lang]} ${episode?.chapterNumber}` : undefined;
+        // if (_chapterName && episode?.chapterName) _chapterName = _chapterName + ": " + episode?.chapterName;
+        // else if (episode?.chapterName) _chapterName = episode?.chapterName[_lang];
         
         if (!_hasChapter && typeof episode?.chapterNumber === "string") {
             _hasChapter = true;
             _chapterName = episode?.chapterNumber
         }
-
+        //TODO: Find a way to group chapters because chapter number is often too numerous...eh or maybe who cares?
+        // let _chapterGroup = episode?.chapterNumber;
+        // if (episode?.chapterName?.english && episode?.chapterName?.english?.length > 0) _chapterGroup = resolveLangString(episode?.chapterName, _lang)
         let _chapterPath = (_hasChapter) ? _bookPath+"?chapter="+episode?.chapterNumber : _bookPath;
 
         //Text
@@ -106,9 +118,7 @@ const useEpisodes = () => {
         const _textBlocks:string[] = (textInLanguage) ? textInLanguage.split("\\n") : [];
         // console.log("EPISODE BLOCKS ", textInLanguage, textInLanguage.split("\\n"), "TEST\nTEST".split(/\r?\n/))
         const _quote = resolveLangString(episode?.quote, _lang); 
-        console.log("QUOTE", episode?.quote)
         const _audioPath = resolveLangString(episode?.audioPath, _lang);
-        console.log("audioPath", _audioPath) 
         //console.log('getEpisodes', getEpisodes())
 
         
@@ -154,6 +164,8 @@ const useEpisodes = () => {
       }, [user.language]);
 
 
+    
+
     return {
         appendEpisodeStrings,
         error,
@@ -163,7 +175,7 @@ const useEpisodes = () => {
         episodes,
         getEpisodes,
         setEpisodes,
-        skip: getEpisodeOptions.current?.skip
+        skip: episodeOptions?.skip
     }
 }
 

@@ -1,11 +1,15 @@
-import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover, IonFooter, useIonRouter, IonSelect, IonSelectOption } from '@ionic/react'
+import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover, IonFooter, useIonRouter, IonSelect, IonSelectOption, IonSpinner, useIonModal } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import { BookCard } from 'components/ui/BookCard'
 import CardList from 'components/ui/CardList'
 import Copyright from 'components/ui/Copyright'
+import { EpisodeCard } from 'components/ui/EpisodeCard'
 import EpisodeListItem from 'components/ui/EpisodeListItem'
+import Hero from 'components/ui/Hero'
+import ListModal from 'components/ui/ListModal'
 import { PlayerControls } from 'components/ui/PlayerControls'
+import SlideList from 'components/ui/SlideList'
 import SpeechListItem from 'components/ui/SpeechListItem'
 import TextDivider from 'components/ui/TextDivider'
 import Thumbnail from 'components/ui/Thumbnail'
@@ -13,24 +17,20 @@ import Toolbar from 'components/ui/Toolbar'
 import { TopicCard } from 'components/ui/TopicCard'
 import { sampleBooks, sampleEpisodes, sampleTopics } from 'data/sampleEpisodes'
 import { userDefaultLanguage } from 'data/translations'
-import { IBook, ITopic } from 'data/types'
+import { IBook, IEpisode, IList, ISpeech, ITopic } from 'data/types'
+import { resolve } from 'dns'
 import useBooks from 'hooks/useBooks'
 import useEpisodes from 'hooks/useEpisodes'
+import useLists from 'hooks/useLists'
 import useTopics from 'hooks/useTopics'
-import { bulb, card, chevronDown, closeCircle, filter, grid, list } from 'ionicons/icons'
+import { addCircleOutline, bulb, card, chevronDown, closeCircle, filter, grid, list, playCircle } from 'ionicons/icons'
 import React, {useRef, useState, useContext, useEffect} from 'react'
+import { SwiperSlide } from 'swiper/react'
 import { resolveLangString } from 'utils/resolveLangString'
 
 interface ISearchPageProps {
-  //"all" (undefined) will only show topics in thumbnails and books in thumbnails
-  //"topics" will only show topics in thumbnails
-  //"episodes" will only show episodes with topic and book chips
-  //"speeches" will only show speeches with topic and book chips
   defaultMode?: string, 
   defaultDisplay?: string, 
-
-
-
   defaultTopicId?: string,
   defaultBookId?: string,
   defaultQuery?: string,
@@ -56,6 +56,7 @@ const SearchPage = (props: ISearchPageProps) => {
   let displayIcon = list;
   if (display === "card") displayIcon = grid;
   if (display === "quote") displayIcon = bulb;
+  const [mode, setMode] = useState<string|undefined>(props.defaultMode);
 
   //Get topics
   const {getTopics, topics} = useTopics();
@@ -68,7 +69,6 @@ const SearchPage = (props: ISearchPageProps) => {
   const [topicFilter, setTopicFilter] = useState<ITopic|undefined>();
   //Get the topics on the first load
   useEffect(() => {  
-    console.log("TOPIC CHANGED", topics, router.routeInfo, !router.routeInfo)
     if (!topics || !router.routeInfo.search) return;
     if (topics.length < 1) return;
     const urlParams = new URLSearchParams(router.routeInfo.search)
@@ -78,7 +78,6 @@ const SearchPage = (props: ISearchPageProps) => {
     });
     setTopicFilter(currentTopic);
   }, [topics, router.routeInfo.search]);
-  // console.log("TOPIC CHANGED", topics, router.routeInfo.search, routeChecks)
   
   //Set topic to the url param (keeping book param if it exists)
   const topicClickHandler = (e, topic:ITopic) => {
@@ -111,7 +110,6 @@ const SearchPage = (props: ISearchPageProps) => {
   const [bookFilter, setBookFilter] = useState<IBook|undefined>();
   //Get the books on the first load
   useEffect(() => {  
-    console.log("BOOK CHANGED", books, router.routeInfo, !router.routeInfo)
     if (!books || !router.routeInfo.search) return;
     if (books.length < 1) return;
     const urlParams = new URLSearchParams(router.routeInfo.search)
@@ -121,7 +119,6 @@ const SearchPage = (props: ISearchPageProps) => {
     });
     setBookFilter(currentBook);
   }, [books, router.routeInfo.search]);
-  // console.log("TOPIC CHANGED", books, router.routeInfo.search, routeChecks)
   
   //Set book to the url param (keeping book param if it exists)
   const bookClickHandler = (e, book:IBook) => {
@@ -160,6 +157,19 @@ const SearchPage = (props: ISearchPageProps) => {
 
   const [max, setMax] = useState<number|undefined>();
   const [reachedMax, setReachedMax] = useState<boolean>(false);
+  const [listMax, setListMax] = useState<number|undefined>();
+  const [reachedListMax, setReachedListMax] = useState<boolean>(false);
+
+  // Set Mode
+  useEffect(() => {      
+    if (!router.routeInfo.search) return;
+    const urlParams = new URLSearchParams(router.routeInfo.search)
+    const modeParam = urlParams.get("mode");
+    if (modeParam === "episodes") setMode("episodes");
+    if (modeParam === "speeches") setMode("speeches");
+  }, [router.routeInfo.search]);
+
+
   const {
     getEpisodes, 
     setEpisodes,
@@ -168,53 +178,165 @@ const SearchPage = (props: ISearchPageProps) => {
     episodes,
     skip,
   } = useEpisodes();
+  
+  const {
+    getLists, 
+    setLists,
+    isLoading: listsIsLoading,
+    error: listError,
+    lists,
+    skip: listSkip,
+  } = useLists();
+  let speeches = lists as ISpeech[]|undefined;
   //Update episode list everytime parameters change
   useEffect(() => {
-    const bookIds = bookFilter ? [bookFilter.objectId] : undefined;
-    const topicIds = topicFilter ? [topicFilter.objectId!] : undefined;
-    setMax(undefined);
-    setReachedMax(false);
-    setEpisodes(undefined);
-    getEpisodes(undefined, {search, bookIds, topicIds, limit: 12,  exclude: ["text"]});
+    if (mode !== "speeches") {
+    let sort = (!search) ? "-publishedAt" : undefined;
+      const bookIds = bookFilter ? [bookFilter.objectId] : undefined;
+      const topicIds = topicFilter ? [topicFilter.objectId!] : undefined;
+      setMax(undefined);
+      setReachedMax(false);
+      setEpisodes(undefined);
+      getEpisodes(undefined, {search, bookIds, topicIds, limit: 24, sort,  exclude: ["text"] });
+    }
+    if (mode !== "episodes") {
+      let sort = (!search) ? "-createdTime" : undefined;
+      const bookId = bookFilter ? bookFilter.objectId: undefined;
+      const topicId = topicFilter ? topicFilter.objectId! : undefined;
+      setListMax(undefined);
+      setReachedListMax(false);
+      setLists(undefined);
+      getLists(undefined, {search, bookId, topicId, limit: 24, isSpeech: true,sort, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+    }
     
-  }, [search, bookFilter, topicFilter])
+  }, [search, bookFilter, topicFilter, mode]);
   
   //get the max count
   useEffect(() => {
     if (!episodes) return setMax(undefined);
-    if (bookFilter && !topicFilter && !search) return setMax(bookFilter.episodeCount);
-    if (!bookFilter && topicFilter && !search) return setMax(topicFilter.episodeCount);
-    setMax(episodes[0]?.hitCount)
+    let newMax = 0;
+    if (bookFilter && !topicFilter && !search) {newMax = bookFilter.episodeCount || 0;}
+    else if (!bookFilter && topicFilter && !search) {
+      newMax = topicFilter.episodeCount || 0;
+    }
+    else {
+      newMax = episodes[0]?.hitCount || 0;
+    }
+    const displayCount = 24 + ((skip||0)*24);
+    if (displayCount >= newMax) setReachedMax(true);
+    setMax(newMax);
   }, [episodes]);
-  console.log("RESULTS", max)
+
   
-  const fetchMoreEpisodes = (e) => {
+  //get the max speech count
+  useEffect(() => {
+    if (!speeches) return setListMax(undefined);
+    let newMax = 0;
+    if (bookFilter && !topicFilter && !search) {
+      newMax = bookFilter.speechCount || 0;
+    }
+    else if (!bookFilter && topicFilter && !search) {
+      newMax = topicFilter.speechCount || 0;
+    }
+    else {
+      newMax = speeches[0]?.hitCount || 0;
+    }
+    const displayCount = 24 + ((skip||0)*24);
+    if (displayCount >= newMax) setReachedListMax(true);
+    setListMax(newMax);
+  }, [lists]);
+  console.log("LIST", reachedListMax, lists)
+  
+
+  
+
+  //Fetch more episodes
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const fetchMoreEpisodes = async (e) => {
     e.preventDefault();
     if (!max) return setReachedMax(true);
-    const displayCount = 12 + ((skip||0)*12);
+    const displayCount = 24 + ((skip||0)*24);
     if (displayCount >= max) return setReachedMax(true);
     const bookIds = bookFilter ? [bookFilter.objectId] : undefined;
     const topicIds = topicFilter ? [topicFilter.objectId!] : undefined;
-    getEpisodes(undefined,{limit: 12, search, bookIds, topicIds, skip: (skip||0)+1, exclude: ["text"]}, true);
+    await getEpisodes(undefined,{limit: 24, search, bookIds, topicIds, skip: (skip||0)+1, exclude: ["text"]}, true);
+    setIsLoadingMore(false);
   }
+  //Fetch more Lists
+  const [listIsLoadingMore, setListIsLoadingMore] = useState<boolean>(false);
+  const fetchMoreLists = async (e) => {
+    e.preventDefault();
+    if (!max) return setReachedListMax(true);
+    const displayCount = 24 + ((listSkip||0)*24);
+    if (displayCount >= max) return setReachedListMax(true);
+    let sort = (!search) ? "-createdTime" : undefined;
+    const bookId = bookFilter ? bookFilter.objectId: undefined;
+    const topicId = topicFilter ? topicFilter.objectId! : undefined;
+    console.log("LIST SKIKP", listSkip)
+    await getLists(undefined, {search, bookId, topicId, limit: 24, sort, isSpeech: true, skip: (listSkip||0)+1, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] }, true);
+    setListIsLoadingMore(false);
+  }
+  // Handle Episode Listen
+  const handleListenClick = (e, index: number) => {
+    e.preventDefault();
+    if (!episodes) return;
+    if (episodes.length < 1) return;
+      const startIndex = (typeof index === "number" && index - 3 >= 0) ? index -3 : 0;
+      const endIndex = (typeof index === "number" && index + 4 <= episodes.length-1) ? index +4 : episodes.length-1;
+      const newEpisodes = [...episodes].slice(startIndex, endIndex);
+      player.setIsAutoPlay(true);
+      player.setList({episodes: newEpisodes});
+      player.setIndex(index);
+      router.push(episodes[index]._path!);
+  }
+  //Handle add to list
+  //List modal trigger
+  const [inspectedEpisode, setInspectedEpisode] = useState<IEpisode|undefined>();
+  const [presentList, dimissList] = useIonModal(ListModal, {
+      onDismiss: (data: string, role: string) => dimissList(data, role),
+        router,
+        isAddingEpisode: true,
+        addEpisodeId: inspectedEpisode?.objectId,
+    });
   
+
+  // Handle Speech Listen
+  const handleSpeechClick = (e, index: number, epIndex = 0) => {
+    e.preventDefault();
+    if (!speeches) return;
+    if (speeches.length < 1) return;
+      //Change speech to list
+      let speech = speeches[index];
+      const list: IList = {
+        name: resolveLangString(speech?.title, lang),
+        episodes: speech.episodes,
+        description: speech.description,
+      };
+      console.log("PUSH", list);
+      player.setIsAutoPlay(true);
+      player.setList(list);
+      player.setIndex(epIndex);
+      if (list.episodes[epIndex]?._path) router.push(list.episodes[epIndex]._path!);
+
+  }
+
   
   const [presentDisplay, dismissDisplay] = useIonPopover(EpisodeDisplay, {
     onDismiss: (data: any, role: string) => dismissDisplay(data, role),
   });
 
-  const [mode, setMode] = useState<string|undefined>(props.defaultMode);
   const [presentMode, dismissMode] = useIonPopover(SearchMode, {
     onDismiss: (data: any, role: string) => dismissMode(data, role),
   });
 
   let modeName = "Search All";
-  if (mode === "topics") modeName = "Select a Topic";
   if (mode === "episodes") modeName = "Search Episodes";
   if (mode === "speeches") modeName = "Search Speeches";
   let hasFilter = false;
   if (topicFilter) hasFilter = true;
   else if (bookFilter) hasFilter = true;
+  else if (mode === "episodes") hasFilter = true;
+  else if (mode === "speeches") hasFilter = true;
   else if (search) hasFilter = true;
 
   return (
@@ -396,49 +518,134 @@ const SearchPage = (props: ISearchPageProps) => {
           }
           {mode !== "speeches" && 
           <div className='flex justify-center w-full'>
-            <div className="flex flex-col items-stretch w-full" style={{maxWidth:"768px"}}>
-                {episodes && episodes.map((_episode, index) => {
+            <div className="flex flex-col items-stretch w-full overflow-hidden rounded-lg" style={{maxWidth:display==="quote" ? undefined: "768px"}}>
+              {display === "quote" &&
+                  <SlideList >
+                    {episodes && episodes.map((episode, index) => {
+                      const publishedAt = episode.publishedAt!;
+                      const oneWeekAgo = Date.now() - publishedAt > 6.048e+8;
+                      return (
+                      <SwiperSlide key={"ephero-"+episode.objectId}>
+                        <Hero 
+                          subtitle={episode._quote}
+                          mainButtonText={"Listen"}
+                          mainButtonIcon={playCircle}
+                          onClickMain={(e) => handleListenClick(e, index)}
+                          subButtonText={"List"}
+                          subButtonIcon={addCircleOutline}
+                          onClickSub={(e:any) => {
+                            if (!user.objectId) return router.push("/signin?message=Log in to save lists")
+                            setInspectedEpisode(episode)
+                            presentList({
+                              onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
+                            })
+                          }}
+                          overlayColor={"rgba(0,0,0,.6)"}
+                          bgImageUrl={episode.imageUrl}
+                          postImageUrl={episode._bookImageUrl} 
+                          postText={episode._fullTitle}
+                          scrollIsHidden
+                          isQuote
+                        />
+                      </SwiperSlide>
+                      )
+                    })
+                    }
+                </SlideList>
+                }
+                {display === "card" &&
+                  <CardList spaceBetween={10} setItemWidth={setEpisodeWidth} idealWidth={180}>
+                      {episodes && episodes.map((episode, index) => {
+                        return (
+                          <EpisodeCard 
+                            size={episodeWidth}
+                            list={{episodes}}
+                            key={"epcard-"+episode.objectId}
+                            index={index}
+                            episode={episode}
+                            customClickHandler={(e) => {handleListenClick(e, index)}}
+                          />
+                        )
+                      })
+                      }
+                  </CardList>
+                  }
+                {display!=="quote" && display !== "card" && episodes && episodes.map((_episode, index) => {
                 let episode = _episode
+
                   return (
                       <EpisodeListItem 
                         episode={episode}  
+                        onPlay={(e) => handleListenClick(e, index)}
+                        onAdd={(e:any) => {
+                          if (!user.objectId) return router.push("/signin?message=Log in to save lists")
+                          setInspectedEpisode(episode)
+                          presentList({
+                            onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
+                          })
+                        }}
                         key={"epresult-"+episode.objectId} 
-                        // customSubText='...heres thd her'
-                        // highlightStrings={['heres']}
                       />
                   )
                 })}
-                {(!reachedMax && max) &&
+                {(!reachedMax) &&
                 <IonButton
                   onClick={(ev) => {
+                    setIsLoadingMore(true);
                     fetchMoreEpisodes(ev);
                   }}
-                  disabled={reachedMax}
+                  disabled={isLoadingMore}
                   color="medium"
                   fill="clear"
                 >
-                  Load More
+                  {isLoadingMore ?
+                    "Loading..."
+                  :
+                    "Load More"
+                  }
                 </IonButton>
                 }
             </div>
           </div>
           }
-          <TextDivider>Speeches</TextDivider>
-          <div className='flex justify-center w-full'>
-            <div className="flex flex-col items-stretch w-full" style={{maxWidth:"768px"}}>
-              <SpeechListItem 
-                list={{name: "How to Gain Spiritual Help", episodes: sampleEpisodes, metaData: {defaultLanguage: "english", english: "1975\nWashington Monument\nSun Myung Moon"}}}
-              />
-              
-              <SpeechListItem 
-                list={{name: "Where Do You Stand?", episodes: [sampleEpisodes[5]], metaData: {defaultLanguage: "english", english: "1975\nWashington Monument\nSun Myung Moon"}}}
-              />
-              
-              <SpeechListItem 
-                list={{name: "Boldly Fulfill God's Expectations", episodes: [sampleEpisodes[6]], metaData: {defaultLanguage: "english", english: "1975\nWashington Monument\nSun Myung Moon"}}}
-              />
+          {mode !== "episodes" &&
+          <>
+            <TextDivider>
+              <span>{`${listMax ? listMax +" ": ""}Speeches`}</span>
+            </TextDivider>
+            <div className='flex justify-center w-full'>
+              <div className="flex flex-col items-stretch w-full" style={{maxWidth:"768px"}}>
+                {speeches && speeches.map((speech, index) => {
+                  return (
+                    <SpeechListItem 
+                      key={"speech-"+speech.objectId}
+                      list={speech}
+                      onPlay={(e) => {handleSpeechClick(e, index)}}
+                    />
+                  )
+                })
+                }
+                {(!reachedListMax) &&
+                <IonButton
+                  onClick={(ev) => {
+                    setListIsLoadingMore(true);
+                    fetchMoreLists(ev);
+                  }}
+                  disabled={listIsLoadingMore}
+                  color="medium"
+                  fill="clear"
+                >
+                  {listIsLoadingMore ?
+                    "Loading..."
+                  :
+                    "Load More"
+                  }
+                </IonButton>
+                }
+              </div>
             </div>
-          </div>
+          </>
+          }
         </div>
         <Copyright />
       </IonContent>
@@ -518,13 +725,6 @@ const SearchMode = ({
                 <IonButton fill="clear" expand="block"  onClick={() => onDismiss(null, 'speeches')} >
                     <div className="flex items-center justify-start w-full space-x-2">
                         <IonLabel >Speeches</IonLabel>
-                    </div>
-                </IonButton>
-                </li>
-                <li>
-                <IonButton fill="clear" expand="block"  onClick={() => onDismiss(null, 'topics')} >
-                    <div className="flex items-center justify-start w-full space-x-2">
-                        <IonLabel >Topics</IonLabel>
                     </div>
                 </IonButton>
                 </li>

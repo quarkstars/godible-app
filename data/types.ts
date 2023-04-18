@@ -37,9 +37,10 @@ export interface IUser extends ParseObjectToJson {
 
 export interface IList extends ParseObjectToJson {
     name?: string,
-    user?: IUser,
+    userId?: string,
     episodes: IEpisode[],
     slug?: string, //This would be book slug+speech name
+    textHighlighted?: string,
 
     // If came from a speech, the metaData will be added here. 
     description?: string,
@@ -72,10 +73,10 @@ export interface IEpisode extends ParseObjectToJson {
     thumbUrl?: string,
     quote?: ILangString,
     metaData?: ILangString,
-    episodeTotal?: number,
     topics?: ITopic[],
     isFreeSample?: boolean,
     position?: IListeningPosition,
+    textHighlighted?: string,
     hitCount?: number,
     // duration?: number,
 
@@ -120,10 +121,13 @@ export interface IBook extends ParseObjectToJson{
     buyLink?: ILangString,
     isPublic?: boolean,
     episodeCount?: number,
+    speechCount?: number,
 }
 
 export interface ISpeech extends IList {
     title?: ILangString,
+    hitCount?: number,
+    textHiglighted?: string,
     // book?: IBook, 
     metaData?: ILangString,
     //If the speech is only available in a certain language
@@ -153,6 +157,7 @@ export interface IListeningPosition extends ParseObjectToJson {
 
 export interface INote extends ParseObjectToJson {
     episode?: IEpisode, //name, slug, number, image
+    episodeId?: string, 
     isPublic?: boolean,
     text?: string,
     userId?: string,
@@ -179,6 +184,7 @@ export interface ITopic extends ParseObjectToJson  {
     imageUrl?: string,
     _name?: string,
     episodeCount?: number,
+    speechCount?: number,
 }
 
 export interface IGetObjectOptions {

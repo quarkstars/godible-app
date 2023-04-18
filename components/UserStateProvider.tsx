@@ -37,8 +37,11 @@ export const UserStateDefault = {
   setUpdateError: () => null,
 
   getMonth: () => null,
-  highlightedDates: [],
+  // highlightedDates: [],
   dateMap: {},
+
+  listReloads: 0,
+  setListReloads: () => null,
 }
 export const UserState = createContext<IUserState>(UserStateDefault);
 

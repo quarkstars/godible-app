@@ -1,4 +1,4 @@
-import { IDateMap, IListening, IUser } from 'data/types';
+import { IDateMap, IListening, INote, IUser } from 'data/types';
 import { IList } from 'data/types';
 import { useEffect, useRef } from 'react';
 //Used in AppShell to create a UserContext and interact with the logged in User on the server
@@ -9,6 +9,7 @@ import React, { SetStateAction, useState } from "react";
 import { isPlatform } from '@ionic/react';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import useParse from './useParse';
+import useLists from './useLists';
 
 // This is also where a non logged in user will store Language Preference, Volume and logically resolve when logging in 
 // where existing user language takes precedemce
@@ -58,8 +59,12 @@ export interface IUserState {
     reset: Function,
 
     getMonth: Function,
-    highlightedDates: any[],
+    // highlightedDates: any[],
     dateMap: IDateMap,
+
+    
+    listReloads: number,
+    setListReloads: Function,
 }
 
 
@@ -80,10 +85,13 @@ const useUser = () => {
     //Logged in user
     const [user, setUser] = useState<IUser>({}); 
     
-
+    
     //language preference. Should be lowercase
     const [language, setLanguage] = useState<string>("english");
 
+
+    //List Reloads. State that will reload the lists across the site
+    const [listReloads, setListReloads] = useState<number>(0);
 
 
     //When logging in, reroute to a specific path
@@ -115,7 +123,7 @@ const useUser = () => {
     //Get Current User
     const getCurrentUser = async function (): Promise<IUser> {
         const currentUser: Parse.User|undefined|null = await Parse.User.current();
-        console.log("CURRENT USER", currentUser)
+        console.log("CURRENT USER", currentUser, currentUser?.get("currentStreak"), currentUser &&  await currentUser.fetch())
         if (currentUser) {
             const currentUserJSON = currentUser.toJSON();
             setUser(currentUserJSON);
@@ -207,7 +215,7 @@ const useUser = () => {
             if (googleUser.imageUrl) currentUser.set('imageUrl', googleUser.imageUrl);
 
 
-            //Currently if a user exists already with the same email, it will not allow a new user
+            // ;;.;8'urrently if a user exists already with the same email, it will not allow a new user
             //
             let idToken = googleUser.authentication.idToken;
             // if (idToken.split(".").length > 1) idToken = idToken.split(".")[0];
@@ -387,7 +395,6 @@ const useUser = () => {
         }
     };
 
-    //Get Calendar
 
     //Get latest listening and next episode
     const getNextEpisode = async (month: string,) => {
@@ -407,7 +414,7 @@ const useUser = () => {
 
     //Calendar, get month
     const fetchedMonths = useRef<string[]>([]);
-    const [highlightedDates, setHighlightedDates] = useState<any[]>([]);
+    // const [highlightedDates, setHighlightedDates] = useState<any[]>([]);
     const [dateMap, setDateMap] = useState<IDateMap>({});
     const getMonth = async (month: string,) => {
         if (!user.objectId) return;
@@ -415,36 +422,40 @@ const useUser = () => {
         try {
             //Listenings
             let listenings = await Parse.Cloud.run("getListenings", {options: {month, hasValidSession: true}}) as IListening[];     
-            let newHighlightedDates:any[] = [];
+            // let newHighlightedDates:any[] = [];
             let newDateMap:IDateMap = {};
             listenings.map((listening) => {
                 if (!listening.date) return;
-                newHighlightedDates = [
-                    ...highlightedDates,
-                    {
-                        date: listening.date,
-                        backgroundColor: '#91caa8',
-                    }
-                ];
+                let newPositions;
+                if (listening.positions) newPositions = listening.positions.filter((position) => {
+                    return position.isValidSession;
+                })
+                const newListening = {...listenings, positions: newPositions}
                 const pastListenings = dateMap[listening.date]?.listenings || [];
                 newDateMap[listening.date] = {
                     ...dateMap[listening.date],
-                    listenings: [...pastListenings, listening]
+                    listenings: [...pastListenings, newListening]
                 }
             });
             //Notes (specify the user's notes only)
-            const notes = await Parse.Cloud.run("getNotes", {options: {month, userId: user.objectId}});     
-            notes.map((note) => {
+            const notes = await Parse.Cloud.run("getNotes", {options: {month, sort: "-createdTime", userId: user.objectId}});     
+            
+            console.log("DATE MAP MISSING NO", notes)
+            let pastNotes: INote[]
+            notes.map((note) => {   
                 if (!note.date) return;
-                const pastNotes = dateMap[note.date]?.notes || [];
+                pastNotes = newDateMap[note.date]?.notes || [];
+                console.log("DATE MAP PAST NOTE", pastNotes, newDateMap)
                 newDateMap[note.date] = {
                     ...dateMap[note.date],
                     ...newDateMap[note.date],
-                    notes: [...pastNotes, note]
+                    notes: [note,...pastNotes]
                 }
+                console.log("DATE MAP NEW NOTES", newDateMap)
             });
-            setHighlightedDates(newHighlightedDates);
-            setDateMap(newDateMap);
+            // setHighlightedDates(prev => [...prev, newHighlightedDates]);
+            console.log("DATE MAP, SETTING MAP", {...dateMap, ...newDateMap})
+            setDateMap(prev => {return {...prev, ...newDateMap}});
             fetchedMonths.current = [...fetchedMonths.current, month]
             
             // Submit the delete request to the server
@@ -504,9 +515,12 @@ const useUser = () => {
         updateError,
         setUpdateError,
 
+        //List
+        setListReloads,
+        listReloads,
+
         //CALENDAR
         getMonth,
-        highlightedDates,
         dateMap,
     }
 }

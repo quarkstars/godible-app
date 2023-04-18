@@ -1,5 +1,5 @@
 import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonModal, IonPopover, IonProgressBar, IonRange, IonRippleEffect, IonTitle, IonToolbar, useIonModal, useIonRouter } from '@ionic/react'
-import { arrowBack, bookmarkOutline, chevronBack, chevronDown, chevronUp, heartOutline, list, pause, pauseCircle, play, playCircle, playSkipBack, playSkipForward, radio, returnDownBack, returnUpForward, volumeHigh, volumeLow, volumeMedium, volumeOff } from 'ionicons/icons'
+import { arrowBack, bookmark, bookmarkOutline, chevronBack, chevronDown, chevronUp, heartOutline, list, pause, pauseCircle, play, playCircle, playSkipBack, playSkipForward, radio, returnDownBack, returnUpForward, volumeHigh, volumeLow, volumeMedium, volumeOff } from 'ionicons/icons'
 import React, { useEffect, useRef } from 'react'
 import { Player } from 'components/AppShell';
 import { useContext, useState } from 'react';
@@ -14,10 +14,15 @@ import ListModal from './ListModal';
 import useEpisodes from 'hooks/useEpisodes';
 import SettingsModal from './SettingsModal';
 import { UserState } from 'components/UserStateProvider';
+import useLists from 'hooks/useLists';
 
 export const PlayerControls = () => {
 
     const player = useContext(Player);
+
+	const router = useIonRouter();
+
+    if (player.router) player.router.current = router;
     
     //Pass user state to the usePlayer context because useUser cannot
     const userState = useContext(UserState);
@@ -38,6 +43,7 @@ export const PlayerControls = () => {
         setList: player.setList,
         index: player.index,
         setIndex: player.setIndex,
+        router,
     });
     function openListModal() {
         if (!player.list?.episodes || typeof player.index !== "number" ) return;
@@ -54,9 +60,44 @@ export const PlayerControls = () => {
         })
     }
 
-    const bookmarkEpisode = () => {
-
+  //User Bookmarks
+  const {
+    getLists,
+    lists,
+    addEpisodeToList,
+    removeEpisodeFromList,
+  } = useLists();
+  const [hasBookmark, setHasBookmark] = useState<boolean>(false);
+  useEffect(() => {
+    if (!userState.user.objectId) return setHasBookmark(false);
+    getLists(undefined, { sort: "+index", limit: 1, userId: userState.user.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+  }, [userState.user?.objectId, userState.listReloads]);
+  useEffect(() => {
+    if (!lists || !lists?.[0]) return setHasBookmark(false);
+    const list = lists[0];
+    
+    let foundBookmark = false;
+    for (let i = 0; i < list.episodes.length; i++) {
+      if (list.episodes[i].objectId === episode?.objectId) {
+        foundBookmark = true;
+        break;
+      }
     }
+    if (foundBookmark) setHasBookmark(true)
+    else setHasBookmark(false);
+  }, [lists]);
+  const  handleBookmark = async (isBookmarking=true) => {
+    if (!episode?.objectId) return;
+    if (isBookmarking) {
+      setHasBookmark(true);
+      addEpisodeToList(0, episode.objectId, true);
+    } else {
+      if (!lists?.[0]) return;
+      setHasBookmark(false);
+      removeEpisodeFromList(lists[0], episode.objectId);
+    }
+    setTimeout(() => userState.setListReloads(prev => prev + 1), 1000);
+  }
 
     let volumeIcon = volumeHigh;
     if (player.volume < .66) volumeIcon =volumeMedium;
@@ -68,7 +109,6 @@ export const PlayerControls = () => {
     const {
         appendEpisodeStrings,
     } = useEpisodes()
-	const router = useIonRouter();
     if (player.list?.episodes && typeof player.index == "number") {
         episode = appendEpisodeStrings(player.list.episodes[player.index]);
     }
@@ -114,7 +154,7 @@ export const PlayerControls = () => {
             >
                 {player.list?.episodes && <>
                 <IonToolbar color={"light"}>
-                    <div className="flex flex-row items-center justify-between w-full px-4 space-x-4">   
+                    <div className="flex flex-row items-center justify-between w-full px-4 space-x-0 md:space-x-4">   
                         <div className="justify-start hidden xs:flex">    
                             <div className="flex-shrink-0 hidden w-22 h-22 xs:block">
                                 <Thumbnail 
@@ -143,9 +183,14 @@ export const PlayerControls = () => {
                                     </IonButton>
                                 </IonButtons>
                                 <IonButtons>
-                                    <IonButton>
+                                    <IonButton
+                                        onClick={() => {
+                                            if (!userState.user.objectId) router.push("/signin?message=Log in to bookmark.")
+                                            handleBookmark(!hasBookmark)
+                                        }}
+                                    >
                                         {/* TODO: Bookmark */}
-                                        <IonIcon slot="icon-only" icon={bookmarkOutline} />
+                                        <IonIcon slot="icon-only" icon={hasBookmark? bookmark : bookmarkOutline} />
                                     </IonButton>
                                 </IonButtons>
                             </div>
@@ -165,7 +210,7 @@ export const PlayerControls = () => {
                                         </IonButton>
                                     </IonButtons>
                                 </div>
-                                <div className="block xs:hidden">
+                                <div className="hidden xs:hidden mobile:block">
                                     <IonButtons>
                                         <IonButton>
                                             {/* TODO: Bookmark */}
@@ -186,7 +231,7 @@ export const PlayerControls = () => {
                                     </div>
                                 </IonButtons>
                                 <IonButtons>
-                                    <IonButton size="large"
+                                    <IonButton 
                                         onClick={()=>{player.jump(-30)}}
                                         disabled={!player.isReady}
                                     >
@@ -197,13 +242,13 @@ export const PlayerControls = () => {
                                     <button 
                                         className="flex items-center justify-center rounded-full shadow-md w-9 h-9 xs:w-12 xs:h-12 ion-activatable ripple-parent circle bg-primary hover:bg-primary-shade focus:outline-none"
                                         onClick={() => player.togglePlayPause()}
-                                        style={{opacity: player.audio?.src ? 1 : .5}}
+                                        style={{opacity: player.audio?.src ? 1 : .5, minWidth: "36px"}}
                                     >   
                                             <IonRippleEffect type="unbounded"></IonRippleEffect>
                                             {player.isPlaying ?
-                                                <svg className="w-6 h-6 xs:w-8 xs:h-8" fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z"/></svg>
+                                                <svg className="w-6 h-6 xs:w-8 xs:h-8" fill="white" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z"/></svg>
                                             :
-                                                <svg className="w-6 h-6 xs:w-8 xs:h-8" fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="3 3 20 20"><polygon points="9.33 6.69 9.33 19.39 19.3 13.04 9.33 6.69"/></svg>
+                                                <svg className="w-6 h-6 xs:w-8 xs:h-8" fill="white" xmlns="https://www.w3.org/2000/svg" viewBox="3 3 20 20"><polygon points="9.33 6.69 9.33 19.39 19.3 13.04 9.33 6.69"/></svg>
                                         }
                                     </button>
                                 <IonButtons>                        
@@ -238,7 +283,7 @@ export const PlayerControls = () => {
                                 <div className="block sm:hidden">
                                 <IonButtons>
                                     <IonButton size="large" onClick={()=>{player.setIsVisible(false)}}>
-                                        <IonIcon slot="start" icon={chevronDown} />
+                                        <IonIcon slot="start" icon={chevronDown} size="medium" />
                                         {/* TODO: Hide if Volume is availbable */}
                                         <span className='hidden text-xs xs-block'>hide</span>
                                     </IonButton>
@@ -253,7 +298,8 @@ export const PlayerControls = () => {
                                 }
                                 {player.audio?.src &&<>
                                 {(player.isReady || player.isPlaying || player.currentSeconds > 0) ?
-                                    <IonRange
+                                    <IonRange                                                
+
                                         value={player.currentSeconds}
                                         max={player.duration||100}
                                         onIonKnobMoveStart={() => {player.setIsSeeking(true)}}
@@ -319,7 +365,7 @@ export const PlayerControls = () => {
                             </IonButtons>
                             <IonButtons>
                                 <IonButton size="large" onClick={()=>{player.setIsVisible(false)}}>
-                                    <IonIcon slot="start" icon={chevronDown} />
+                                    <IonIcon slot="start" icon={chevronDown} size="small" />
                                     <span className='text-xs'>hide</span>
                                 </IonButton>
                             </IonButtons>

@@ -1,11 +1,13 @@
-import { IonButton, IonButtons, IonContent, IonIcon, IonItem, useIonPopover } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonIcon, IonItem, useIonModal, useIonPopover, useIonRouter } from '@ionic/react';
 import { IEpisode, IList, ISpeech } from 'data/types';
-import { addCircleOutline, arrowForward, chevronForward, playCircle } from 'ionicons/icons';
+import { addCircleOutline, arrowForward, chevronForward, playCircle, list as listIcon } from 'ionicons/icons';
 import React, { useState, useMemo, useContext } from 'react'
 import Thumbnail from './Thumbnail';
 import { userDefaultLanguage } from 'data/translations';
 import { UserState } from 'components/UserStateProvider';
 import { resolveLangString } from 'utils/resolveLangString';
+import ListModal from './ListModal';
+import { Player } from 'components/AppShell';
 
 interface ISpeechListItemProps {
   list: ISpeech,
@@ -15,15 +17,18 @@ interface ISpeechListItemProps {
   highlightStrings?: string[]
 }
 
+
 const SpeechListItem = (props: ISpeechListItemProps) => {
   const list = props.list;
+  console.log("LIST", list)
 
+  const router = useIonRouter();
   const {
     user
   } = useContext(UserState);
   const lang = (user?.language) ? user.language : userDefaultLanguage;
   const episode = list.episodes[0] as IEpisode|undefined;
-  const imageUrl = episode?.book?.imageUrl || episode?.imageUrl;
+  const imageUrl = episode?.book?.thumbUrl || episode?.thumbUrl;
   const firstEpisode = episode;
   const lastEpisode = list.episodes[list.episodes.length-1] as IEpisode;
   const metaData = resolveLangString(list?.metaData, lang);
@@ -34,6 +39,17 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
       bookTitle: firstEpisode?._bookTitle || firstEpisode?.book?.title?.[lang],
       metaDataBlocks,
       name: list.name,
+  });
+
+    //List Modal
+  const [presentList, dimissList] = useIonModal(ListModal, {
+    onDismiss: (data: string, role: string) => dimissList(data, role),
+      list: {
+        name: resolveLangString(list?.title, lang),
+        episodes: list.episodes,
+        description: list.description,
+      },
+      router,
   });
 
   return (
@@ -71,22 +87,13 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
     </div>
     <div className='flex flex-col'>
       <div className='flex items-center space-x-1'>
-        <span className='pl-3 font-medium line text-light text-md dark:text-dark'>Speech</span>
+        <span className='pl-3 text-sm font-medium line text-medium'>Speech</span>
       
-        {/* <div className="hidden w-4 h-4 overflow-hidden rounded-lg xs:block" >
-          <img src={firstEpisode.imageUrl} alt={firstEpisode.number?.toString()} />
-        </div>
-        <div className="hidden xs:block">
-          <IonIcon color="medium" icon={chevronForward} /> 
-        </div>
-        <div className="hidden w-4 h-4 overflow-hidden rounded-lg xs:block" >
-          <img src={lastEpisode.imageUrl} alt={firstEpisode.number?.toString()} />
-        </div> */}
-        <span className='hidden pl-4 text-sm italic line text-medium sm:block'>{`${list.episodes.length} Episodes `}</span>
+        <span className='hidden pl-4 text-sm italic line text-medium sm:block'>{`${list.episodes.length} Episode${list.episodes.length > 1 ? "s" : ""} `}</span>
 
       </div>
 
-      <div className="flex items-center pl-3 space-x-1 font-medium leading-tight line-clamp-2 text-md">
+      <div className="flex items-center pl-3 space-x-1 text-sm font-medium leading-snug font line-clamp-2 text-light dark:text-dark xs:text-md">
         {list.name}
       </div>
     </div>
@@ -99,10 +106,10 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
       <IonButton
         onClick={(e: any) => {
             e.stopPropagation();
-            if (props.onAdd) props.onAdd(e);
+            presentList();
         }}
       >
-        <IonIcon icon={addCircleOutline} slot="icon-only" />
+        <IonIcon icon={listIcon} slot="icon-only" />
       </IonButton>
     </IonButtons>
   </IonItem>

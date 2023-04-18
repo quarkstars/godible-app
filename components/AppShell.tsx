@@ -56,6 +56,9 @@ export const Player = createContext<IPlayer>({
     next: () => null,
     setIsAutoPlay: () => null,
     userState: undefined,
+    isMutatingList: true, 
+    setIsMutatingList: () => null,
+    router: undefined,
 })
 
 initializeParse(

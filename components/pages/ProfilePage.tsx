@@ -1,15 +1,23 @@
-import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonTitle, IonToolbar, useIonModal, useIonPopover, useIonRouter, useIonViewDidEnter } from '@ionic/react'
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonTitle, IonToolbar, ItemReorderEventDetail, useIonModal, useIonPopover, useIonRouter, useIonViewDidEnter } from '@ionic/react'
+import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import ListListItem from 'components/ui/ListListItem'
+import ListModal from 'components/ui/ListModal'
+import { PlayerControls } from 'components/ui/PlayerControls'
 import SettingsModal from 'components/ui/SettingsModal'
 import TextDivider from 'components/ui/TextDivider'
 import Toolbar from 'components/ui/Toolbar'
 import { sampleEpisodes } from 'data/sampleEpisodes'
-import { arrowForward, calendar, card, cardOutline, documentText, chevronForward, checkmarkCircle, today, pencil, play, flame, settingsSharp, person, swapVertical } from 'ionicons/icons'
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { IList } from 'data/types'
+import useLists from 'hooks/useLists'
+import { arrowForward, calendar, card, cardOutline, documentText, chevronForward, checkmarkCircle, today, pencil, play, flame, settingsSharp, person, swapVertical, add, ban, closeCircle } from 'ionicons/icons'
+import { list } from 'postcss'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import InitialsAvatar from 'react-initials-avatar';
 import { FreeMode, Navigation, Thumbs }  from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { addMonths } from 'utils/addMonths'
+import { formatDate } from 'utils/formatDate'
 import { toIsoString } from 'utils/toIsoString'
 //https://chrisgriffith.wordpress.com/2019/05/14/ionic-design-profile-page/
 const ProfilePage:React.FC = () => {
@@ -30,8 +38,9 @@ const ProfilePage:React.FC = () => {
     logInWithGoogle,
     setReroutePath,
     getMonth,
-    highlightedDates,
     dateMap,
+    setListReloads,
+    listReloads,
 
   } = useContext(UserState);
 
@@ -43,28 +52,109 @@ const ProfilePage:React.FC = () => {
   });
 
   //Because sliders are different sizes, on switch, use scroller
-  const goToTop = () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
-  };
+  // const goToTop = () => {
+  //   window.scrollTo({
+  //       top: 0,
+  //       behavior: 'smooth',
+  //     });
+  // };
 
   const [presentSettings, dismissSettings] = useIonModal(SettingsModal, {
     onDismiss: (data: string, role: string) => dismissSettings(data, role),
     isProfile: true,
 });
 
+
+const player = useContext(Player);
+    
+  const {
+    getLists, 
+    setLists,
+    postList,
+    isLoading: listsIsLoading,
+    error: listError,
+    lists,
+    skip: listSkip,
+    deleteList,
+    reorderLists
+  } = useLists();
+  //Focus name input
+  const nameListInput = useRef<HTMLIonInputElement>(null);
+  const [isNamingList, setIsNamingList] = useState(false);
+  //List Modal
+  const [inspectedListIndex, setInspectedListIndex] = useState<number|undefined>();
+  function setList(list?: IList) {
+    setLists(prevLists => {
+      if (typeof inspectedListIndex !== "number" || !list) return prevLists;
+      let newLists = prevLists || [];
+      newLists[inspectedListIndex] = list;
+      return newLists;
+    })
+    player.setList(list);
+  }
+  //get player index if it matches the current episode
+
+  let playerIndex = (typeof player.index === "number" &&  player.list?.episodes?.[player.index] &&  lists?.[inspectedListIndex||0]?.episodes?.[player.index]?.objectId === player.list?.episodes?.[player.index]?.objectId) ? player.index : undefined
+  //List modal trigger
+  const [presentList, dimissList] = useIonModal(ListModal, {
+    onDismiss: (data: string, role: string) => dimissList(data, role),
+      list: lists?.[inspectedListIndex||0],
+      setList: setList,
+      index: playerIndex,
+      setIndex: player.setIndex,
+      isBookmarks: inspectedListIndex === 0,
+      router,
+  });
+    
+
+  //List saving
+  async function handleSaveList(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, _name?: string) {
+    let saveList;
+    let name = (_name === "Bookmarks") ? "More Bookmarks" : _name;
+    if (lists && lists.length > 1) saveList = {name, index: lists.length};
+    else return setListReloads(prev => prev + 1);
+    const updatedList = await postList(saveList);
+    setListReloads(prev => prev + 1);
+  }
+  //List deleting
+  async function handleDelete(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, episodeId: string) {
+    if (!lists) return;
+    await deleteList(episodeId);
+    setListReloads(prev => prev + 1);
+  }
+
+  //Handle play
+  async function handlePlay(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, listIndex: number) {
+    const episode = lists?.[listIndex]?.episodes?.[0];
+    if (!episode) return;
+    //Reverse episodes because playlist should be incremental
+      event.preventDefault();
+      player.setIsAutoPlay(true);
+      player.setList(lists?.[listIndex]);
+      player.setIndex(0);
+      if (!player.isPlaying) player.togglePlayPause(true);
+      if (router) router.push(episode._path!);
+  }
+
+  //Handle reordering
+  const [isReordering, setIsReordering] = useState(false);
+  function handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
+    console.log("REORDER?", event)
+    let newListOrder = event.detail.complete();
+    // setList(newListOrder);
+    reorderLists(event.detail.from, event.detail.to)
+  }
+
+
   const [swiperRef, setSwiperRef] = useState<any>(null);
   const [tabIndex, setTabIndex] = useState<number>(0);
   useEffect(() => {
     if (!swiperRef) return;
     setTabIndex(swiperRef.activeIndex);
-    contentRef.current && contentRef.current.scrollToTop();
+    // contentRef.current && contentRef.current.scrollToTop();
   }, [swiperRef?.activeIndex]);
 
 
-  const [isReordering, setIsReordering] = useState(false);
 
   const urlParams = new URLSearchParams(router.routeInfo.search)
   const defaultTab = urlParams.get("tab");
@@ -73,7 +163,7 @@ const ProfilePage:React.FC = () => {
 
 
   useEffect(() => {
-    window.scroll(0, 0);
+    // window.scroll(0, 0);
     if (!swiperRef) return;
     switch (defaultTab) {
       case "calendar":
@@ -86,32 +176,125 @@ const ProfilePage:React.FC = () => {
         swiperRef.slideTo(2);
         break;
     }  
-  }, [defaultTab, swiperRef])
+    router.push("/profile/");
+  }, [defaultTab, swiperRef]);
 
+
+  
   useEffect(() => {
-    console.log("DID ENTER");
-    const now = new Date();
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-      // suppose the date is 12:00 UTC
-    var invdate = new Date(now.toLocaleString('en-US', {
-      timeZone
-    }));
+    if (!user.objectId) return setLists(undefined);
+    getLists(undefined, {limit: 30, userId: user.objectId, sort: "+index", exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+}, [listReloads, user.objectId]);
 
-  // then invdate will be 07:00 in Toronto
-  // and the diff is 5 hours
-  var diff = now.getTime() - invdate.getTime();
 
-  // so 12:00 in Toronto is 17:00 UTC
-    const date = toIsoString(new Date()); // get YYYY-MM-DD
-    
+  const dateTime = useRef<HTMLIonDatetimeElement>(null);
+  const [currentDate, setCurrentDate] = useState<string>();
+  const recordRange = useRef(0);
+  const initializeDates = async (date: string) => {
     const month = date.slice(0, 7);  
-    console.log("DATE", now, invdate, date, month, new Date(new Date().toLocaleString('en', {timeZone})).toISOString(), timeZone);
-    getMonth();
-  }, []);
-  console.log("highlightedDates", highlightedDates, dateMap, user)
+    await getMonth(month);
+    console.log("CURRENT DATE", date, currentDate);
+    setCurrentDate(date);
+    dateTime.current!.value = date;
+  }
+  useEffect(() => {
+    currentDate
+  }, [dateMap])
+  
+  useEffect(() => {
+    if (!dateTime.current) return;
+
+    const date = toIsoString(new Date()).slice(0,10); // get YYYY-MM-DD
+    dateTime.current.value = date;
+    
+    initializeDates(date);
+    
+  }, [dateTime.current, user.objectId]);
+  
+  //Create date detail
+  const dateDetail = useMemo(() => {
+    if (typeof currentDate !== "string") return <></>
+    const formattedDate = formatDate(currentDate);
+    // const hasDate = dateMap.hasOwnProperty(currentDate);
+    let records = dateMap[currentDate];
+    console.log("HERE IS A LOG", user, user.currentStreak, dateMap, currentDate, records)
+    const listenings = records?.listenings;
+    let listening = listenings?.[0];
+    const notes = records?.notes;
+    console.log("DATE MAP", currentDate, notes, dateMap)
+    return (
+      <div className="px-6 -mt-6 sm:mt-0">
+        <h5 className="text-center">{formattedDate}</h5>
+        {(!listening?.positions && !notes) && 
+          <span className="flex justify-center w-full py-4 text-medium">
+            No listenings or notes
+          </span>
+        }
+        <IonList>
+          {listening?.positions && listening?.positions.map((position, index) => {
+            if (index > 2) return <></>
+            else return (
+              <IonItem button 
+                  onClick={(e) => {
+                    if (position?.episode?.slug) router.push("/episode/"+position?.episode?.slug)
+                  }} 
+                  key={position?.episode?.objectId+"-"+index}
+                >
+                <IonIcon icon={checkmarkCircle} size="small" color="primary" slot="start" onClick={(e) => {
+                  
+                }} />
+                  {`Listened to Episode${typeof position?.episode?.number === "number" ? " "+ position?.episode?.number :""}`}
+                <IonIcon icon={chevronForward} size="small" color="medium" slot="end" />
+              </IonItem>
+            )
+          })
+          }
+          {listening?.positions && listening?.positions.length > 3 && <span className="flex justify-center w-full text-sm text-medium">{`and ${listening.positions.length - 3} more`}</span>}
+          {notes && notes.map((note, index) => {
+            if (index > 2) return <></>
+            return (
+              <IonItem 
+                button 
+                key={note.objectId} 
+                onClick={(e) => { if (note.episode?.slug) router.push(`/episode/${note.episode?.slug}?notes=1`)}}
+              >
+                <IonIcon icon={documentText} size="small" color="tertiatry" slot="start" />
+                <span className="line-clamp-1"><span>Note </span><span className="italic text-medium">{note?.text}</span></span>
+                {note.episode?.slug && <IonIcon icon={chevronForward} size="small" color="medium" slot="end" />}
+              </IonItem>
+            )
+          })
+          }
+          {notes && notes.length > 3 && <span className="flex justify-center w-full text-sm text-medium">{`and ${notes.length - 3} more`}</span>}
+
+        </IonList>
+      </div>
+    )
+  }, [currentDate, dateMap]);
+  
+  //Refetch Months
+  function handleDateChange(e) {
+    if (typeof e.detail.value !== "string") return;
+    setCurrentDate(e.detail.value.slice(0,10));
+    recordRange.current = 0;
+  }
+  function handleDateClick(e) {
+    if (typeof e.target.value !== "string") return;
+    const month = e.target.value.slice(0, 7);
+    let expandedRange = recordRange.current+1
+    const minMonth = addMonths(month, expandedRange*-1)
+    const maxMonth = addMonths(month, expandedRange)
+    console.log("DATE CLICK 2", recordRange.current-1, minMonth, maxMonth)
+    getMonth(minMonth);
+    getMonth(maxMonth);
+    recordRange.current = recordRange.current + 1
+  }
+
+  
+  
 
   return (
-    <IonPage>
+  <IonPage>
     <IonHeader>
     <IonToolbar>
             <IonButtons slot="start">
@@ -207,7 +390,7 @@ const ProfilePage:React.FC = () => {
               </div>
               <div className="block xs:hidden"></div>
             </div>
-            <div className='flex w-full mb-6 border-b justify-evenly'>
+            <div className='flex w-full mt-4 mb-6 border-b justify-evenly'>
               {/* <IonTabBar slot="bottom"> */}
 
                     <IonButton fill="clear" onClick={() => swiperRef.slideTo(0)}>
@@ -246,6 +429,7 @@ const ProfilePage:React.FC = () => {
               onSlideChange={(swiper) => setTabIndex(swiper.activeIndex)}
               onSwiper={(swiper) => setSwiperRef(swiper)}
               spaceBetween={0}
+              allowTouchMove={false}
               // thumbs={{ swiper: thumbsSwiper }}
               modules={[Navigation]}
               className="mySwiper2"
@@ -255,56 +439,32 @@ const ProfilePage:React.FC = () => {
                   <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                     <div className='flex justify-center'>
                       <IonDatetime
+                        ref={dateTime}
                         presentation="date"
-                        value="2023-03-20"
-                        highlightedDates={[
-                          {
-                            date: '2023-03-15',
-                            backgroundColor: '#91caa8',
-                          },
-                          {
-                            date: '2023-03-16',
-                            backgroundColor: '#91caa8',
-                          },
-                          {
-                            date: '2023-03-17',
-                            backgroundColor: '#91caa8',
-                          },
-                          {
-                            date: '2023-03-18',
-                            backgroundColor: '#91caa8',
-                          },
-                          {
-                            date: '2023-03-19',
-                            backgroundColor: '#91caa8',
-                          },
-                        ]}
+                        onIonChange={(e) => {
+                          handleDateChange(e)
+                        }}
+                        onClick={(e) => {
+                          handleDateClick(e)
+                        }}
+                        highlightedDates={(date) => {
+
+                          if(dateMap.hasOwnProperty(date) && dateMap[date].listenings) return {
+                            textColor: '#000000',
+                            backgroundColor: '#71df9d'
+                            };
+                            
+                          if(dateMap.hasOwnProperty(date) && dateMap[date].notes) return {
+                            textColor: '#000000',
+                            backgroundColor: '#afc4b7'
+                            };
+                  
+                          return undefined;
+                        }}
                     ></IonDatetime>
                     </div>
-                    <div className="px-6 -mt-6 sm:mt-0">
-                      <h5 className="text-center">Monday, March 20</h5>
-                      <IonList>
-                        <IonItem button>
-                          <IonIcon icon={checkmarkCircle} size="small" color="primary" slot="start" />
-                          Listened to Episode 6
-                          <IonIcon icon={chevronForward} size="small" color="medium" slot="end" />
-                        </IonItem>
-                        <IonItem>
-                          <IonIcon icon={flame} size="small" color="primary" slot="start" />
-                          Day 3 of 7-day streak
-                        </IonItem>
-                        <IonItem button>
-                          <IonIcon icon={documentText} size="small" color="secondary" slot="start" />
-                          <span className="line-clamp-1"><span>Note </span><span className="italic text-medium">I really love that True Parents work covers business</span></span>
-                          <IonIcon icon={chevronForward} size="small" color="medium" slot="end" />
-                        </IonItem>
-                        <IonItem button>
-                          <IonIcon icon={today} size="small" color="tertiary" slot="start" />
-                          Ahn Shi Il
-                          <IonIcon icon={chevronForward} size="small" color="medium" slot="end" />
-                        </IonItem>
-                      </IonList>
-                    </div>
+                    {dateDetail}
+
                   </div>
                   <button className='relative flex items-center w-auto p-4 pl-6 pr-4 mt-10 space-x-3 overflow-hidden rounded-full shadow-lg text-light sm:mt-4 bg-primary hover:opacity-50 focus:outline-none ion-activatable ripple-parent '>
                     <IonRippleEffect></IonRippleEffect>
@@ -315,11 +475,24 @@ const ProfilePage:React.FC = () => {
               </SwiperSlide>
               <SwiperSlide>
                 <IonList>
+                  {lists && lists[0] &&
                   <ListListItem
-                    list={{name: "Bookmarked Episodes", episodes: sampleEpisodes}}
+                    list={lists[0]}
+                    onPlay={(e) => handlePlay(e, 0)}
+                    onClick={(e) => {
+                      if (isReordering || isLoading) return;
+                      e.preventDefault();
+                      setInspectedListIndex(0)
+                      presentList({
+                        onDidDismiss: () => {setInspectedListIndex(undefined)},
+
+                      })
+                    }}
+                    
                   />
+                  }
                   <div className="flex items-center justify-between w-full pt-8">
-                    <span className="font-medium text-medium">My Saved Lists</span>
+                    <span className="font-medium text-light dark:text-dark">My Saved Lists</span>
                     <IonButton size="small" fill="clear" color={isReordering ? "primary" : "medium"}
                       onClick={()=>{setIsReordering(prev=>!prev)}}
                     >
@@ -329,21 +502,104 @@ const ProfilePage:React.FC = () => {
                   </div>
                   </IonList>
                   <IonList>
-                    <IonReorderGroup disabled={!isReordering} onIonItemReorder={() => {}}>
-                        <IonReorder>
-                          <ListListItem
-                            list={{name: "How to Gain Spiritual Help", episodes: sampleEpisodes, description: "1975\nWashington Monument\nSun Myung Moon"}}
-                            isReordering={isReordering}
-                          />
-                        </IonReorder>
-                        <IonReorder>
-                          <ListListItem
-                            list={{name: "How to Gain Spiritual Help", episodes: sampleEpisodes, description: "1975\nWashington Monument\nSun Myung Moon"}}
-                            isReordering={isReordering}
-                          />
-                      </IonReorder>
-                    </IonReorderGroup>
+                    <IonReorderGroup disabled={!isReordering} onIonItemReorder={(e) => {handleReorder(e)}}>
+                        {lists && [...lists].slice(1,lists.length).map((list, _index) => {
+                          return (
+                          <IonReorder key={"mylists-"+list.objectId}>
+                            <ListListItem
+                              list={list}
+                              onPlay={(e) => handlePlay(e, _index+1)}
+                              isReordering={isReordering}
+                              disabled={listsIsLoading}
+                              onClick={(e) => {
+                                if (isReordering || isLoading) return;
+                                e.preventDefault();
+                                setInspectedListIndex(_index+1)
+                                presentList({
+                                  onDidDismiss: () => {setInspectedListIndex(undefined)},
+          
+                                })
+                              }}
+                              onDelete={(e, listId) => {
+                                if (isReordering || isLoading) return;
+                                e.preventDefault();
+                                handleDelete(e, listId);
+                              }}
+                            />
+                          </IonReorder>
+                          )
+                        })}
 
+                    </IonReorderGroup>
+                    {(lists && lists.length >= 30) ?
+                    <IonItem color="medium" fill="outline" lines="none" className="ion-padding">
+                        <IonIcon icon={ban} slot="start"/>
+                        You have reached the 30 list limit. (Delete a list to make a new one)
+                    </IonItem>
+                    :
+                    <>
+                      
+                      {isNamingList ?
+                      <div className="flex w-full">
+                        <div className="w-full">
+                      <IonItem>
+                        <IonInput 
+                          placeholder="Name your list..." 
+                          ref={nameListInput}
+                          onIonChange={(e) => {
+                            if (typeof e.detail.value !== "string") return;
+                          }}
+                        >
+                        </IonInput>
+                      </IonItem>
+                      </div>
+                      <IonButtons slot="end">
+                        <IonButton onClick={(e) => {
+                          const name = typeof nameListInput.current?.value === "string" ? nameListInput.current?.value : undefined
+                          handleSaveList(e, name?.slice(0,250));
+                          setIsNamingList(false);
+                        }}  
+                          size="small"
+                          color="primary"
+                          fill="clear"
+                        >
+                        <IonIcon icon={checkmarkCircle} slot="start" />
+                          Save
+                        </IonButton>
+                        <IonButton onClick={(e) => {
+                          setIsNamingList(false);
+                        }}  
+                          size="small"
+                          color="medium"
+                          fill="clear"
+                        >
+                        <IonIcon icon={closeCircle} slot="start" />
+                          Cancel
+                        </IonButton>
+                      </IonButtons>
+                      </div>
+                      :
+                      <IonButton 
+                        color="medium" 
+                        fill="clear" 
+                        className="ion-padding" 
+                        disabled={listsIsLoading}
+                        onClick={(e) => {
+                          if (!isNamingList) {
+                            setIsReordering(false);
+                            setIsNamingList(true);
+                            setTimeout(async () => {
+                              await nameListInput.current?.setFocus();
+                            }, 200);
+                          } else setIsNamingList(false);
+                        }}  
+                      >
+                          <IonIcon icon={add} slot="start"/>
+                          {listsIsLoading ? "Loading..." : "Create a List"}
+                      </IonButton>
+                      }
+                    </>
+                    }
                 </IonList>
               </SwiperSlide>
               <SwiperSlide>
@@ -499,6 +755,9 @@ const ProfilePage:React.FC = () => {
           </div>
         </div>
       </IonContent>
+      <IonFooter>
+        <PlayerControls />
+      </IonFooter>
     </IonPage>
   )
 }

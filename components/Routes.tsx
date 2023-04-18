@@ -90,7 +90,7 @@ export const pages:IPage[] = [
     }, 
     {
         label: "Notes",
-        path: "/Notes", //NotesPage
+        path: "/notes", //NotesPage
         component: NotesPage,
         icon: documentText,
         iosIcon: documentTextOutline,

@@ -12,13 +12,18 @@ import {
     IonNote,
     IonToggle,
     useIonModal,
+    useIonRouter,
   } from '@ionic/react';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { archiveOutline, archiveSharp, bookmark, bookmarkOutline, heartOutline, heartSharp, list, mailOutline, mailSharp, moonOutline, paperPlaneOutline, paperPlaneSharp, settingsSharp, sunnyOutline, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
-import { Theme } from 'components/AppShell';
+import { archiveOutline, archiveSharp, arrowForward, bookmark, bookmarkOutline, heartOutline, heartSharp, list, listCircle, listCircleOutline, mailOutline, mailSharp, moonOutline, paperPlaneOutline, paperPlaneSharp, reorderFour, settingsSharp, sunnyOutline, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
+import { Player, Theme } from 'components/AppShell';
 import { pages } from 'components/Routes';
 import SettingsModal from './SettingsModal';
+import useLists from 'hooks/useLists';
+import ListModal from './ListModal';
+import { UserState } from 'components/UserStateProvider';
+import { IList } from 'data/types';
   
   interface AppPage {
     url: string;
@@ -26,11 +31,12 @@ import SettingsModal from './SettingsModal';
     mdIcon: string;
     title: string;
   }
-
+  
   const titles = ['Bookmarks', 'My List', ];
   
-  const Menu: React.FC = () => {
+const Menu: React.FC = () => {
     const location = useLocation();
+    const router = useIonRouter();
 
     let hideClass:string|undefined;
     if (location.pathname === "/signup" || location.pathname === "/signin") {
@@ -38,16 +44,71 @@ import SettingsModal from './SettingsModal';
     }
     console.log(location.pathname, hideClass)
 
+  const player = useContext(Player);
+    
+  const {
+    getLists, 
+    setLists,
+    postList,
+    isLoading: listsIsLoading,
+    error: listError,
+    lists,
+    skip: listSkip,
+  } = useLists();
+  
+  const {
+    user,
+    listReloads,
+    setListReloads,
+  } = useContext(UserState);
+
+
+  useEffect(() => {
+      if (!user.objectId) return setLists(undefined);
+      getLists(undefined, {limit: 5, userId: user.objectId, sort: "+index", exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+  }, [listReloads, user.objectId]);
+
+  //Create a Bookmarks list by default
+  useEffect(() => {
+    if (!user.objectId || !lists) return;
+    if (lists.length === 0) postList({name: "Bookmarks", index: 0});
+    if (listReloads === 0) setTimeout(() => {setListReloads(prev => prev + 1)}, 5000)
+  }, [lists]);
+  
+
+  //List Modal
+  const [inspectedListIndex, setInspectedListIndex] = useState<number|undefined>();
+  function setList(list?: IList) {
+    setLists(prevLists => {
+      if (typeof inspectedListIndex !== "number" || !list) return prevLists;
+      let newLists = prevLists || [];
+      newLists[inspectedListIndex] = list;
+      return newLists;
+    })
+    player.setList(list);
+  }
+  //get player index if it matches the current episode
+  let playerIndex = (typeof player.index === "number" &&  player.list?.episodes?.[player.index] &&  lists?.[inspectedListIndex||0]?.episodes?.[player.index]?.objectId === player.list?.episodes?.[player.index]?.objectId) ? player.index : undefined
+  //List modal trigger
+  const [presentList, dimissList] = useIonModal(ListModal, {
+    onDismiss: (data: string, role: string) => dimissList(data, role),
+      list: lists?.[inspectedListIndex||0],
+      setList: setList,
+      index: playerIndex,
+      setIndex: player.setIndex,
+      isBookmarks: inspectedListIndex === 0,
+      router,
+  });
     
     //Settings Modal
     const [presentSettings, dimissSettings] = useIonModal(SettingsModal, {
       onDismiss: (data: string, role: string) => dimissSettings(data, role),
-  });
-  function openSettingsModal() {
-      presentSettings({
-          initialBreakpoint:0.85,
-      })
-  }
+    });
+    function openSettingsModal() {
+        presentSettings({
+            initialBreakpoint:0.85,
+        })
+    }
   
     return (
         <IonMenu contentId="main" type="overlay" className={hideClass}>
@@ -79,21 +140,50 @@ import SettingsModal from './SettingsModal';
                   })}
                 </IonList>
               </div>
-              {/* TODO: MIN HEIGHT DOESN"T WORK */}
-              <div className="items-start justify-start flex-grow w-full overflow-y-scroll min-h-[100px]">
+              <div className="items-start justify-start flex-grow w-full overflow-y-scroll min-h-[100px]" style={{minHeight: "100px"}}>
                 <IonList id="labels-list">
-                  {titles.map((listTitle, index) => (
+                  {lists ? [...lists].slice(0,4).map((myList, index) => (
                     <IonItem 
                       lines="none" 
-                      key={index} 
-                      routerLink={"/profile?tab=lists"}
+                      key={myList.objectId} 
+                      onClick={(e: any) => {
+                        e.preventDefault();
+                        setInspectedListIndex(index)
+                        presentList({
+                          // onDidDismiss: () => {setInspectedListIndex(undefined)},
+                          // list: myList,
+
+                        })
+                      }}
                       routerDirection="none"  
                       button 
                     >
-                      <IonIcon slot="start" icon={listTitle==="Bookmarks" ? bookmark : list} />
-                      <IonLabel>{listTitle}</IonLabel>
+                      <IonIcon slot="start" icon={myList.name==="Bookmarks" ? bookmark : list} />
+                      <IonLabel>{myList.name}</IonLabel>
                     </IonItem>
-                  ))}
+                  ))
+                :
+                  <IonItem 
+                    lines="none" 
+                    routerLink={"/profile?tab=lists"}
+                    routerDirection="none"  
+                    button 
+                  >
+                    <IonIcon slot="start" icon={bookmark} />
+                    <IonLabel>Bookmarks</IonLabel>
+                  </IonItem>
+                  }
+                  {lists && lists.length > 4 &&
+                  <IonItem 
+                    lines="none" 
+                    routerLink={"/profile?tab=lists"}
+                    routerDirection="none"  
+                    button 
+                  >
+                    <IonIcon slot="start" icon={arrowForward} color="medium" />
+                    <IonLabel><span className="italic text-medium">All Lists</span></IonLabel>
+                  </IonItem>
+                }
                 </IonList>
               </div>
               <span className="h-0.5 w-full border-t border-gray-400 block border-opacity-10"></span>

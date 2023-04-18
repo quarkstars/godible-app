@@ -1,4 +1,4 @@
-import { useIonRouter } from '@ionic/react';
+import { UseIonRouterResult, useIonRouter } from '@ionic/react';
 //Used in AppShell to create a PlayerContext and interact with a consistent player while browsing the app
 
 import { IEpisode, IList } from 'data/types';
@@ -44,6 +44,9 @@ export interface IPlayer {
         rewind: Function,
         next: Function,
         userState: React.MutableRefObject<IUserState>|undefined,
+        router: React.MutableRefObject<UseIonRouterResult|undefined>|undefined,
+        isMutatingList: boolean,  
+        setIsMutatingList: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
 export const calculateTime = (secs: number) => {
@@ -73,9 +76,22 @@ const usePlayer = ():IPlayer => {
     const userState = useRef<IUserState>(UserStateDefault);
     const { user } = userState.current;
 
+    //User needed to save position
+    const router = useRef<UseIonRouterResult|undefined>();
     
     const invalidPositionEpisodeIds= useRef<string[]>([]);
 
+    //Time to doublecheck
+    const doubleCheckCurrentTime= useRef<number|undefined>();
+    const doubleCheckTime = (pastTime: number) => {
+        console.log("DOUBLE CHECK", doubleCheckCurrentTime.current, pastTime, isPlaying)
+        if (typeof doubleCheckCurrentTime.current !== "number") return;
+        if (isPlaying && pastTime === doubleCheckCurrentTime.current) {setIsPlaying(false);console.log("DOUBLE CHECK PAUSE" )}
+        else if (!isPlaying && pastTime < doubleCheckCurrentTime.current) {setIsPlaying(true);console.log("DOUBLE CHECK PLAY");}
+    }
+
+    // boolean to protect from episode page fighting against new list update
+    const [isMutatingList, setIsMutatingList] = useState(false);
     //Update audio element everytime the episode list changes, the index, or the userState (which indicates language)
     const initializeAudio = () => {
         const audio = _audio.current;
@@ -111,21 +127,30 @@ const usePlayer = ():IPlayer => {
         setMessage(undefined);
         setIsVisible(true);
 
-        return () => {if (timer) clearTimeout(timer);}
+        //Double check current time just in case set to playing and fails to play
+        let checkTimer:NodeJS.Timeout;
+        doubleCheckCurrentTime.current = audio.currentTime;
+        checkTimer = setTimeout(() => {
+            doubleCheckTime(audio.currentTime);
+        }, 1500);
+
+        
+
+        // return () => {if (timer) clearTimeout(timer);}
     }
     useEffect(() => {
-        console.log("INITIALIZING AUDIO")
+        // console.log("INITIALIZING AUDIO")
         initializeAudio();
     }, [_audio.current, list?.episodes, index]);
-    useEffect(() => {
-        console.log("INITIALIZING AUDIO CURRENT", _audio.current)
-    }, [_audio.current]);
-    useEffect(() => {
-        console.log("INITIALIZING AUDIO LIST", list?.episodes)
-    }, [list?.episodes]);
-    useEffect(() => {
-        console.log("INITIALIZING AUDIO INDEX", index)
-    }, [index]);
+    // useEffect(() => {
+    //     console.log("INITIALIZING AUDIO CURRENT", _audio.current)
+    // }, [_audio.current]);
+    // useEffect(() => {
+    //     console.log("INITIALIZING AUDIO LIST", list?.episodes)
+    // }, [list?.episodes]);
+    // useEffect(() => {
+    //     console.log("INITIALIZING AUDIO INDEX", index)
+    // }, [index]);
 
 
     //Start Audio when audio loads if autoplay is on
@@ -133,6 +158,7 @@ const usePlayer = ():IPlayer => {
     const [timeTilNext, setTimeTilNext] = useState<number|undefined>();
     const [currentSeconds, setCurrentSeconds] = useState(0);
     
+// console.log("DOUBLE CHECK IS PLAYING", isPlaying)
     //Keep duration updated when available
     const [duration, setDuration] = useState<number|undefined>();
     useEffect(() => {
@@ -265,6 +291,7 @@ const usePlayer = ():IPlayer => {
         const audio = _audio.current;
         //Automatically move value only if playing and the user is not seeking
         if (audio && isPlaying && !isSeeking) {
+
             setCurrentSeconds(audio.currentTime);
         }
         //Handle end of episode
@@ -329,6 +356,7 @@ const usePlayer = ():IPlayer => {
     }
 
     const switchEpisode = (index: number) => {
+        setIsMutatingList(true)
         const audio = _audio.current;
         //Check conditions for next audio autoplay
         const isComplete = duration && currentSeconds >= duration;
@@ -341,6 +369,9 @@ const usePlayer = ():IPlayer => {
         //Switch
         setIndex(index);
         setCurrentSeconds(0);
+        if (router.current) router.current.push(`${list?.episodes?.[index]?._path}`)
+        setTimeout(() => setIsMutatingList(false), 500);
+
     }
 
 
@@ -350,7 +381,8 @@ const usePlayer = ():IPlayer => {
         if (location.pathname === "/signup" || location.pathname === "/signin") {
             togglePlayPause(false)
         }
-    }, [location.pathname])
+    }, [location.pathname]);
+    
     
 
 
@@ -384,6 +416,9 @@ const usePlayer = ():IPlayer => {
         rewind,
         next,
         userState,
+        isMutatingList,
+        setIsMutatingList,
+        router,
     }
 }
 

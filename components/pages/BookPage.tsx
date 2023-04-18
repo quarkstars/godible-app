@@ -59,11 +59,12 @@ const BookPage:React.FC = () => {
   useEffect(() => {
     //TODO: set to 24
     if (!books) return;
-    console.log("BOOK EP", books);
+    console.log("BOOK TO EP", books);
     let bookIds = (book) ? [book?.objectId] : undefined;
-    getEpisodes(undefined, {limit: 12, bookIds ,exclude: ["text"]});
+    console.log("BOOK TO EP", bookIds);
+    getEpisodes(undefined, {limit: 24, bookIds, sort: "-publishedAt", exclude: ["text"]});
   }, [books]);
-  console.log("BOOK EPISODES", episodes);
+  console.log("BOOK TO EPISODES", episodes);
 
 	const router = useIonRouter();
   const player = useContext(Player);
@@ -98,8 +99,9 @@ const BookPage:React.FC = () => {
       const reversedIndex = Math.abs(episodes.length - 1 - index);
       //Get 3 before and 3 after in the list
       const startIndex = (typeof reversedIndex === "number" && reversedIndex - 3 >= 0) ? reversedIndex -3 : 0;
-      const endIndex = (typeof reversedIndex === "number" && reversedIndex + 3 <= reversedEpisodes.length) ? reversedIndex -3 : 0;
+      const endIndex = (typeof reversedIndex === "number" && reversedIndex + 4 <= reversedEpisodes.length-1) ? reversedIndex +4 : reversedEpisodes.length-1;
       const newEpisodes = [...reversedEpisodes].slice(startIndex, endIndex);
+      console.log("NEW EPISODES", startIndex, endIndex, newEpisodes)
       let newIndex = newEpisodes.findIndex((ep) => ep.objectId === episodes[index].objectId);
       if (newIndex < 0) newIndex = 0;
       player.setIsAutoPlay(true);
@@ -123,9 +125,13 @@ useEffect(() => {
 }, [episodes]);
 
 
-const fetchMoreEpisodes = (e) => {
+const fetchMoreEpisodes = async (e) => {
+  console.log("CALL FETCH 1")
   e.preventDefault();
-  getEpisodes(undefined,{limit: 12, exclude: ["text"], skip: (skip||0)+1}, true);
+  console.log("CALL FETCH 2")
+  let bookIds = (book) ? [book?.objectId] : undefined;
+  await getEpisodes(undefined,{limit: 24, bookIds, sort: "-publishedAt", exclude: ["text"], skip: (skip||0)+1}, true);
+  e.target.complete()
 }
 
   return (

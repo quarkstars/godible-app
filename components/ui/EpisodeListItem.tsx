@@ -10,7 +10,6 @@ interface IEpisodeListItemProps {
   onPlay?: (e: any) => void,
   onAdd?: (e: any) => void,
   customSubText?: string,
-  highlightStrings?: string[]
 }
 
 const EpisodeListItem = (props: IEpisodeListItemProps) => {
@@ -24,28 +23,28 @@ const EpisodeListItem = (props: IEpisodeListItemProps) => {
   let highlight = (props.isActive) ? "light" : undefined;
   let weight = (props.isActive) ? "font-bold" : "font-medium";
 
+  let textHighlighted = useMemo(() => {
+    if (!episode.textHighlighted) return <></>;
+    const segments = episode.textHighlighted.replaceAll("\\n", " ").split(/(<em>.*?<\/em>)/);
 
-  let customSubComponent = useMemo(() => {
-      if (!props.customSubText) return <></>;
-      return (
-      <span> 
-        {props.customSubText.split(" ").map((word, index) => {
-            console.log('word', props.highlightStrings, word.toLowerCase(), props.highlightStrings)
-          if (props.highlightStrings && props.highlightStrings.includes(word.toLowerCase().replace(/[^0-9a-z]/gi, ''))) {
+    return (
+      <span>
+        {segments.map((segment, index) => {
+          if (segment.startsWith("<em>") && segment.endsWith("</em>")) {
+            const innerText = segment.substring(4, segment.length - 5);
             return (
-              <span className="bg-warning text-light" key={props.customSubText!+index}>{word+" "}</span>
-            )
+              <span key={index}>
+                <span className="bg-primary text-light">{innerText}</span>
+              </span>
+            );
+          } else {
+            return <span key={index}>{segment}</span>;
           }
-          else {
-              return (
-              <span  key={props.customSubText!+index}>{word+" "}</span>
-            )
-          }
-        })
-      }
-      </span>)
-    }, 
-  [props.customSubText, props.highlightStrings])
+        })}
+      </span>
+    );
+  }, [episode.textHighlighted]);
+
 
   return (
     <IonItem color={highlight}
@@ -56,7 +55,7 @@ const EpisodeListItem = (props: IEpisodeListItemProps) => {
       }}
       button
     >
-    <div className="w-10 h-10 overflow-hidden rounded-lg cursor-pointer" 
+    <div className={`w-10 h-${episode.textHighlighted ? "16" : "10"} overflow-hidden rounded-lg cursor-pointer`} 
       onClick={(e: any) => {
           e.stopPropagation();
           presentDetails({
@@ -64,18 +63,18 @@ const EpisodeListItem = (props: IEpisodeListItemProps) => {
           onDidDismiss: (e: CustomEvent) => {},
         })
       }}
+      style={{minWidth: "40px"}}
     >
-      <Thumbnail  imageUrl={episode.imageUrl} size={40} />
+      <Thumbnail  imageUrl={episode.thumbUrl} size={40} />
     </div>
     <div className='flex flex-col'>
       <span className={`pl-3 line  ${weight}`}>{`Episode ${episode.number}`}</span>
-      <div className={`flex space-x-1 pl-3 text-medium font-medium text-xs items-center ${weight}`}>
-        {props.customSubText && <span className="truncated line-clamp-1">{customSubComponent}</span>}
-        {!props.customSubText && <span className="truncated hidden xs:inline">{episode?._bookTitle}</span>}
+      <div className={`flex space-x-1 pl-3 text-light dark:text-dark font-medium text-xs items-center ${weight}`}>
+        {!props.customSubText && <span className="hidden truncated xs:inline">{episode?._bookTitle}</span>}
         {(episode?._chapterName && !props.customSubText) && <span className="hidden xs:inline"><IonIcon icon={chevronForward} /></span> }
         {(episode?._chapterName &&  !props.customSubText ) && <span className="truncated">{episode?._chapterName}</span>}
-
       </div>
+      {episode.textHighlighted && <span className="pl-3 mb-1 text-xs truncated text-medium line-clamp-2 highlighted-text">{textHighlighted}</span>}
     </div>
     <IonButtons slot="end">
       <IonButton>

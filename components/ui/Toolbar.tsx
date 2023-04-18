@@ -25,23 +25,25 @@ const Toolbar = ({children}) => {
             {children}
             <IonButtons slot="end">
                 {user.objectId ?
-                    <IonAvatar
-                        onClick={()=>{router.push("/profile");}}
-                    >
-                        {user.imageUrl ?
-                            <img 
-                                src={user.imageUrl} 
-                                alt="My Profile" 
-                                className='p-2'
-                            />
-                        :
-                            <div
-                                className='p-2'
-                            >
-                                <InitialsAvatar name={`${user.firstName} ${user.lastName}`}  />
-                            </div>
-                        }
-                    </IonAvatar>
+                    <div className="cursor-pointer hover:opacity-80">
+                        <IonAvatar
+                            onClick={()=>{router.push("/profile/");}}
+                        >
+                            {user.imageUrl ?
+                                <img 
+                                    src={user.imageUrl} 
+                                    alt="My Profile" 
+                                    className='p-2'
+                                />
+                            :
+                                <div
+                                    className='p-2'
+                                >
+                                    <InitialsAvatar name={`${user.firstName} ${user.lastName}`}  />
+                                </div>
+                            }
+                        </IonAvatar>
+                    </div>
                 :
                     <IonButton 
                         fill="clear" 
