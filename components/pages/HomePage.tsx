@@ -80,19 +80,20 @@ const HomePage:React.FC = () => {
     //Reverse episodes because playlist should be incremental
       e.preventDefault();
       const startIndex = (typeof index === "number" && index - 3 >= 0) ? index -3 : 0;
-      const endIndex = (typeof index === "number" && index + 4 <= episodes.length-1) ? index +4 : episodes.length-1;
+      const endIndex = (typeof index === "number" && index + 4 <= episodes.length-1) ? index +4 : episodes.length;
       const newEpisodes = [...episodes].slice(startIndex, endIndex);
       let newIndex = newEpisodes.findIndex((ep) => {
         return ep.objectId === episodes[index].objectId;
       })
       const reversedEpisodes = [...newEpisodes].reverse(); 
       const reversedIndex = Math.abs(newEpisodes.length - 1 - newIndex);
+      console.log("PROBLEM EPISODE", reversedEpisodes.length , reversedIndex, newIndex, newEpisodes, startIndex, endIndex)
       player.setList(undefined);
       player.setList({episodes: reversedEpisodes});
       player.setIndex(reversedIndex);
       player.setIsAutoPlay(true);
       console.log("")
-      router.push(reversedEpisodes[reversedIndex]._path!);
+      router.push(reversedEpisodes[reversedIndex]?._path!);
   }
 
   console.log("EPISODES", episodes);

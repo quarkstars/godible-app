@@ -287,7 +287,7 @@ const SearchPage = (props: ISearchPageProps) => {
     if (!episodes) return;
     if (episodes.length < 1) return;
       const startIndex = (typeof index === "number" && index - 3 >= 0) ? index -3 : 0;
-      const endIndex = (typeof index === "number" && index + 4 <= episodes.length-1) ? index +4 : episodes.length-1;
+      const endIndex = (typeof index === "number" && index + 4 <= episodes.length-1) ? index +4 : episodes.length;
       const newEpisodes = [...episodes].slice(startIndex, endIndex);
       let newIndex = newEpisodes.findIndex((ep) => {
         return ep.objectId === episodes[index].objectId;
@@ -295,7 +295,7 @@ const SearchPage = (props: ISearchPageProps) => {
       player.setIsAutoPlay(true);
       player.setList({episodes: newEpisodes});
       player.setIndex(newIndex);
-      router.push(newEpisodes[newIndex]._path!);
+      router.push(newEpisodes[newIndex]?._path!);
   }
   //Handle add to list
   //List modal trigger
