@@ -98,6 +98,7 @@ const Menu: React.FC = () => {
       index: playerIndex,
       setIndex: player.setIndex,
       isBookmarks: inspectedListIndex === 0,
+      router,
   });
     
     //Settings Modal

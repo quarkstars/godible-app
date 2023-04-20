@@ -25,6 +25,7 @@ interface IPlayerListModalProps {
   router?:  UseIonRouterResult,
   isAddingEpisode?: boolean,
   addEpisodeId?: string,
+  isViewOnly?: boolean,
 }
 
 const ListModal = (props: IPlayerListModalProps) => {
@@ -40,6 +41,7 @@ const ListModal = (props: IPlayerListModalProps) => {
     isLoading,
     isAddingEpisode,
     addEpisodeId,
+    isViewOnly,
   } = props;
 
 
@@ -374,7 +376,7 @@ const ListModal = (props: IPlayerListModalProps) => {
             <IonIcon icon={isLoading ? sync : checkmarkCircle}  className="ion-padding"  slot="end" size="small" color="medium" />
           :
           <IonButtons slot="end">
-            {user.objectId &&
+            {user.objectId && list?.name !== "Bookmarks" &&
               <IonButton onClick={(e) => {
                 if (!isNamingList) {
                   setIsReordering(false);
@@ -516,6 +518,7 @@ const ListModal = (props: IPlayerListModalProps) => {
                   >
                     <IonIcon icon={isPlaying ? pauseCircle : playCircle} slot="icon-only" />
                   </IonButton>
+                  {!isViewOnly &&
                   <IonButton
                     onClick={(e: any) => {
                         e.stopPropagation();
@@ -529,6 +532,7 @@ const ListModal = (props: IPlayerListModalProps) => {
                   >
                     <IonIcon icon={ellipsisVertical} slot="icon-only" />
                   </IonButton>
+                  }
                 </IonButtons>
                 }
               </IonItem>

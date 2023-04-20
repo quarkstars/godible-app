@@ -14,7 +14,7 @@ interface ISpeechListItemProps {
   onPlay?: (e: any) => void,
   onAdd?: (e: any) => void,
   customSubText?: string,
-  highlightStrings?: string[]
+  highlightStrings?: string[],
 }
 
 
@@ -50,6 +50,7 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
         description: list.description,
       },
       router,
+      isViewOnly: true,
   });
 
   return (
