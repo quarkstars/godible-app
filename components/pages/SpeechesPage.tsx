@@ -9,7 +9,7 @@ import SearchPage from './SearchPage'
 const SpeechesPage:React.FC = () => {
 
   return (
-    <SearchPage defaultMode="speeches" />
+    <SearchPage defaultMode="speeches" isNotInitSearch />
   )
 }
 

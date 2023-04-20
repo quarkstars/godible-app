@@ -1,20 +1,23 @@
-import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail } from '@ionic/react'
+import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonNote, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail, UseIonRouterResult } from '@ionic/react'
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
 import { Player, Theme } from 'components/AppShell';
-import { IEpisode, IList } from 'data/types';
-import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send } from 'ionicons/icons';
-import React, {useRef, useContext} from 'react'
+import { IEpisode, IList, IUser } from 'data/types';
+import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send, sync, camera, logOutOutline } from 'ionicons/icons';
+import React, {useRef, useContext, useEffect, useState} from 'react'
 import TextDivider from './TextDivider';
 import InitialsAvatar from 'react-initials-avatar';
 import { UserState } from 'components/UserStateProvider';
+import usePhoto from 'hooks/usePhoto';
 
-interface IPlayerListModalProps {
+interface ISettingsModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
   isProfile?: boolean,
-
+  isScrollToReminders?: number,
+  onLogout?: Function,
+  router?: UseIonRouterResult,
 }
 
-const SettingsModal = (props: IPlayerListModalProps) => {
+const SettingsModal = (props: ISettingsModalProps) => {
 
   //TODO: Get translations
 
@@ -23,21 +26,159 @@ const SettingsModal = (props: IPlayerListModalProps) => {
   const {
     user,
     updateUser,
+    isLoading,
   } = useContext(UserState);
+
+  const {
+    takePhoto,
+    isLoading: photoIsLoading,
+  } = usePhoto();
 
   const  {
     language,
     fontContrast,
     fontStyle,
     fontSize,
+    firstName,
+    lastName,
+    email,
+    phone,
   } = user;
   
   const theme = useContext(Theme);
+  
+  //Set up input values from the current logged in user
+  const firstNameInput = useRef<HTMLIonInputElement>(null);
+  useEffect(() => {
+    if (!firstNameInput.current) return;
+    if (!user?.objectId) return firstNameInput.current.value = undefined;
+    firstNameInput.current.value = user.firstName;
+  }, [user?.objectId, firstNameInput.current]);
+
+  const lastNameInput = useRef<HTMLIonInputElement>(null);
+  useEffect(() => {
+    if (!lastNameInput.current) return;
+    if (!user?.objectId) return lastNameInput.current.value = undefined;
+    lastNameInput.current.value = user.lastName;
+  }, [user?.objectId, lastNameInput.current]);
+
+  const emailInput = useRef<HTMLIonInputElement>(null);
+  useEffect(() => {
+    if (!emailInput.current) return;
+    if (!user?.objectId) return emailInput.current.value = undefined;
+    emailInput.current.value = user.email;
+  }, [user?.objectId, emailInput.current]);
+  
+  const phoneInput = useRef<HTMLIonInputElement>(null);
+  useEffect(() => {
+    if (!phoneInput.current) return;
+    if (!user?.objectId) return phoneInput.current.value = undefined;
+    phoneInput.current.value = user.phone;
+  }, [user?.objectId, phoneInput.current]);
+
+  const sendHour = useRef<HTMLIonSelectElement>(null);
+  useEffect(() => {
+    if (!sendHour.current) return;
+    if (!user?.objectId) return sendHour.current.value = undefined;
+    sendHour.current.value = user?.sendHour||"5";
+  }, [user?.objectId, sendHour.current]);
+
+  const sendType = useRef<HTMLIonSelectElement>(null);
+  useEffect(() => {
+    if (!sendType.current) return;
+    if (!user?.objectId) return sendType.current.value = undefined;
+    sendType.current.value = user.sendType||"newest";
+  }, [user?.objectId, sendType.current]);
+
+  const isPushOn = useRef<HTMLIonToggleElement>(null);
+  useEffect(() => {
+    if (!isPushOn.current) return;
+    if (!user?.objectId) return isPushOn.current.value = undefined;
+    isPushOn.current.checked = user.isPushOn||false;
+  }, [user?.objectId, isPushOn.current]);
+
+  const isTextOn = useRef<HTMLIonToggleElement>(null);
+  useEffect(() => {
+    if (!isTextOn.current) return;
+    if (!user?.objectId) return isTextOn.current.value = undefined;
+    isTextOn.current.checked = user.isTextOn||false;
+  }, [user?.objectId, isTextOn.current]);
+
+  const isEmailOn = useRef<HTMLIonToggleElement>(null);
+  useEffect(() => {
+    if (!isEmailOn.current) return;
+    if (!user?.objectId) return isEmailOn.current.value = undefined;
+    isEmailOn.current.checked = user.isEmailOn||false;
+  }, [user?.objectId, isEmailOn.current]);
+
+  
+  const [imageUrl, setImageUrl] = useState<string|undefined>();
+  useEffect(() => {
+    if (!user?.objectId) return;
+    if (user.imageUrl) setImageUrl(user.imageUrl)
+  }, [user?.objectId]);
+
+  const [firstNameNote, setFirstNameNote] = useState<string|undefined>();
+  const [lastNameNote, setLastNameNote] = useState<string|undefined>();
+  const [emailNote, setEmailNote] = useState<string|undefined>();
+  const [phoneNote, setPhoneNote] = useState<string|undefined>();
+  
+  const handleInputChange = async (update: IUser) => {
+    //If no change, exit and don't show any note
+    if (update.firstName &&  firstNameInput.current && user.firstName === firstNameInput.current!.value) return setFirstNameNote(undefined);
+    if (update.lastName &&  lastNameInput.current && user.lastName === lastNameInput.current!.value) return setLastNameNote(undefined);
+    if (update.email &&  emailInput.current && user.email === emailInput.current!.value) return setEmailNote(undefined);
+    if (update.phone &&  phoneInput.current && user.phone === phoneInput.current!.value) return setPhoneNote(undefined);
+
+    if (update.firstName) setFirstNameNote("Saving...");
+    if (update.lastName) setLastNameNote("Saving...");
+    if (update.email) setEmailNote("Saving...");
+    if (update.phone) setPhoneNote("Saving...");
+    let response = await updateUser(update);
+    if (response && response.email) {
+      if (update.firstName) setFirstNameNote("Saved!");
+      if (update.lastName) setLastNameNote("Saved!");
+      if (update.email) setEmailNote("Saved!");
+      if (update.phone) setPhoneNote("Saved!");
+    } else {
+      if (update.firstName) setFirstNameNote(undefined);
+      if (update.lastName) setLastNameNote(undefined);
+      if (update.email) setEmailNote(undefined);
+      if (update.phone) setPhoneNote(undefined);
+    }
+  }
+  
+
+  const handleUploadPhoto = async () => {
+    if (!user?.objectId) return;
+    let photo = await takePhoto(user?.objectId);
+    
+    if (!photo?.url) return;
+    let imageUrl = photo.url.replace("/upload/", "/upload/c_thumb,w_250,h_250/");
+    setImageUrl(imageUrl);
+    updateUser({imageUrl});
+  }
+  
+  //TODO: Change this to the input values 
+  let userName = `${user?.firstName ? user?.firstName:""}${user?.lastName ? " "+user?.lastName:""}`
+  if (userName.length === 0) userName = "M E"
 
   let volumeIcon = volumeHigh;
   if (player.volume < .66) volumeIcon =volumeMedium;
   if (player.volume < .33) volumeIcon = volumeLow;
   if (player.volume < .05) volumeIcon = volumeOff;
+
+
+  const content = useRef<HTMLIonContentElement | null>(null);
+  const reminders = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!reminders.current || !content.current) return
+    if (!props.isScrollToReminders) {
+      content.current.scrollToTop();
+      return;
+    }
+    reminders.current.scrollIntoView();
+  }, [reminders.current, content.current, props.isScrollToReminders]);
   
 
   return (
@@ -50,36 +191,48 @@ const SettingsModal = (props: IPlayerListModalProps) => {
               {/* Default */}
             </IonButton>
           </IonButtons>
+          <div className="pr-10">
           <IonTitle>Settings</IonTitle>
-            <IonIcon icon={checkmarkCircle} slot="end" className="ion-padding" />
+          </div>
+            {/* <IonIcon icon={isLoading ? sync : checkmarkCircle} slot="end" className="ion-padding" /> */}
             {/* <IonSpinner name="dots" slot="end" className="ion-padding" /> */}
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
+      <IonContent className="ion-padding" ref={content}>
         {props.isProfile && 
         <>
-          <IonItem>               
+          <IonItem>  
+            {photoIsLoading ?   
+            <div className="p-6"><IonSpinner /></div>
+            :           
             <div
                   className="w-20 h-20 overflow-hidden rounded-full"
                 >
-                  {user.imageUrl ?
+                  {imageUrl ?
                       <img 
-                          src={user.imageUrl} 
+                          src={imageUrl} 
                           alt="My Profile" 
-                          className='p-2'
+                          className='p-2 rounded-full'
                       />
                   :
                       <div
                           className='p-2'
                       >
-                          <InitialsAvatar name={`${user.firstName} ${user.lastName}`}  />
+                          <InitialsAvatar name={userName}  />
                       </div>
                   }
               </div>
+              }
             <IonButtons>
+              {user?.imageUrl ? <>
               <IonButton 
                 size="small" 
                 color="medium"
+                disabled={photoIsLoading || isLoading}
+                onClick={async () => {
+                  await updateUser({imageUrl: null});
+                  setImageUrl(undefined)
+                }}
 
               >
                 Clear
@@ -88,10 +241,30 @@ const SettingsModal = (props: IPlayerListModalProps) => {
                 size="small" 
                 fill="outline"
                 color="medium"
+                disabled={photoIsLoading || isLoading}
+                onClick={() => {
+                  handleUploadPhoto();
+                }}
 
               >                
                 Change
               </IonButton>
+              </>:
+              <IonButton 
+                size="small" 
+                fill="outline"
+                color="medium"
+                disabled={photoIsLoading || isLoading}
+                onClick={() => {
+                  handleUploadPhoto();
+                }}
+
+              >                
+                <IonIcon icon={camera} slot="start" />
+                Add
+              </IonButton>
+              
+              }
             </IonButtons>
           </IonItem>
             <div className="grid w-full grid-cols-2 gap-4">
@@ -99,36 +272,64 @@ const SettingsModal = (props: IPlayerListModalProps) => {
                   <IonItem>
                     <IonLabel position='floating'>First name</IonLabel>
                     <IonInput 
+                      ref={firstNameInput}
                       placeholder="First" 
-                      // onIonChange={(event) => setFirst(typeof event.target.value === "string" ? event.target.value : "")}
+                      debounce={1000}
+                      onFocus={()=>setFirstNameNote(undefined)}
+                      onIonChange={(event) => {
+                        if (typeof firstNameInput.current?.value === "string" && firstNameInput.current.value.length > 0) {
+                          
+                          handleInputChange({firstName: firstNameInput.current?.value.slice(0,100)})
+                      }}}
                     >
+                      
 
                     </IonInput>
+                       <IonNote slot="helper"><span className="text-xs text-primary">{firstNameNote}</span></IonNote>
                   </IonItem>
               </div>
               <div className="mb-6 form-group">
                   <IonItem>
                     <IonLabel position='floating'>Last name</IonLabel>
                     <IonInput 
+                      ref={lastNameInput}
                       placeholder="Last" 
-                      // onIonChange={(event) => setLast(typeof event.target.value === "string" ? event.target.value : "")}
+                      debounce={1000}
+                      onFocus={()=>setLastNameNote(undefined)}
+                      onIonChange={(event) => {
+                        if (typeof lastNameInput.current?.value === "string" && lastNameInput.current.value.length > 0) {
+                          
+                          handleInputChange({lastName: lastNameInput.current?.value.slice(0,100)})
+                      }}}
                     >
+                      
 
                     </IonInput>
+                       <IonNote slot="helper"><span className="text-xs text-primary">{lastNameNote}</span></IonNote>
                   </IonItem>
               </div>
             </div>
             <div className="w-full">
-                  <IonItem>
-                    <IonLabel position='floating'>Email</IonLabel>
-                    <IonInput 
-                      placeholder="Email" 
-                      // onIonChange={(event) => setFirst(typeof event.target.value === "string" ? event.target.value : "")}
-                    >
+              <IonItem>
+                <IonLabel position='floating'>Email</IonLabel>
+                <IonInput 
+                  ref={emailInput}
+                  placeholder="Email" 
+                  debounce={1000}
+                  onFocus={()=>setEmailNote(undefined)}
+                  onIonChange={(event) => {
+                    if (typeof emailInput.current?.value === "string" && emailInput.current.value.length > 0) {
+                      
+                      handleInputChange({email: emailInput.current?.value.slice(0,1000), username: emailInput.current?.value.slice(0,1000)})
+                  }}}
+                >
+                  
 
-                    </IonInput>
-                  </IonItem>
+                </IonInput>
+                    <IonNote slot="helper"><span className="text-xs text-primary">{emailNote}</span></IonNote>
+              </IonItem>
             </div>
+            <IonItem lines="none"></IonItem>
             </>}
         <IonList>
           {!props.isProfile &&
@@ -180,11 +381,19 @@ const SettingsModal = (props: IPlayerListModalProps) => {
         </IonItem>
         
         {props.isProfile && <>
-        <IonItem><IonIcon slot="start"></IonIcon></IonItem>
+        <IonItem lines="none"></IonItem>
+        <div ref={reminders}></div>
         <IonItem> 
             <IonIcon icon={alarm} slot="start" />
             <IonLabel>Daily Reminder Time</IonLabel>
-            <IonSelect value="5" interface="action-sheet" slot="end" >
+            <IonSelect 
+              ref={sendHour} 
+              interface="action-sheet" 
+              slot="end" 
+              onIonChange={(e) => {
+                if (user.objectId) updateUser({sendHour: e.detail.value})
+              }}
+            >
               <IonSelectOption value="0">12:00 AM</IonSelectOption>
               <IonSelectOption value="1">1:00 AM</IonSelectOption>
               <IonSelectOption value="2">2:00 AM</IonSelectOption>
@@ -215,7 +424,13 @@ const SettingsModal = (props: IPlayerListModalProps) => {
             <IonIcon icon={send} slot="start" />
             <IonLabel>Send Me</IonLabel>
 
-                <IonSelect value="newest" slot="end">
+                <IonSelect 
+                  ref={sendType} 
+                  slot="end"
+                  onIonChange={(e) => {
+                    if (user.objectId) updateUser({sendType: e.detail.value})
+                  }}
+                >
                   <IonSelectOption value="newest">Newest release</IonSelectOption>
                   <IonSelectOption value="next">My next episode</IonSelectOption>
                 </IonSelect>
@@ -224,9 +439,12 @@ const SettingsModal = (props: IPlayerListModalProps) => {
             <IonIcon icon={mail} slot="start" />
             <IonLabel>Email ON</IonLabel>
             <IonToggle
-              name="darkMode"
+              name="email"
+              ref={isEmailOn}
               // checked={theme.isDark}
-              onClick={() => {}}
+              onIonChange={(e) => {
+                if (user.objectId) updateUser({isEmailOn: e.detail.checked})
+              }}
             />
         </IonItem>
         
@@ -234,31 +452,49 @@ const SettingsModal = (props: IPlayerListModalProps) => {
             <IonIcon icon={notifications} slot="start" />
             <IonLabel>Push Notification ON</IonLabel>
             <IonToggle
-              name="darkMode"
+              name="push"
+              ref={isPushOn}
               // checked={theme.isDark}
-              onClick={() => {}}
+              onIonChange={(e) => {
+                if (user.objectId) updateUser({isPushOn: e.detail.checked})
+              }}
             />
         </IonItem>
         <IonItem> 
             <IonIcon icon={chatbox} slot="start" />
             <IonLabel>Text Message ON</IonLabel>
             <IonToggle
-              name="darkMode"
+              name="text"
+              ref={isTextOn}
               // checked={theme.isDark}
-              onClick={() => {}}
+              onIonChange={(e) => {
+                if (user.objectId) updateUser({isTextOn: e.detail.checked})
+              }}
             />
         </IonItem>
-        <IonItem> 
+        <IonItem > 
             <IonIcon icon={phonePortraitOutline} slot="start" />    
-            <IonLabel>Phone</IonLabel>
+            <IonLabel>Mobile</IonLabel>
 
-            <IonInput type="tel" placeholder='1 (000) 000-0000'>
+            <IonInput 
+              ref={phoneInput} 
+              type="tel" 
+              placeholder='1 (000) 000-0000'
+              debounce={1000}
+              onFocus={()=>setPhoneNote(undefined)}
+              onIonChange={(event) => {
+                if (typeof phoneInput.current?.value === "string" && phoneInput.current.value.length > 0) {
+                  const phone = phoneInput.current?.value .replace(/[^0-9]/g,"");
+                  handleInputChange({phone: Number(phone)})
+              }}}
+            >
 
             </IonInput>
-        </IonItem>
+               <IonNote slot="helper"><span className="text-xs text-primary">{phoneNote}</span></IonNote>
+          </IonItem>
         </>
         }
-        <IonItem><IonIcon slot="start"></IonIcon></IonItem>
+        <IonItem lines="none"></IonItem>
         {!props.isProfile && <>
         <IonItem> 
           <IonIcon icon={text} slot="start" />
@@ -356,6 +592,21 @@ const SettingsModal = (props: IPlayerListModalProps) => {
           </IonButtons>
         </IonItem>
         </>}
+        {props.onLogout &&
+          <IonItem 
+            lines="none" 
+            button
+            onClick={async (e) => {
+              if (!props.onLogout) return;
+              await props.onLogout();
+              if (props.router) props.router.push("/");
+              props.onDismiss();
+            }}
+          > 
+              <IonLabel slot="end" color="danger">Log out</IonLabel>
+              <IonIcon icon={logOutOutline} slot="end"  color="danger"/>    
+          </IonItem>
+        }
         </IonList>
       </IonContent>
     </IonPage>

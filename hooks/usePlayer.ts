@@ -86,8 +86,8 @@ const usePlayer = ():IPlayer => {
     const doubleCheckTime = (pastTime: number) => {
         console.log("DOUBLE CHECK", doubleCheckCurrentTime.current, pastTime, isPlaying)
         if (typeof doubleCheckCurrentTime.current !== "number") return;
-        if (isPlaying && pastTime === doubleCheckCurrentTime.current) {setIsPlaying(false);console.log("DOUBLE CHECK PAUSE" )}
-        else if (!isPlaying && pastTime < doubleCheckCurrentTime.current) {setIsPlaying(true);console.log("DOUBLE CHECK PLAY");}
+        if (isPlaying && pastTime === doubleCheckCurrentTime.current) {setIsPlaying(false);}
+        else if (!isPlaying && pastTime < doubleCheckCurrentTime.current) {setIsPlaying(true);}
     }
 
     // boolean to protect from episode page fighting against new list update
@@ -231,6 +231,7 @@ const usePlayer = ():IPlayer => {
             let progress = currentSeconds/duration;
             let isComplete = progress >= .95;
             let isValidSession = (listenedSeconds.current >= 50) ? true : false;
+            if (episode.position?.isValidSession) isValidSession = true;
             const updatedTime = Date.now();
             const listening = {
                 date: date,

@@ -1,4 +1,4 @@
-import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover, IonFooter, useIonRouter, IonSelect, IonSelectOption, IonSpinner, useIonModal } from '@ionic/react'
+import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover, IonFooter, useIonRouter, IonSelect, IonSelectOption, IonSpinner, useIonModal, IonSkeletonText } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import { BookCard } from 'components/ui/BookCard'
@@ -34,6 +34,7 @@ interface ISearchPageProps {
   defaultTopicId?: string,
   defaultBookId?: string,
   defaultQuery?: string,
+  isNotInitSearch?:boolean,
 }
 
 
@@ -59,7 +60,7 @@ const SearchPage = (props: ISearchPageProps) => {
   const [mode, setMode] = useState<string|undefined>(props.defaultMode);
 
   //Get topics
-  const {getTopics, topics} = useTopics();
+  const {getTopics, topics, isLoading: topicsIsLoading} = useTopics();
   useEffect(() => {
     if (topics) return;
     getTopics(undefined, {sort: "+index"});
@@ -144,6 +145,10 @@ const SearchPage = (props: ISearchPageProps) => {
   const searchBar = useRef<HTMLIonSearchbarElement>(null)
   useIonViewDidEnter(async () => {
     if (!searchBar.current) return;
+    
+    const urlParams = new URLSearchParams(router.routeInfo.search)
+    const init = urlParams.get("init");
+    if (init == "0" || props.isNotInitSearch) return;
     setTimeout(async () => {await searchBar.current!.setFocus()}, 200);
   }, [searchBar.current]);
 
@@ -284,10 +289,13 @@ const SearchPage = (props: ISearchPageProps) => {
       const startIndex = (typeof index === "number" && index - 3 >= 0) ? index -3 : 0;
       const endIndex = (typeof index === "number" && index + 4 <= episodes.length-1) ? index +4 : episodes.length-1;
       const newEpisodes = [...episodes].slice(startIndex, endIndex);
+      let newIndex = newEpisodes.findIndex((ep) => {
+        return ep.objectId === episodes[index].objectId;
+      })
       player.setIsAutoPlay(true);
       player.setList({episodes: newEpisodes});
-      player.setIndex(index);
-      router.push(episodes[index]._path!);
+      player.setIndex(newIndex);
+      router.push(newEpisodes[newIndex]._path!);
   }
   //Handle add to list
   //List modal trigger
@@ -471,6 +479,13 @@ const SearchPage = (props: ISearchPageProps) => {
                   )
                 })
                 }
+                {(!topics && topicsIsLoading) && Array(12).fill(undefined).map((skel, index) => {
+                    console.log("TOPIC", index)
+                    return (
+                      <IonSkeletonText key={"topicskel-"+index} style={{width:"180px", height:"180px"}} />
+                    )
+                  })
+                }
               </CardList>
             </div>
           </div>}
@@ -571,7 +586,7 @@ const SearchPage = (props: ISearchPageProps) => {
                   </CardList>
                   }
                 {display!=="quote" && display !== "card" && episodes && episodes.map((_episode, index) => {
-                let episode = _episode
+                  let episode = _episode
 
                   return (
                       <EpisodeListItem 
@@ -588,6 +603,12 @@ const SearchPage = (props: ISearchPageProps) => {
                       />
                   )
                 })}
+                {(!episodes && episodesIsLoading) && Array(12).fill(undefined).map((skel, index) => {
+                    return (
+                      <IonSkeletonText key={"episodeskel-"+index} style={{width:"100%", height:"48px"}} />
+                    )
+                  })
+                }
                 {(!reachedMax) &&
                 <IonButton
                   onClick={(ev) => {
@@ -615,7 +636,7 @@ const SearchPage = (props: ISearchPageProps) => {
             </TextDivider>
             <div className='flex justify-center w-full'>
               <div className="flex flex-col items-stretch w-full" style={{maxWidth:"768px"}}>
-                {speeches && speeches.map((speech, index) => {
+                {speeches  && speeches.map((speech, index) => {
                   return (
                     <SpeechListItem 
                       key={"speech-"+speech.objectId}
@@ -624,6 +645,12 @@ const SearchPage = (props: ISearchPageProps) => {
                     />
                   )
                 })
+                }
+                {!speeches && listsIsLoading && Array(12).fill(undefined).map((skel, index) => {
+                      return (
+                        <IonSkeletonText key={"speechskel-"+index} style={{width:"100%", height:"75px"}} />
+                      )
+                    })
                 }
                 {(!reachedListMax) &&
                 <IonButton

@@ -54,7 +54,7 @@ const useEpisodes = () => {
             const skip = options?.skip || 0;
             const displayCount = limit + (skip*limit);
             if (max > 0 && displayCount >= max) return setIsLoading(false);
-            console.log("FETCH with fetch more NOW: ", options?.skip, options?.limit)
+            console.log("EPISODE TRY GETTING EPISODES WITH: ", options)
             const results = await Parse.Cloud.run("getEpisodes", {episodeIds, options});
 
             let newEpisodes = results.map((episode: any) => {
@@ -76,7 +76,24 @@ const useEpisodes = () => {
         }
     };
     
-    
+
+    //Get the next and previous in the book based on number
+    const getAdjacentEpisodes = async (episode: IEpisode, previous: boolean, next: boolean) => {
+        let adjacentEpisodes:Array<IEpisode|null> = [null, null];
+        if (!episode.book) return adjacentEpisodes;
+        try {
+            const results:Array<IEpisode|null> = await Parse.Cloud.run("getAdjacentEpisodes", {episode, previous, next});
+
+            adjacentEpisodes = results.map((episode: any) => {
+                if (!episode) return null;
+                return appendEpisodeStrings(episode);
+            });
+        } catch (error) {
+            console.error(error);
+        }
+        return adjacentEpisodes;
+    };
+        
 
     
     const appendEpisodeStrings = (episode: IEpisode): IEpisode => {
@@ -175,7 +192,8 @@ const useEpisodes = () => {
         episodes,
         getEpisodes,
         setEpisodes,
-        skip: episodeOptions?.skip
+        skip: episodeOptions?.skip,
+        getAdjacentEpisodes,
     }
 }
 

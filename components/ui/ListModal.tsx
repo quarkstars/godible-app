@@ -196,7 +196,7 @@ const ListModal = (props: IPlayerListModalProps) => {
   async function handleSaveListToAdd(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, _name?: string) {
     let saveList;
     let name = (_name === "Bookmarks") ? "More Bookmarks" : _name;
-    if (lists && lists.length > 1) saveList = {name, index: lists.length};
+    if (lists && lists.length >= 1) saveList = {name, index: lists.length};
     else return setListReloads(prev => prev + 1);
     const updatedList = await postList(saveList);
     setListReloads(prev => prev + 1);

@@ -88,11 +88,12 @@ const Note = (props: INoteProps) => {
 
     const userName = `${note?.user?.firstName ? note?.user?.firstName:""}${note?.user?.lastName ? " "+note?.user?.lastName:""}`
     const avatar = (note?.user?.imageUrl) ? 
-        <img src={note?.user.imageUrl} alt="My Profile" className='p-2 px-4 rounded-full' style={{zoom: .2}} />
+        <div className="w-4 h-4 mr-2 overflow-hidden rounded-full">
+            <img src={note?.user.imageUrl} className="w-full h-full"/>
+        </div>
     :
         <div className='p-2 px-4' style={{zoom: .38}}><InitialsAvatar name={userName} /></div>
 
-    console.log("Avatar", userName)
 
 
     const date = (note?.createdTime) ? formatShortDate(note?.createdTime) : ""

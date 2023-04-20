@@ -8,9 +8,10 @@ import SettingsModal from 'components/ui/SettingsModal'
 import TextDivider from 'components/ui/TextDivider'
 import Toolbar from 'components/ui/Toolbar'
 import { sampleEpisodes } from 'data/sampleEpisodes'
+import { userDefaultLanguage } from 'data/translations'
 import { IList } from 'data/types'
 import useLists from 'hooks/useLists'
-import { arrowForward, calendar, card, cardOutline, documentText, chevronForward, checkmarkCircle, today, pencil, play, flame, settingsSharp, person, swapVertical, add, ban, closeCircle } from 'ionicons/icons'
+import { arrowForward, calendar, card, cardOutline, documentText, chevronForward, checkmarkCircle, today, pencil, play, flame, settingsSharp, person, swapVertical, add, ban, closeCircle, timeOutline, logOutOutline } from 'ionicons/icons'
 import { list } from 'postcss'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import InitialsAvatar from 'react-initials-avatar';
@@ -18,6 +19,7 @@ import { FreeMode, Navigation, Thumbs }  from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { addMonths } from 'utils/addMonths'
 import { formatDate } from 'utils/formatDate'
+import { resolveLangString } from 'utils/resolveLangString'
 import { toIsoString } from 'utils/toIsoString'
 //https://chrisgriffith.wordpress.com/2019/05/14/ionic-design-profile-page/
 const ProfilePage:React.FC = () => {
@@ -43,25 +45,24 @@ const ProfilePage:React.FC = () => {
     listReloads,
 
   } = useContext(UserState);
+  const lang = (user?.language) ? user.language : userDefaultLanguage;
 
   //Modal
   const [presentStreak, dismissStreak] = useIonPopover(StreakDetails, {
       onDismiss: (data: string, role: string) => dismissStreak(data, role),
-      streak: 7,
-      max: 10,
+      currentStreak: user.currentStreak||0,
+      maxStreak: user.maxStreak||0,
   });
 
-  //Because sliders are different sizes, on switch, use scroller
-  // const goToTop = () => {
-  //   window.scrollTo({
-  //       top: 0,
-  //       behavior: 'smooth',
-  //     });
-  // };
 
+  const [isScrollToReminders, setIsScrollToReminders] = useState(false);
+  const onLogout = (user.objectId) ? logOut : undefined
   const [presentSettings, dismissSettings] = useIonModal(SettingsModal, {
     onDismiss: (data: string, role: string) => dismissSettings(data, role),
     isProfile: true,
+    isScrollToReminders,
+    onLogout,
+    router,
 });
 
 
@@ -105,13 +106,18 @@ const player = useContext(Player);
       isBookmarks: inspectedListIndex === 0,
       router,
   });
-    
+   //List modal trigger
+   const [presentLogoutMenu, dismissLogoutMenu] = useIonPopover(LogoutMenu, {
+    onDismiss: (data: string, role: string) => dismissLogoutMenu(data, role),
+      logOut,
+      router,
+  });   
 
   //List saving
   async function handleSaveList(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, _name?: string) {
     let saveList;
     let name = (_name === "Bookmarks") ? "More Bookmarks" : _name;
-    if (lists && lists.length > 1) saveList = {name, index: lists.length};
+    if (lists && lists.length >= 1) saveList = {name, index: lists.length};
     else return setListReloads(prev => prev + 1);
     const updatedList = await postList(saveList);
     setListReloads(prev => prev + 1);
@@ -176,7 +182,7 @@ const player = useContext(Player);
         swiperRef.slideTo(2);
         break;
     }  
-    router.push("/profile/");
+    if (defaultTab && defaultTab.length > 0) router.push("/profile/");
   }, [defaultTab, swiperRef]);
 
 
@@ -292,6 +298,8 @@ const player = useContext(Player);
 
   
   
+  let userName = `${user?.firstName ? user?.firstName:""}${user?.lastName ? " "+user?.lastName:""}`
+  if (userName.length === 0) userName = "No User"
 
   return (
   <IonPage>
@@ -304,19 +312,38 @@ const player = useContext(Player);
                 </div>
             </IonButtons>
             <IonTitle>
+              <div className={'flex justify-center items-center text-lg'}>
               My Profile
+              {user?.objectId &&
+                <IonButtons>
+                  <IonButton 
+                    size="small"
+                    onClick={(e: any) => {presentLogoutMenu({
+                      event: e,
+                      onDidDismiss: (e: CustomEvent) => {},
+                      side: "left"
+                    })}}
+                    color="medium"
+                  >
+                    <IonIcon icon={logOutOutline} color="medium" size="small" slot="start" />
+                  </IonButton>
+                </IonButtons>
+              }
+              </div>
             </IonTitle>
             <IonButtons slot="end">
                 <IonButton
-                    onClick={() =>
+                    onClick={(e: any) =>{
+                      setIsScrollToReminders(false);
                       presentSettings({
                           // initialBreakpoint:0.85,
-                      })
+                          // event: e,
+                      })}
                       }
                       size="small"
                     >
-                  <IonIcon icon={person} slot="start" />
-                  Settings
+                  <IonIcon icon={person} slot="start" size="small" />
+                  <span className="text-xs mobile:text-md">Settings</span>
                 </IonButton>
             </IonButtons>
         </IonToolbar>
@@ -328,8 +355,10 @@ const player = useContext(Player);
             <div className='flex items-center justify-between w-full p-4 rounded-lg bg-dark dark:bg-light'>
               
               <IonAvatar
-                    onClick={()=>{router.push("/profile");}}
-                    
+                    onClick={()=>{
+                      setIsScrollToReminders(false);
+                      presentSettings()
+                    }}
                 >
                   {user.imageUrl ?
                       <img 
@@ -341,39 +370,45 @@ const player = useContext(Player);
                       <div
                           className='p-2'
                       >
-                          <InitialsAvatar name={`${user.firstName} ${user.lastName}`}  />
+                          <InitialsAvatar name={userName}  />
                       </div>
                   }
               </IonAvatar>
               <div className='flex flex-col justify-start'>
                 <div className="flex items-center justify-start">
-                  <span className="w-full pl-3 text-lg font-medium xs:text-2xl">{`${user.firstName} ${user.lastName}`}</span>
-                  <div className="block xs:hidden">
+                  <span className="w-full pl-3 font-medium text-md xs:text-2xl mobile:text-lg">{userName}</span>
+                  <div className="block xs:hidden" style={{zoom:.7}}>
                     <IonChip color="primary"
                     onClick={(e: any) =>
                       presentStreak({
                           event: e,
                           onDidDismiss: (e: CustomEvent) => {},
+                          side: "left"
                       })
                       }
                     >
                       <IonIcon icon={flame} color="primary" />
-                      <span className="font-black">7</span>
+                      <span className="font-black ">{user.currentStreak||0}</span>
                     </IonChip>   
                   </div>
                 </div>
-                <IonButton fill="clear">
+                {user.nextEpisode && 
+                <IonButton 
+                  fill="clear"
+                  disabled={(user.nextEpisode?.publishedAt && user.nextEpisode?.publishedAt > Date.now())? true: false}
+                  onClick={(e) => {if (user.nextEpisode?._path) router.push(user.nextEpisode._path)}}
+                >
                   <div className="flex flex-col justify-start w-full -ml-2 text-sm tracking-tight normal-case">
                     <div className="flex items-center gap-x-1">
                       My Next Episode
-                      <IonIcon size="small" icon={arrowForward} slot="end" />
+                      <IonIcon size="small" icon={(user.nextEpisode?.publishedAt && user.nextEpisode?.publishedAt > Date.now())? timeOutline: arrowForward} slot="end" />
                     </div>
                     <div className="flex items-center text-xs text-medium">
-                      Chambumo Gyeong Ep 3 
-                      {/* <IonIcon size="small" icon={arrowForward} slot="end" /> */}
+                      {`${resolveLangString(user.nextEpisode.book?.title, lang)} Ep ${user.nextEpisode.number}`}
                     </div>
                   </div>
                 </IonButton>
+                }
               </div>
               <div className="hidden xs:block">
                     <IonChip color="primary"
@@ -381,11 +416,12 @@ const player = useContext(Player);
                       presentStreak({
                           event: e,
                           onDidDismiss: (e: CustomEvent) => {},
+                          side: "left"
                       })
                       }
                     >
                     <IonIcon icon={flame} color="primary" />
-                    <span className="font-black">7</span>
+                    <span className="font-black">{user.currentStreak||0}</span>
                   </IonChip>      
               </div>
               <div className="block xs:hidden"></div>
@@ -395,7 +431,7 @@ const player = useContext(Player);
 
                     <IonButton fill="clear" onClick={() => swiperRef.slideTo(0)}>
                       <div className="flex flex-col">
-                        <span className="text-lg">Calendar</span>
+                        <span className="text-md mobile:text-lg">Calendar</span>
                         {(tabIndex === 0) &&
                           <div className="w-full h-0.5 bg-primary rounded-full"></div>
                         }
@@ -404,7 +440,7 @@ const player = useContext(Player);
  
                     <IonButton fill="clear" onClick={() => swiperRef.slideTo(1)}>
                       <div className="flex flex-col">
-                        <span className="text-lg">Lists</span>
+                        <span className="text-md mobile:text-lg">Lists</span>
                         {(tabIndex === 1) &&
                           <div className="w-full h-0.5 bg-primary rounded-full"></div>
                         }
@@ -412,7 +448,7 @@ const player = useContext(Player);
                     </IonButton>
                     <IonButton fill="clear" onClick={() => swiperRef.slideTo(2)}>
                       <div className="flex flex-col">
-                        <span className="text-lg">Donation</span>
+                        <span className="text-md mobile:text-lg">Donation</span>
                         {(tabIndex === 2) &&
                           <div className="w-full h-0.5 bg-primary rounded-full"></div>
                         }
@@ -466,7 +502,14 @@ const player = useContext(Player);
                     {dateDetail}
 
                   </div>
-                  <button className='relative flex items-center w-auto p-4 pl-6 pr-4 mt-10 space-x-3 overflow-hidden rounded-full shadow-lg text-light sm:mt-4 bg-primary hover:opacity-50 focus:outline-none ion-activatable ripple-parent '>
+                  <button 
+                    onClick={()=>{
+                      setIsScrollToReminders(true);
+                      presentSettings({
+                      })
+                    }}
+                    className='relative flex items-center w-auto p-4 pl-6 pr-4 mt-10 space-x-3 overflow-hidden rounded-full shadow-lg text-light sm:mt-4 bg-primary hover:opacity-80 focus:outline-none ion-activatable ripple-parent '
+                  >
                     <IonRippleEffect></IonRippleEffect>
                     <span className='text-lg text-center'>Text, Push, and Email daily at <span className="font-bold">5AM</span></span>
                             <IonIcon size="small" icon={pencil} slot="icon-only" />
@@ -603,7 +646,7 @@ const player = useContext(Player);
                 </IonList>
               </SwiperSlide>
               <SwiperSlide>
-                <div className="flex flex-col items-center w-full pb-8">
+                <div className="flex flex-col items-center w-full px-1 pb-8">
                   <h2 className="w-full text-3xl font-bold text-left dark:text-primary text-light">Become a Godible Donor</h2>
                   <div className='flex items-center justify-between w-full'>
                     <div className='flex items-center justify-between w-full'>
@@ -763,21 +806,60 @@ const player = useContext(Player);
 }
 
 
-const StreakDetails = ({streak, max}) => {
+const StreakDetails = ({currentStreak, maxStreak}) => {
   return (
     
     <IonContent className="ion-padding">
     <div className="flex flex-col items-center space-x-1">
       <div className="flex items-center space-x-2 font-medium">
         <IonIcon size="small" icon={flame} color="primary" />
-          {`${streak ? streak : 0}-Day Streak`}
+          {`${currentStreak}-day Streak`}
       </div>
       <div className="flex items-center space-x-1 text-medium">
-          {`${max ? max : 0}-day max streak`}
+          {`${maxStreak}-day max streak`}
       </div>
     </div>
     </IonContent>
   )
 }
+
+
+
+const LogoutMenu = ({onDismiss, logOut, router}) => {
+  return (    
+    <IonContent class="ion-padding">
+      <IonTitle>Confirm log out...</IonTitle>
+            <ul className="py-1 text-sm text-gray-700 dark:text-gray-200">
+                <li>
+                <IonButton fill="clear" expand="block" 
+                  onClick={(e) => {
+                    logOut();
+                    router.push("/")
+                    onDismiss();
+                  }}
+                >
+                    <div className="flex items-center justify-start w-full space-x-2">
+                        <IonIcon icon={checkmarkCircle} color="danger" />
+                        <IonLabel color="danger">Log out</IonLabel>
+                    </div>
+                </IonButton>
+                </li>
+                <li>
+                <IonButton fill="clear" expand="block" 
+                  onClick={(e) => {
+                    onDismiss();
+                  }}
+                >
+                    <div className="flex items-center justify-start w-full space-x-2">
+                        <IonIcon icon={closeCircle} color="medium" />
+                        <IonLabel color="medium">Cancel</IonLabel>
+                    </div>
+                </IonButton>
+                </li>
+            </ul>
+  </IonContent>  
+  )
+}
+
 
 export default ProfilePage

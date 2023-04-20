@@ -1,4 +1,4 @@
-import { IonContent, IonFooter, IonHeader, IonPage, IonTitle, IonToolbar, useIonRouter } from '@ionic/react'
+import { IonContent, IonFooter, IonHeader, IonPage, IonSkeletonText, IonTitle, IonToolbar, useIonRouter } from '@ionic/react'
 import { BookCard } from 'components/ui/BookCard'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
@@ -8,7 +8,7 @@ import React, {useEffect} from 'react'
 
 const BooksPage:React.FC = () => {
 	const router = useIonRouter();
-  const {getBooks, books} = useBooks();
+  const {getBooks, books, isLoading} = useBooks();
   //Get Books
   useEffect(() => {
     if (books) return;
@@ -27,7 +27,13 @@ const BooksPage:React.FC = () => {
       </IonHeader>
       <IonContent>
         <div className='flex justify-center w-full'>
-          <div className="flex flex-col p-4 pt-4 space-y-4 sm:p-10 sm:pt-6" style={{maxWidth: "1200px"}}>
+          <div className="flex flex-col w-full p-4 pt-4 space-y-4 sm:p-10 sm:pt-6" style={{maxWidth: "1200px"}}>
+          {(!books && isLoading) &&   Array(4).fill(undefined).map((skel, index) => {
+                    return (
+                      <IonSkeletonText key={"episodeskel-"+index} style={{width:"100%", height:"348px"}} />
+                    )
+                  })
+                }
           {books && books.map((book, index) => {
                 return (
                   <BookCard 

@@ -123,7 +123,6 @@ const useUser = () => {
     //Get Current User
     const getCurrentUser = async function (): Promise<IUser> {
         const currentUser: Parse.User|undefined|null = await Parse.User.current();
-        console.log("CURRENT USER", currentUser, currentUser?.get("currentStreak"), currentUser &&  await currentUser.fetch())
         if (currentUser) {
             const currentUserJSON = currentUser.toJSON();
             setUser(currentUserJSON);
@@ -375,7 +374,6 @@ const useUser = () => {
             ...updates,
         }
         setUser(newUser);
-        //TODO: Protect user table from writing new columns
         //If user is logged in, save updates to the server or reverse them if failed.
         if (!user.objectId) return newUser;
         try {

@@ -5,7 +5,7 @@ import Toolbar from 'components/ui/Toolbar'
 import { text, userDefaultLanguage } from 'data/translations'
 import { IEpisode, IList } from 'data/types'
 import useEpisodes from 'hooks/useEpisodes'
-import { add, bookOutline, bookmark,  documentTextOutline, chevronDown, chevronUp, language, pauseCircle,  playCircle, settings, settingsOutline, documentText, megaphone, send, checkmarkCircle, calendar, close, addCircleOutline, list, bookmarkOutline } from 'ionicons/icons'
+import { add, bookOutline, bookmark,  documentTextOutline, chevronDown, chevronUp, language, pauseCircle,  playCircle, settings, settingsOutline, documentText, megaphone, send, checkmarkCircle, calendar, close, addCircleOutline, list, bookmarkOutline, arrowBack, arrowForward, time, timeOutline } from 'ionicons/icons'
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import Thumbnail from 'components/ui/Thumbnail'
@@ -42,9 +42,10 @@ const EpisodePage:React.FC = () => {
   const {
     getEpisodes,
     episodes,
+    getAdjacentEpisodes,
   } = useEpisodes();
   
-  const {user, listReloads, setListReloads} = useContext(UserState);
+  const {user, listReloads, setListReloads, updateUser} = useContext(UserState);
   const lang = (user?.language) ? user.language : userDefaultLanguage;
 
 
@@ -104,10 +105,11 @@ const EpisodePage:React.FC = () => {
 
   useEffect(() => {
         //If current episode matches location, get the episode from the server
-        const currentSlug = location.pathname.substring(location.pathname.lastIndexOf('/') + 1);
+        if (!router.routeInfo) return;
+        const currentSlug = router.routeInfo.pathname.substring(router.routeInfo.pathname.lastIndexOf('/') + 1);
+        if (currentSlug.length === 0) return;
         //set a preliminary episode lite only once from player if it matches
         const currentPlayerEpisode = (typeof player?.index === "number") ? player.list?.episodes?.[player.index] : undefined;
-        console.log("REMOVE LIST ism mutatintg", player.isMutatingList)
         if (episode?.slug !== currentSlug && currentPlayerEpisode && currentPlayerEpisode.slug === currentSlug) {
           setEpisode(currentPlayerEpisode);
         }
@@ -115,14 +117,64 @@ const EpisodePage:React.FC = () => {
         const tokenParam = urlParams.get("token");
         const token = (tokenParam) ? tokenParam : undefined;
         getEpisodes(undefined, {slug: currentSlug, token})
-  }, [player.list?.episodes?.[player.index], location.pathname])
+  }, [player.list?.episodes?.[player.index], router.routeInfo])
 
   //Update the episode when episodes is updated
   useEffect(() => {
     if (!episodes) return;
     setEpisode(episodes[0]);
   }, [episodes]);
+
   
+  useEffect(() => {
+    if (!episode) return;
+    setupAdjacentEpisodes();
+  }, [episode]);
+  const [adjacentEpisodes, setAdjacentEpisodes] = useState<Array<IEpisode|null>>([null, null]);
+  const [isAdjacentEpisodeFromList, setIsAdjacentEpisodesFromList] = useState<Array<boolean>>([false, false]);
+  const setupAdjacentEpisodes = async () => {
+    if (!player.list || typeof player.index !== "number") return;
+    let _isAdjacentEpisodeFromList = [false, false];
+    let previousPlayerEpisode = player.list.episodes[player.index-1];
+    if (previousPlayerEpisode) {
+      _isAdjacentEpisodeFromList[0] = true;
+      setAdjacentEpisodes(adjacentEps => {
+        adjacentEps[0] = previousPlayerEpisode;
+        return adjacentEps;
+      });
+    }
+    let nextPlayerEpisode = player.list.episodes[player.index+1];
+    if (nextPlayerEpisode) {
+      _isAdjacentEpisodeFromList[1] = true;
+      setAdjacentEpisodes(adjacentEps => {
+        adjacentEps[1] = nextPlayerEpisode;
+        return adjacentEps;
+      });
+    }
+    setIsAdjacentEpisodesFromList(_isAdjacentEpisodeFromList);
+    if (!_isAdjacentEpisodeFromList[0] || !_isAdjacentEpisodeFromList[1]) {
+      const [previousEpisode, nextEpisode] = await getAdjacentEpisodes(episode!, !_isAdjacentEpisodeFromList[0], !_isAdjacentEpisodeFromList[1]);
+      console.log("PREVIOUS EPISODE RETURNED", previousEpisode)
+      setAdjacentEpisodes(adjacentEps => {
+        if (previousEpisode) adjacentEps[0] = previousEpisode;
+        if (nextEpisode) adjacentEps[1] = nextEpisode;
+        return adjacentEps;
+      })
+    }
+
+    // If the user remains on the same episode for 2 minutes, assign the next episode to the user
+    if (user.objectId) setTimeout(() => saveNextEpisode(episode!.slug), 120000)
+
+  }
+
+  const saveNextEpisode = async(expectedSlug: string) => {
+    if (!user.objectId || !adjacentEpisodes[1]) return; 
+    if (expectedSlug === episode?.slug) {
+      updateUser({nextEpisode: adjacentEpisodes[1]});
+    }
+  }
+  
+  console.log("GET ADJACENT EPISODES PREV ", adjacentEpisodes[0])
 
   const [showQuote, setShowQuote] = useState(false);  
   useEffect(() => {
@@ -131,6 +183,7 @@ const EpisodePage:React.FC = () => {
     const currentPlayerEpisode = (typeof player.index === "number") ? player.list?.episodes?.[player.index] : undefined;
     //only load it if the currently playing episode is different and we are on an episode page 
     if (!player.isMutatingList && currentPlayerEpisode?.objectId !== episode.objectId && location.pathname.includes("episode")) {
+      console.log("EPISODE TRY CURRENT", currentPlayerEpisode?.slug, episode.slug, currentPlayerEpisode?.objectId, episode.objectId)
       player.setList({episodes: [episode]});
       player.setIndex(0);
     }
@@ -138,18 +191,8 @@ const EpisodePage:React.FC = () => {
     if (showQuote === false && episode.isForbidden) setShowQuote(true);
   }, [episode]);
 
-  // If token is set to appId, then allow admin to see entire episode regardless of publishedAt etc.
-  useEffect(() => {      
+  console.log("EPISODE TRY SLUG",  location.pathname.substring(location.pathname.lastIndexOf('/') + 1))
 
-    if (!router.routeInfo.search) return;
-    const urlParams = new URLSearchParams(router.routeInfo.search)
-    const tokenParam = urlParams.get("token");
-    const token = (tokenParam) ? tokenParam : undefined;
-    if (!token) return;
-    const currentSlug = location.pathname.substring(location.pathname.lastIndexOf('/') + 1);
-    getEpisodes(undefined, {slug: currentSlug, token})
-  }, [router.routeInfo.search]);
-  
   
   console.log("PARAMS START", router.routeInfo.search)
   //Prep episode data
@@ -447,6 +490,30 @@ const EpisodePage:React.FC = () => {
               <div className="flex items-center w-full space-x-2">
               </div>
           </div>
+          <div id="topics" className="flex justify-between w-full">
+            {adjacentEpisodes[0] &&
+                <IonButton 
+                  fill="clear"
+                  onClick={(e) => {if (adjacentEpisodes[0]?._path) router.push(adjacentEpisodes[0]._path)}}
+                >
+                  <IonIcon icon={arrowBack} slot="start" />
+                  {adjacentEpisodes[0]._bookImageUrl && <img className="w-4 h-4 mx-1" src={adjacentEpisodes[0]._bookImageUrl} />}
+                  {`${adjacentEpisodes[0].number ? adjacentEpisodes[0].number : ""}`}
+                </IonButton>
+            }
+            <div></div>
+            {adjacentEpisodes[1] &&
+                <IonButton 
+                  fill="clear"
+                  disabled={(adjacentEpisodes[1]?.publishedAt && adjacentEpisodes[1]?.publishedAt > Date.now())? true: false}
+                  onClick={(e) => {if (adjacentEpisodes[1]?._path) router.push(adjacentEpisodes[1]._path)}}
+                >
+                  <IonIcon icon={(adjacentEpisodes[1]?.publishedAt && adjacentEpisodes[1]?.publishedAt > Date.now())? timeOutline: arrowForward} slot="end" />
+                  {adjacentEpisodes[1]._bookImageUrl && <img className="w-4 h-4 mx-1" src={adjacentEpisodes[1]._bookImageUrl} />}
+                  {`${adjacentEpisodes[1].number ? adjacentEpisodes[1].number : ""}`}
+                </IonButton>
+            }
+          </div>
           {(episode?.topics && episode?.topics.length > 0) ?
           <div id="topics" className="flex flex-col w-full pt-8">
               <h4 className="leading-none">Topics</h4>
@@ -454,7 +521,7 @@ const EpisodePage:React.FC = () => {
               {
                 episode?.topics.map((topic, index) => {
                   return (
-                    <IonChip key={"topic-"+topic.objectId} outline onClick={() => {router.push(`/search?topic=${topic.slug}`)}}>{resolveLangString(topic.name, lang)}</IonChip>
+                    <IonChip key={"topic-"+topic.objectId} outline onClick={() => {router.push(`/search?topic=${topic.slug}&init=0`)}}>{resolveLangString(topic.name, lang)}</IonChip>
                   )
                 }) 
               }

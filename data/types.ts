@@ -22,9 +22,26 @@ export interface IUser extends ParseObjectToJson {
     savedListId?: string,
 
     email?: string,
-    imageUrl?: string,
+    username?: string,
+    imageUrl?: string|null,
     firstName?: string,
     lastName?: string,
+    phone?: number,
+    sendHour?: number,
+    timeZone?: string,
+    isPushOn?: boolean,
+    isTextOn?: boolean,
+    isEmailOn?: boolean,
+    sendType?: string, // "next" "neweset"
+    nextEpisode?: IEpisode,
+
+    //Responses
+    nextSendTime?: number,
+    lastNotificationTime?: number,
+    lastSendTime?: number,
+    lastEmailResponse?: string,
+    lastPushResponse?: string,
+    lastTextResponse?: string,
 
     // //
     // heartCount?: number,

@@ -1,4 +1,4 @@
-import { IonButton, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react'
+import { IonButton, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonPage, IonSkeletonText, IonTitle, IonToolbar } from '@ionic/react'
 import { UserState } from 'components/UserStateProvider'
 import Note from 'components/ui/Note'
 import NoteInput from 'components/ui/NoteInput'
@@ -39,7 +39,7 @@ const NotesPage:React.FC = () => {
 
     useEffect(() => {
 
-        getNotes(undefined, { sort: "-createdTime", userIdNot: user.objectId, flagDifference: 2,/*heartCount:2,*/    limit: 12 });
+        getNotes(undefined, { sort: "-createdTime", userIdNot: user.objectId, flagDifference: 2,/*heartCount:2,*/ limit: 12 });
         if (!user.objectId)  {
             setUserNotes(undefined);
             return;
@@ -127,6 +127,13 @@ const NotesPage:React.FC = () => {
             :<></>}
             {(showingUserNotes && userNotes) &&
             <div className="flex flex-col items-center w-full justify-stretch">
+              
+                {!notes && isNoteLoading && Array(4).fill(undefined).map((skel, index) => {
+                      return (
+                        <IonSkeletonText key={"speechskel-"+index} style={{width:"100%", height:"175px"}} />
+                      )
+                    })
+                }
                 {userNotes && userNotes.map((note, index) => {
                     if (typeof editNoteIndex === "number" && editNoteIndex===index)
                     return (

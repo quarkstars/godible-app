@@ -110,7 +110,7 @@ export const BookCard = (props: IBookCardProps) => {
                             <div className="flex items-center justify-center w-12 h-12 pr-0 overflow-hidden rounded-full min-w-12 min-h-12">
                             <Thumbnail size={48} imageUrl={book.authorImageUrl} />
                             </div>
-                        <span className="font-medium text-light dark:text-dark" style={{maxWidth: "85%"}}>{"by "+book.author?.[lang]}</span>
+                            {(book.author && resolveLangString(book.author, lang) && resolveLangString(book.author, lang)!.length > 0) && <span className="font-medium text-light dark:text-dark" style={{maxWidth: "85%"}}>{"by "+resolveLangString(book.author, lang)}</span>}
                     </div>
                     }
                     {props.showEpisodesLink && 

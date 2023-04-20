@@ -1,7 +1,7 @@
 import { IonButton, IonIcon, IonItem, IonList, IonSelect, IonSelectOption, IonTextarea } from '@ionic/react'
 import { IEpisode, INote } from 'data/types';
 import { closeCircle, send } from 'ionicons/icons'
-import React, {useRef, useEffect} from 'react'
+import React, {useRef, useEffect, useState} from 'react'
 
 interface INotesProps {
     episode?: IEpisode;
@@ -27,21 +27,25 @@ const NoteInput = (props: INotesProps) => {
         setTimeout(async () => {await inputEl.current?.setFocus()}, 200);
     }, [note, inputEl.current])
     
-    const selectEl = useRef<HTMLIonSelectElement>(null);
+    const [isPublic, setIsPublic] = useState<string>("private")
     useEffect(() => {
-        if (!note || !selectEl.current) return;
-        if (note.isPublic) selectEl.current.value = "public";
-        else selectEl.current.value = "private";
-    }, [note, selectEl.current]);
+        if (!note) return;
+        if (note.isPublic) {
+            setIsPublic("public")
+        }
+        else {
+            setIsPublic("private")
+        }
+    }, [note]);
 
     function handleSave() {
-        if (!selectEl.current || !inputEl.current || !onSave) return;
+        if (!inputEl.current || !onSave) return;
         if (!inputEl.current.value) return;
         if (inputEl.current.value.length === 0) return;
-        let isPublic = (selectEl.current.value === "public") ? true : false
+        let _isPublic = (isPublic === "public") ? true : false
         let text = inputEl.current.value;
         let episodeId = episode?.objectId
-        let saveNote:INote = {...(note||{}), isPublic, text, episodeId};
+        let saveNote:INote = {...(note||{}), isPublic: _isPublic, text, episodeId};
         onSave(saveNote);
     }
 
@@ -68,8 +72,12 @@ const NoteInput = (props: INotesProps) => {
             </div>
                 <IonList>
                     <IonItem>
-                        <IonSelect interface="popover" value="private" ref={selectEl}>
-                        <IonSelectOption value="private" >Private</IonSelectOption>
+                        <IonSelect 
+                            interface="popover" 
+                            value={isPublic}
+                            onIonChange={(e) => setIsPublic(e.detail.value)}
+                        >
+                        <IonSelectOption value="private">Private</IonSelectOption>
                         <IonSelectOption value="public">Public</IonSelectOption>
                         </IonSelect>
                     </IonItem>

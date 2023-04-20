@@ -60,6 +60,7 @@ const Menu: React.FC = () => {
     user,
     listReloads,
     setListReloads,
+    logOut,
   } = useContext(UserState);
 
 
@@ -97,12 +98,14 @@ const Menu: React.FC = () => {
       index: playerIndex,
       setIndex: player.setIndex,
       isBookmarks: inspectedListIndex === 0,
-      router,
   });
     
     //Settings Modal
+  const onLogout = (user?.objectId) ? logOut : undefined
     const [presentSettings, dimissSettings] = useIonModal(SettingsModal, {
       onDismiss: (data: string, role: string) => dimissSettings(data, role),
+      router,
+      onLogout,
     });
     function openSettingsModal() {
         presentSettings({

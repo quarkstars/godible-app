@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonFooter, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItemDivider, IonPage, IonSelect, IonSelectOption, IonTitle, IonToolbar, useIonRouter, useIonViewDidEnter } from '@ionic/react'
+import { IonButton, IonContent, IonFooter, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItemDivider, IonPage, IonSelect, IonSelectOption, IonSkeletonText, IonTitle, IonToolbar, useIonRouter, useIonViewDidEnter } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import { BookCard } from 'components/ui/BookCard'
@@ -145,7 +145,9 @@ const fetchMoreEpisodes = async (e) => {
       </IonHeader>
       <IonContent>
         <div className="flex justify-center w-full">
-          <div className="flex flex-col p-4 pt-4 sm:p-10 sm:pt-6" style={{maxWidth:"1200px"}}>
+          <div className="flex flex-col w-full p-4 pt-4 sm:p-10 sm:pt-6" style={{maxWidth:"1200px"}}>
+                  
+            {(!book && isLoading) &&  <IonSkeletonText style={{width:"100%", height:"386px"}} /> }
             {book &&
               <BookCard 
                 book={book} 
@@ -159,6 +161,7 @@ const fetchMoreEpisodes = async (e) => {
                 breakpoint='sm'
               />
             }
+            
             <div className='flex justify-center w-full'>
               <div className="flex flex-col items-stretch w-full" style={{maxWidth:"768px"}}>
                   <TextDivider>{`${book?.episodeCount ? book?.episodeCount +" ": ""}Episodes`}</TextDivider>
@@ -200,6 +203,12 @@ const fetchMoreEpisodes = async (e) => {
                     )
                   })}
                   
+                {(!episodes && episodesIsLoading) && Array(12).fill(undefined).map((skel, index) => {
+                    return (
+                      <IonSkeletonText key={"episodeskel-"+index} style={{width:"100%", height:"48px"}} />
+                    )
+                  })
+                }
                 <IonInfiniteScroll
                   onIonInfinite={(ev) => {
                     fetchMoreEpisodes(ev);

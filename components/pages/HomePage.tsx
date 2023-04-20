@@ -1,8 +1,8 @@
-import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonMenuButton, IonPage, IonText, IonTitle, IonToolbar, useIonModal, useIonRouter } from '@ionic/react'
+import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonMenuButton, IonPage, IonSkeletonText, IonText, IonTitle, IonToolbar, useIonModal, useIonRouter } from '@ionic/react'
 import Hero from 'components/ui/Hero';
 import SlideList from 'components/ui/SlideList';
 import Toolbar from 'components/ui/Toolbar';
-import { add, addCircleOutline, arrowForwardOutline, logIn, logInOutline, playCircle } from 'ionicons/icons'
+import { add, addCircleOutline, arrowForward, arrowForwardOutline, logIn, logInOutline, playCircle, timeOutline } from 'ionicons/icons'
 import { Swiper, SwiperSlide } from "swiper/react";
 import React, { useState, useContext, useEffect, useRef } from 'react'
 import Thumbnail from 'components/ui/Thumbnail';
@@ -21,6 +21,8 @@ import useNotes from 'hooks/useNotes';
 import { UserState } from 'components/UserStateProvider';
 import { TopicCard } from 'components/ui/TopicCard';
 import ListModal from 'components/ui/ListModal';
+import { resolveLangString } from 'utils/resolveLangString';
+import { userDefaultLanguage } from 'data/translations';
 
 const HomePage:React.FC = () => {
 
@@ -28,6 +30,8 @@ const HomePage:React.FC = () => {
 	const router = useIonRouter();
 
   const {user} = useContext(UserState);
+  
+  const lang = (user?.language) ? user.language : userDefaultLanguage;
   const [episodeWidth, setEpisodeWidth] = useState<number>(148);
   const [topicWidth, setTopicWidth] = useState<number>(148);
   const [bookWidth, setBookWidth] = useState<number>(376);
@@ -75,12 +79,20 @@ const HomePage:React.FC = () => {
     if (episodes.length < 1) return;
     //Reverse episodes because playlist should be incremental
       e.preventDefault();
-      const reversedEpisodes = [...episodes].reverse();
-      const reversedIndex = Math.abs(episodes.length - 1 - index);
-      player.setIsAutoPlay(true);
+      const startIndex = (typeof index === "number" && index - 3 >= 0) ? index -3 : 0;
+      const endIndex = (typeof index === "number" && index + 4 <= episodes.length-1) ? index +4 : episodes.length-1;
+      const newEpisodes = [...episodes].slice(startIndex, endIndex);
+      let newIndex = newEpisodes.findIndex((ep) => {
+        return ep.objectId === episodes[index].objectId;
+      })
+      const reversedEpisodes = [...newEpisodes].reverse(); 
+      const reversedIndex = Math.abs(newEpisodes.length - 1 - newIndex);
+      player.setList(undefined);
       player.setList({episodes: reversedEpisodes});
       player.setIndex(reversedIndex);
-      router.push(episodes[index]._path!);
+      player.setIsAutoPlay(true);
+      console.log("")
+      router.push(reversedEpisodes[reversedIndex]._path!);
   }
 
   console.log("EPISODES", episodes);
@@ -158,6 +170,26 @@ const HomePage:React.FC = () => {
     <IonPage>
     <IonHeader>
       <Toolbar>
+        {user.nextEpisode ?
+          <div className="flex justify-center w-full pl-8">
+          <IonButton 
+            fill="clear"
+            disabled={(user.nextEpisode?.publishedAt && user.nextEpisode?.publishedAt > Date.now())? true: false}
+            onClick={(e) => {if (user.nextEpisode?._path) router.push(user.nextEpisode._path)}}
+          >
+          <div className="flex flex-col justify-start w-full -ml-2 text-sm tracking-tight normal-case">
+            <div className="flex items-center gap-x-1 text-medium">
+              My Next Episode
+            </div>
+            <div className="flex items-center justify-center w-full space-x-1 text-sm text-light dark:text-dark">
+              {user.nextEpisode._bookImageUrl && <img className="w-4 h-4 mx-1" src={user.nextEpisode._bookImageUrl} />}
+              {`${user.nextEpisode.number ? user.nextEpisode.number : ""}`}
+              <IonIcon icon={(user.nextEpisode?.publishedAt && user.nextEpisode?.publishedAt > Date.now())? timeOutline: arrowForward} />
+            </div>
+          </div>
+          </IonButton>
+          </div>
+        :
         <IonTitle>
           <div className="flex items-center justify-center w-full py-2 md:hidden">
             {user.objectId ? 
@@ -168,6 +200,7 @@ const HomePage:React.FC = () => {
           </div>
           <div className="hidden md:inline">Welcome</div>
         </IonTitle>
+        }
       </Toolbar>
       </IonHeader>
       <IonContent>
@@ -190,9 +223,9 @@ const HomePage:React.FC = () => {
             />
           </SwiperSlide>
           }
-            {episodes && episodes.map((episode, index) => {
-        //TODO: Test again
-              const publishedAt = episode.publishedAt!;
+            {(episodes && !episodesIsLoading) ? episodes.map((episode, index) => {
+              //offset a few hours since it is published slightly before midnight
+              const publishedAt = episode.publishedAt! + 4.32e+7;
               const oneWeekAgo = Date.now() - publishedAt > 6.048e+8;
               let pretext = (!index && Date.now() - publishedAt < 8.64e+7) ? "Today's Episode" : `${oneWeekAgo ? "Last": ""} ${new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(publishedAt)}'s Episode`
               return (
@@ -224,22 +257,24 @@ const HomePage:React.FC = () => {
               </SwiperSlide>
               )
             })
-            }
+            :
+            <IonSkeletonText  style={{width:"100%", height:"450px"}} />
+          }
 
 
         </SlideList>
         <div className="flex flex-col p-4 sm:p-10">
           <div className="flex flex-row items-center w-full space-x-5">
-            <h2 className="mt-0 text-2xl">
+            <h2 className="mt-0 text-lg xs:text-2xl">
               Latest Episodes
             </h2>
-            <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=episodes")}>
+            <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=episodes&init=0")}>
               Show All
             </IonButton>
           </div>
           
-          <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={220}>
-            {episodes && episodes.map((episode, index) => {
+          <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={210}>
+            {episodes ? episodes.map((episode, index) => {
               return (
                 <SwiperSlide key={"epcard-"+episode.objectId}>
                   <EpisodeCard 
@@ -252,16 +287,24 @@ const HomePage:React.FC = () => {
               </SwiperSlide>
               )
             })
+            :
+            Array(6).fill(undefined).map((skel, index) => {
+              return (
+              <SwiperSlide key={"skeleton-"+index}>
+                <IonSkeletonText  style={{width:episodeWidth, height:"194px"}} />
+              </SwiperSlide>
+              )
+            })
             }
           </SlideList>
 
         </div>
         <div className="flex flex-col p-4 sm:p-10">
           <div className="flex flex-row items-center w-full space-x-5">
-            <h2 className="mt-0 text-2xl">
+            <h2 className="mt-0 text-lg xs:text-2xl">
               Topics
             </h2>
-            <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=topics")}>
+            <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=topics&init=0")}>
               Show All
             </IonButton>
           </div>
@@ -285,7 +328,7 @@ const HomePage:React.FC = () => {
         </div>
         <div className="flex flex-col p-4 sm:p-10">
           <div className="flex flex-row items-center w-full space-x-5">
-            <h2 className="mt-0 text-2xl">
+            <h2 className="mt-0 text-lg xs:text-2xl">
               Books
             </h2>
             <IonButton fill="clear" color="medium" onClick={() => router.push("/books")}>
