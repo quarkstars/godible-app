@@ -39,10 +39,6 @@ const useEpisodes = () => {
     }
 
     const [episodeOptions, setEpisodeOptions] = useState <IGetEpisodeOptions|undefined>();
-    useEffect(() => {
-      if(episodeOptions) console.log("FETCH WHAT")
-      if (!episodeOptions) console.log("FETCH THE FUCK?")
-    }, [episodeOptions])
     
 
 
@@ -54,7 +50,6 @@ const useEpisodes = () => {
             const skip = options?.skip || 0;
             const displayCount = limit + (skip*limit);
             if (max > 0 && displayCount >= max) return setIsLoading(false);
-            console.log("EPISODE TRY GETTING EPISODES WITH: ", options)
             const results = await Parse.Cloud.run("getEpisodes", {episodeIds, options});
 
             let newEpisodes = results.map((episode: any) => {

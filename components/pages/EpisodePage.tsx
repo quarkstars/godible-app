@@ -103,6 +103,17 @@ const EpisodePage:React.FC = () => {
   if (user.fontStyle==="sanserif") fontStyle = "";
 
 
+
+  const [loaded, setLoaded] = useState(false)
+  useEffect(() => {
+    //If current episode matches location, get the episode from the server
+    if (!router.routeInfo || !user || loaded) return;
+    setLoaded(true);
+    const urlParams = new URLSearchParams(router.routeInfo.search)
+    const languageParam = urlParams.get("l");
+    if (languageParam === "j") updateUser({language:"japanese"})
+}, [router.routeInfo, user])
+
   useEffect(() => {
         //If current episode matches location, get the episode from the server
         if (!router.routeInfo) return;

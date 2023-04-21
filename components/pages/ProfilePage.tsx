@@ -1,4 +1,4 @@
-import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonTitle, IonToolbar, ItemReorderEventDetail, useIonModal, useIonPopover, useIonRouter, useIonViewDidEnter } from '@ionic/react'
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonText, IonTitle, IonToolbar, ItemReorderEventDetail, useIonModal, useIonPopover, useIonRouter, useIonViewDidEnter } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import ListListItem from 'components/ui/ListListItem'
@@ -43,7 +43,7 @@ const ProfilePage:React.FC = () => {
     dateMap,
     setListReloads,
     listReloads,
-
+    getStreak,
   } = useContext(UserState);
   const lang = (user?.language) ? user.language : userDefaultLanguage;
 
@@ -64,7 +64,34 @@ const ProfilePage:React.FC = () => {
     onLogout,
     router,
 });
+//Handle unsubsribe or reminder in url params
+  const urlParams = new URLSearchParams(router.routeInfo.search)
+  const emailParam = urlParams.get("unsubscribe");
+  const reminders = urlParams.get("reminders");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [presentUnsubscribed, dismissUnsubscribed] = useIonPopover(unsubscribePopOver, {
+    onDismiss: (data: string, role: string) => dismissUnsubscribed(data, role),
+    isSuccess,
+    email: emailParam,
+  });
+  const unsubscribe = async (email: string) => {
+    let result:any;
+    try {
+      console.log("UNSUBSCRIBE")
+      result = await Parse.Cloud.run("unsubscribe", {email}) as any;  
+    } catch (err) {
+      result = false;
+    }
+    setIsSuccess(result);
+    presentUnsubscribed({});
+  }
+  useEffect(() => {  
+    console.log("UNSUBSCRIBE", router.routeInfo.search, emailParam)
+    if (!router.routeInfo.search) return;
+    if (emailParam && emailParam.length > 0) unsubscribe(emailParam);
+  }, [router.routeInfo.search]);
 
+ 
 
 const player = useContext(Player);
     
@@ -79,6 +106,20 @@ const player = useContext(Player);
     deleteList,
     reorderLists
   } = useLists();
+
+  //Get any updated streak when visiting the profile
+  useEffect(() => {
+    if (!user?.objectId) return;
+    getStreak();
+    //If reminder param is 1, then open settings
+    if (reminders == "1" && user.objectId) {
+      setIsScrollToReminders(true);
+      presentSettings({
+      })
+    }
+  }, [user?.objectId])
+
+
   //Focus name input
   const nameListInput = useRef<HTMLIonInputElement>(null);
   const [isNamingList, setIsNamingList] = useState(false);
@@ -145,7 +186,6 @@ const player = useContext(Player);
   //Handle reordering
   const [isReordering, setIsReordering] = useState(false);
   function handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
-    console.log("REORDER?", event)
     let newListOrder = event.detail.complete();
     // setList(newListOrder);
     reorderLists(event.detail.from, event.detail.to)
@@ -161,8 +201,17 @@ const player = useContext(Player);
   }, [swiperRef?.activeIndex]);
 
 
+const responsePopOver = ({onDismiss, response}) => {
+  return (    
+    <IonContent class="ion-padding">
+      <div className={'flex w-full flex-col items-center text-center'}>
+        <IonText>{response ? response : ""}</IonText>
+      </div>
+  </IonContent>  
+  )
+}
 
-  const urlParams = new URLSearchParams(router.routeInfo.search)
+
   const defaultTab = urlParams.get("tab");
   const contentRef = useRef<HTMLIonContentElement | null>(null);
 
@@ -199,7 +248,6 @@ const player = useContext(Player);
   const initializeDates = async (date: string) => {
     const month = date.slice(0, 7);  
     await getMonth(month);
-    console.log("CURRENT DATE", date, currentDate);
     setCurrentDate(date);
     dateTime.current!.value = date;
   }
@@ -223,11 +271,9 @@ const player = useContext(Player);
     const formattedDate = formatDate(currentDate);
     // const hasDate = dateMap.hasOwnProperty(currentDate);
     let records = dateMap[currentDate];
-    console.log("HERE IS A LOG", user, user.currentStreak, dateMap, currentDate, records)
     const listenings = records?.listenings;
     let listening = listenings?.[0];
     const notes = records?.notes;
-    console.log("DATE MAP", currentDate, notes, dateMap)
     return (
       <div className="px-6 -mt-6 sm:mt-0">
         <h5 className="text-center">{formattedDate}</h5>
@@ -246,7 +292,7 @@ const player = useContext(Player);
                   }} 
                   key={position?.episode?.objectId+"-"+index}
                 >
-                <IonIcon icon={checkmarkCircle} size="small" color="primary" slot="start" onClick={(e) => {
+                <IonIcon icon={checkmarkCircle} size="small" color="secondary" slot="start" onClick={(e) => {
                   
                 }} />
                   {`Listened to Episode${typeof position?.episode?.number === "number" ? " "+ position?.episode?.number :""}`}
@@ -290,7 +336,6 @@ const player = useContext(Player);
     let expandedRange = recordRange.current+1
     const minMonth = addMonths(month, expandedRange*-1)
     const maxMonth = addMonths(month, expandedRange)
-    console.log("DATE CLICK 2", recordRange.current-1, minMonth, maxMonth)
     getMonth(minMonth);
     getMonth(maxMonth);
     recordRange.current = recordRange.current + 1
@@ -299,7 +344,15 @@ const player = useContext(Player);
   
   
   let userName = `${user?.firstName ? user?.firstName:""}${user?.lastName ? " "+user?.lastName:""}`
-  if (userName.length === 0) userName = "No User"
+  if (userName.length === 0) userName = "Not Logged In"
+
+
+  //Construct Reminder Button Text
+  const reminderTextArray = [] as string[];
+  if (user.isPushOn) reminderTextArray.push("Push");
+  if (user.isTextOn) reminderTextArray.push("Text");
+  if (user.isEmailOn) reminderTextArray.push("Email");
+  const reminderText = reminderTextArray.join(", ")
 
   return (
   <IonPage>
@@ -487,7 +540,7 @@ const player = useContext(Player);
 
                           if(dateMap.hasOwnProperty(date) && dateMap[date].listenings) return {
                             textColor: '#000000',
-                            backgroundColor: '#71df9d'
+                            backgroundColor: '#61eac8'
                             };
                             
                           if(dateMap.hasOwnProperty(date) && dateMap[date].notes) return {
@@ -511,7 +564,11 @@ const player = useContext(Player);
                     className='relative flex items-center w-auto p-4 pl-6 pr-4 mt-10 space-x-3 overflow-hidden rounded-full shadow-lg text-light sm:mt-4 bg-primary hover:opacity-80 focus:outline-none ion-activatable ripple-parent '
                   >
                     <IonRippleEffect></IonRippleEffect>
-                    <span className='text-lg text-center'>Text, Push, and Email daily at <span className="font-bold">5AM</span></span>
+                    {(user?.isPushOn || user?.isTextOn || user?.isEmailOn) ?
+                      <span className='text-lg text-center'>{`${reminderText} daily reminder at `}<span className="font-bold">{`${(user.sendHour||5) > 13 ? (user.sendHour! - 12) + "PM" : user?.sendHour == 0 ? "12AM" : user.sendHour+"AM"}`}</span></span>
+                      :
+                      <span className='text-lg text-center'>Daily Reminders OFF</span>
+                    }
                             <IonIcon size="small" icon={pencil} slot="icon-only" />
                   </button>
                 </div>
@@ -717,7 +774,7 @@ const player = useContext(Player);
                               <IonIcon icon={checkmarkCircle} color="medium" size="small" />
                             </div>
 
-                            Note your Notes
+                            Take reading notes
                           </li>
                           <li className="flex items-start text-gray-600 dark:text-gray-200">
                             <div className="w-6 pt-1 pr-2">
@@ -861,5 +918,19 @@ const LogoutMenu = ({onDismiss, logOut, router}) => {
   )
 }
 
+const unsubscribePopOver = ({onDismiss, email, isSuccess}) => {
+  return (    
+    <IonContent class="ion-padding">
+      <div className={'flex w-full flex-col items-center text-center'}>
+      {isSuccess ? 
+      <IonText>{`You have successfully unsubscribed${email ? " " + email : ""}`}</IonText>
+      :
+      <IonText>{`Sorry, something went wrong unsubscribing${email ? " " + email : ""}. Try unsubcribing in your account settings or contact support.`}</IonText>
+      }
+      <IonButton onClick={onDismiss}>Close</IonButton>
+      </div>
+  </IonContent>  
+  )
+}
 
 export default ProfilePage

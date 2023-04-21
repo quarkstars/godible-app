@@ -86,7 +86,7 @@ const SearchPage = (props: ISearchPageProps) => {
     const urlParams = new URLSearchParams(router.routeInfo.search)
     const bookSlug = urlParams.get("book");
     let bookParam = (bookSlug) ? `&book=${bookSlug}` : "";
-    router.push("/search?topic="+topic.slug+bookParam);
+    router.push(`${router.routeInfo.pathname}?topic=${topic.slug}${bookParam}`);
     setTopicFilter(topic);
   }
     //Set topic to the url param (keeping book param if it exists)
@@ -95,7 +95,7 @@ const SearchPage = (props: ISearchPageProps) => {
       const urlParams = new URLSearchParams(router.routeInfo.search)
       const bookSlug = urlParams.get("book");
       let bookParam = (bookSlug) ? `&book=${bookSlug}` : "";
-      router.push("/search?"+bookParam);
+      router.push(`${router.routeInfo.pathname}?${bookParam}`);
       setTopicFilter(undefined);
     }
 
@@ -127,7 +127,7 @@ const SearchPage = (props: ISearchPageProps) => {
     const urlParams = new URLSearchParams(router.routeInfo.search)
     const topicSlug = urlParams.get("topic");
     let topicParam = (topicSlug) ? `&topic=${topicSlug}` : "";
-    router.push("/search?book="+book.slug+topicParam);
+    router.push(`${router.routeInfo.pathname}?book="${book.slug}${topicParam}`);
     setBookFilter(book);
   }
     //Set book to the url param (keeping book param if it exists)
@@ -136,9 +136,10 @@ const SearchPage = (props: ISearchPageProps) => {
       const urlParams = new URLSearchParams(router.routeInfo.search)
       const topicSlug = urlParams.get("topic");
       let topicParam = (topicSlug) ? `&topic=${topicSlug}` : "";
-      router.push("/search?"+topicParam);
+      router.push(`${router.routeInfo.pathname}?${topicParam}`);
       setBookFilter(undefined);
     }
+    console.log("ROUTER", router.routeInfo.pathname)
 
 
   //Focus search bar when entering the page

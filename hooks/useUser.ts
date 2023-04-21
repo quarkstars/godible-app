@@ -10,6 +10,7 @@ import { isPlatform } from '@ionic/react';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import useParse from './useParse';
 import useLists from './useLists';
+import { nextSendTime } from 'utils/nextSendTime';
 
 // This is also where a non logged in user will store Language Preference, Volume and logically resolve when logging in 
 // where existing user language takes precedemce
@@ -61,6 +62,7 @@ export interface IUserState {
     getMonth: Function,
     // highlightedDates: any[],
     dateMap: IDateMap,
+    getStreak: Function,
 
     
     listReloads: number,
@@ -130,6 +132,21 @@ const useUser = () => {
         }
         return getResetUser({});
     };
+
+    //Get Current User with Streak
+    const getStreak = async function (): Promise<IUser> {
+        let currentUser:any;
+        try {
+            currentUser = await Parse.Cloud.run("getStreak");
+        } catch (err) {}
+        if (currentUser) {
+            const currentUserJSON = currentUser.toJSON();
+            setUser(currentUserJSON);
+            return currentUserJSON;
+        }
+        return getResetUser({});
+    };
+
     //Get Current User
     useEffect(() => {
         if (!Parse) return;
@@ -209,9 +226,12 @@ const useUser = () => {
             let currentUser = new Parse.User();
             currentUser.set('username', googleUser.email);
             currentUser.set('email', googleUser.email);
+            currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+            currentUser.set('nextSendTime', nextSendTime(5));
             if (googleUser.givenName) currentUser.set('firstName', googleUser.givenName);
             if (googleUser.familyName) currentUser.set('lastName', googleUser.familyName);
             if (googleUser.imageUrl) currentUser.set('imageUrl', googleUser.imageUrl);
+            
 
 
             // ;;.;8'urrently if a user exists already with the same email, it will not allow a new user
@@ -324,7 +344,9 @@ const useUser = () => {
                     firstName: first,
                     lastName: last,
                     language,
-                }
+                    timeZone:  Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    nextSendTime: nextSendTime(5),
+                },
             )
             if (!newUser) {
                 setSignUpError({message: "An issue occured"});
@@ -394,21 +416,6 @@ const useUser = () => {
     };
 
 
-    //Get latest listening and next episode
-    const getNextEpisode = async (month: string,) => {
-        if (!user.objectId) return;
-        
-        try {
-
-            //Get most recent listen
-            // Submit the delete request to the server
-        } catch (error) {
-            // error can occur in background
-            console.error(error);
-            return undefined;
-        } 
-    }
-
 
     //Calendar, get month
     const fetchedMonths = useRef<string[]>([]);
@@ -438,21 +445,17 @@ const useUser = () => {
             //Notes (specify the user's notes only)
             const notes = await Parse.Cloud.run("getNotes", {options: {month, sort: "-createdTime", userId: user.objectId}});     
             
-            console.log("DATE MAP MISSING NO", notes)
             let pastNotes: INote[]
             notes.map((note) => {   
                 if (!note.date) return;
                 pastNotes = newDateMap[note.date]?.notes || [];
-                console.log("DATE MAP PAST NOTE", pastNotes, newDateMap)
                 newDateMap[note.date] = {
                     ...dateMap[note.date],
                     ...newDateMap[note.date],
                     notes: [note,...pastNotes]
                 }
-                console.log("DATE MAP NEW NOTES", newDateMap)
             });
             // setHighlightedDates(prev => [...prev, newHighlightedDates]);
-            console.log("DATE MAP, SETTING MAP", {...dateMap, ...newDateMap})
             setDateMap(prev => {return {...prev, ...newDateMap}});
             fetchedMonths.current = [...fetchedMonths.current, month]
             
@@ -520,6 +523,7 @@ const useUser = () => {
         //CALENDAR
         getMonth,
         dateMap,
+        getStreak,
     }
 }
 

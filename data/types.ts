@@ -27,6 +27,7 @@ export interface IUser extends ParseObjectToJson {
     firstName?: string,
     lastName?: string,
     phone?: number,
+    countryCode?: string,
     sendHour?: number,
     timeZone?: string,
     isPushOn?: boolean,
@@ -39,9 +40,12 @@ export interface IUser extends ParseObjectToJson {
     nextSendTime?: number,
     lastNotificationTime?: number,
     lastSendTime?: number,
-    lastEmailResponse?: string,
-    lastPushResponse?: string,
-    lastTextResponse?: string,
+    lastEmailResponse?: string|null,
+    lastPushResponse?: string|null,
+    lastTextResponse?: string|null,
+    emailErrorCount?: number,
+    pushErrorCount?: number,
+    textErrorCount?: number,
 
     // //
     // heartCount?: number,

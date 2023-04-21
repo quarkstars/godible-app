@@ -1,13 +1,15 @@
-import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonNote, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail, UseIonRouterResult } from '@ionic/react'
+import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonNote, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail, UseIonRouterResult, useIonPopover } from '@ionic/react'
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
 import { Player, Theme } from 'components/AppShell';
 import { IEpisode, IList, IUser } from 'data/types';
-import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send, sync, camera, logOutOutline } from 'ionicons/icons';
+import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send, sync, camera, logOutOutline, closeCircle } from 'ionicons/icons';
 import React, {useRef, useContext, useEffect, useState} from 'react'
 import TextDivider from './TextDivider';
 import InitialsAvatar from 'react-initials-avatar';
 import { UserState } from 'components/UserStateProvider';
 import usePhoto from 'hooks/usePhoto';
+import { nextSendTime } from 'utils/nextSendTime';
+import { countryCodes } from 'data/countryCodes';
 
 interface ISettingsModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
@@ -113,15 +115,22 @@ const SettingsModal = (props: ISettingsModalProps) => {
 
   
   const [imageUrl, setImageUrl] = useState<string|undefined>();
+  const [countryCode, setCountryCode] = useState<string|undefined>("+1 US");
   useEffect(() => {
     if (!user?.objectId) return;
-    if (user.imageUrl) setImageUrl(user.imageUrl)
+    if (user.imageUrl) setImageUrl(user.imageUrl);
+    if (user.countryCode) setCountryCode(user.countryCode);
+    else {
+      updateUser({countryCode: "+1 US"});
+      setCountryCode("+1 US");
+    }
   }, [user?.objectId]);
 
   const [firstNameNote, setFirstNameNote] = useState<string|undefined>();
   const [lastNameNote, setLastNameNote] = useState<string|undefined>();
   const [emailNote, setEmailNote] = useState<string|undefined>();
   const [phoneNote, setPhoneNote] = useState<string|undefined>();
+
   
   const handleInputChange = async (update: IUser) => {
     //If no change, exit and don't show any note
@@ -148,6 +157,14 @@ const SettingsModal = (props: ISettingsModalProps) => {
     }
   }
   
+  
+  const [response, setResponse] = useState<string|undefined>();
+  const [presentResponse, dimissResponse] = useIonPopover(responsePopOver, {
+    onDismiss: (data: string, role: string) => dimissResponse(data, role),
+    response,
+  });
+
+
 
   const handleUploadPhoto = async () => {
     if (!user?.objectId) return;
@@ -320,7 +337,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                   onIonChange={(event) => {
                     if (typeof emailInput.current?.value === "string" && emailInput.current.value.length > 0) {
                       
-                      handleInputChange({email: emailInput.current?.value.slice(0,1000), username: emailInput.current?.value.slice(0,1000)})
+                      handleInputChange({email: emailInput.current?.value.slice(0,500), username: emailInput.current?.value.slice(0,500), emailErrorCount: 0, lastEmailResponse: null})
                   }}}
                 >
                   
@@ -391,7 +408,13 @@ const SettingsModal = (props: ISettingsModalProps) => {
               interface="action-sheet" 
               slot="end" 
               onIonChange={(e) => {
-                if (user.objectId) updateUser({sendHour: e.detail.value})
+                if (user.objectId) updateUser(
+                  {
+                    sendHour: e.detail.value, 
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    nextSendTime: nextSendTime(e.detail.value),
+                  }
+                )
               }}
             >
               <IonSelectOption value="0">12:00 AM</IonSelectOption>
@@ -437,7 +460,18 @@ const SettingsModal = (props: ISettingsModalProps) => {
         </IonItem>
         <IonItem> 
             <IonIcon icon={mail} slot="start" />
-            <IonLabel>Email ON</IonLabel>
+            <IonLabel>{`Email ${user?.isEmailOn ? "on": "off"}`}</IonLabel>
+            {user.lastEmailResponse && 
+              <IonIcon 
+                size="small" 
+                color={user.lastEmailResponse.includes("success") ?"primary":"danger"} 
+                icon={user.lastEmailResponse.includes("success") ? checkmarkCircle : closeCircle} 
+                onClick={(e:any) => {
+                  setResponse(user.lastEmailResponse!)
+                  presentResponse({event: e, side:"left"})
+                }}
+              />
+            }
             <IonToggle
               name="email"
               ref={isEmailOn}
@@ -450,19 +484,31 @@ const SettingsModal = (props: ISettingsModalProps) => {
         
         <IonItem> 
             <IonIcon icon={notifications} slot="start" />
-            <IonLabel>Push Notification ON</IonLabel>
+            <IonLabel>{`Push notification ${user?.isPushOn ? "on": "off"}`}</IonLabel>
             <IonToggle
               name="push"
               ref={isPushOn}
               // checked={theme.isDark}
               onIonChange={(e) => {
-                if (user.objectId) updateUser({isPushOn: e.detail.checked})
+                if (user.objectId) updateUser({isPushOn: e.detail.checked, pushErrorCount: 0, lastPushResponse: null})
               }}
             />
         </IonItem>
         <IonItem> 
             <IonIcon icon={chatbox} slot="start" />
-            <IonLabel>Text Message ON</IonLabel>
+            
+            <IonLabel>{`Text message ${user?.isTextOn ? "on": "off"}`}</IonLabel>
+            {user.lastTextResponse && 
+              <IonIcon 
+                size="small" 
+                color={user.lastTextResponse.includes("success") ?"primary":"danger"} 
+                icon={user.lastTextResponse.includes("success") ? checkmarkCircle : closeCircle} 
+                onClick={(e:any) => {
+                  setResponse(user.lastTextResponse!)
+                  presentResponse({event: e, side:"left"})
+                }}
+              />
+            }
             <IonToggle
               name="text"
               ref={isTextOn}
@@ -473,24 +519,43 @@ const SettingsModal = (props: ISettingsModalProps) => {
             />
         </IonItem>
         <IonItem > 
-            <IonIcon icon={phonePortraitOutline} slot="start" />    
-            <IonLabel>Mobile</IonLabel>
+            {/* <IonLabel slot="start">Mobile</IonLabel> */}
+            <div className="flex justify-start w-full ml-10">
+              <IonSelect 
+                slot="start" 
+                interface="action-sheet" 
+                value={countryCode||"+1 US"}  
+                selectedText={countryCode}
+                onIonChange={(e) => {
+                  setCountryCode(e.detail.value);
+                  if (user.objectId) updateUser({countryCode: e.detail.value, textErrorCount: 0, lastTextResponse: null});
+                }}
+              >
+                {countryCodes.map((countryCode)=>{
+                  return (
+                    <IonSelectOption key={countryCode.dial_code} value={countryCode.dial_code}>
+                        {`${countryCode.dial_code} ${countryCode.name} (${countryCode.code})`}
+                      </IonSelectOption>
+                  )
+                })
+                }
+              </IonSelect>
+                <IonInput 
+                  ref={phoneInput} 
+                  type="tel" 
+                  placeholder='Enter your mobile #'
+                  debounce={1000}
+                  onFocus={()=>setPhoneNote(undefined)}
+                  onIonChange={(event) => {
+                    if (typeof phoneInput.current?.value === "string" && phoneInput.current.value.length > 0) {
+                      const phone = phoneInput.current?.value .replace(/[^0-9]/g,"");
+                      handleInputChange({phone: Number(phone), textErrorCount: 0, lastTextResponse: null});
+                  }}}
+                >
+              </IonInput>
+            </div>
 
-            <IonInput 
-              ref={phoneInput} 
-              type="tel" 
-              placeholder='1 (000) 000-0000'
-              debounce={1000}
-              onFocus={()=>setPhoneNote(undefined)}
-              onIonChange={(event) => {
-                if (typeof phoneInput.current?.value === "string" && phoneInput.current.value.length > 0) {
-                  const phone = phoneInput.current?.value .replace(/[^0-9]/g,"");
-                  handleInputChange({phone: Number(phone)})
-              }}}
-            >
-
-            </IonInput>
-               <IonNote slot="helper"><span className="text-xs text-primary">{phoneNote}</span></IonNote>
+              <IonNote slot="helper"><span className="text-xs text-primary">{phoneNote}</span></IonNote>
           </IonItem>
         </>
         }
@@ -542,7 +607,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 }}
               >     
               <IonIcon icon={(fontSize === "regular" || typeof fontSize === "undefined") ? checkmarkCircle : ellipseOutline} slot="start"/>
-              <span className="text-lg capitalize">Regular</span>
+              <span className="capitalize text-md xs:text-lg">Regular</span>
             </IonButton>
               <IonButton 
                 size="small" 
@@ -552,7 +617,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 }}
               >     
               <IonIcon icon={fontSize === "large" ? checkmarkCircle : ellipseOutline} slot="start"/>
-              <span className="text-xl capitalize">Large</span>
+              <span className="capitalize text-md xs:text-xl">Large</span>
             </IonButton>
           </IonButtons>
           <div className='-space-x-2 '>
@@ -577,7 +642,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                   if (fontContrast !== "normal") updateUser({fontContrast: "normal"})
                 }}
               >     
-              <IonIcon icon={fontContrast === "normal" ? checkmarkCircle : ellipseOutline} slot="start"/>
+              <IonIcon icon={(!fontContrast || fontContrast === "normal") ? checkmarkCircle : ellipseOutline} slot="start"/>
               <span className="font-bold text-gray-700 dark:text-gray-300">Normal</span>
             </IonButton>
               <IonButton 
@@ -595,16 +660,19 @@ const SettingsModal = (props: ISettingsModalProps) => {
         {props.onLogout &&
           <IonItem 
             lines="none" 
-            button
-            onClick={async (e) => {
-              if (!props.onLogout) return;
-              await props.onLogout();
-              if (props.router) props.router.push("/");
-              props.onDismiss();
-            }}
           > 
+            <IonButton
+              onClick={async (e) => {
+                if (!props.onLogout) return;
+                await props.onLogout();
+                if (props.router) props.router.push("/");
+                props.onDismiss();
+              }}
+              fill="clear"
+            >
               <IonLabel slot="end" color="danger">Log out</IonLabel>
-              <IonIcon icon={logOutOutline} slot="end"  color="danger"/>    
+              <IonIcon icon={logOutOutline} slot="start"  color="danger"/>    
+            </IonButton>
           </IonItem>
         }
         </IonList>
@@ -612,5 +680,18 @@ const SettingsModal = (props: ISettingsModalProps) => {
     </IonPage>
   )
 }
+
+
+const responsePopOver = ({onDismiss, response}) => {
+  return (    
+    <IonContent class="ion-padding">
+      <div className={'flex w-full flex-col items-center text-center'}>
+        <IonText>{response ? response : ""}</IonText>
+      </div>
+  </IonContent>  
+  )
+}
+
+
 
 export default SettingsModal

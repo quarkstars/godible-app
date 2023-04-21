@@ -514,3 +514,15 @@ ion-breadcrumbs {
 }
 
 /* END CENTER BREADCRUMBS */
+/*
+ * Add scroll bar to select options
+ * cf. https://github.com/ionic-team/ionic/issues/17397#issuecomment-496092852
+ */
+ .action-sheet-group::-webkit-scrollbar,
+ .alert-radio-group::-webkit-scrollbar,
+ .alert-checkbox-group::-webkit-scrollbar {
+   width: 1.2em;
+   display: block !important;
+ }
+ 
+

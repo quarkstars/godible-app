@@ -33,6 +33,7 @@ export const UserStateDefault = {
   reset: async () => null,
 
   updateUser: async (update: IUser) => { return update},
+  getStreak: async () => null,
   updateError: undefined,
   setUpdateError: () => null,
 
