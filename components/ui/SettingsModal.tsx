@@ -171,7 +171,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
     let photo = await takePhoto(user?.objectId);
     
     if (!photo?.url) return;
-    let imageUrl = photo.url.replace("/upload/", "/upload/c_thumb,w_250,h_250/");
+    let imageUrl = photo.url.replace("/upload/", "/upload/c_thumb,w_250,h_250/").replace("http://", "https://");
     setImageUrl(imageUrl);
     updateUser({imageUrl});
   }

@@ -4,7 +4,7 @@ import SlideList from 'components/ui/SlideList';
 import Toolbar from 'components/ui/Toolbar';
 import { add, addCircleOutline, arrowForward, arrowForwardOutline, logIn, logInOutline, playCircle, timeOutline } from 'ionicons/icons'
 import { Swiper, SwiperSlide } from "swiper/react";
-import React, { useState, useContext, useEffect, useRef } from 'react'
+import React, { useState, useContext, useEffect, useRef, useMemo } from 'react'
 import Thumbnail from 'components/ui/Thumbnail';
 import { EpisodeCard } from 'components/ui/EpisodeCard';
 import { IEpisode } from 'data/types';
@@ -105,6 +105,107 @@ const HomePage:React.FC = () => {
     setBooks(undefined);
   });
 
+
+  // RENDER LISTS
+
+  //Hero List
+  const episodesHero = useMemo(() => {
+    if (!episodes) return <></>
+    return episodes.map((episode, index) => {
+        //offset a few hours since it is published slightly before midnight
+        const publishedAt = episode.publishedAt! + 4.32e+7;
+        const oneWeekAgo = Date.now() - publishedAt > 6.048e+8;
+        let pretext = (!index && Date.now() - publishedAt < 8.64e+7) ? "Today's Episode" : `${oneWeekAgo ? "Last": ""} ${new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(publishedAt)}'s Episode`
+        return (
+        <SwiperSlide key={"ephero-"+episode.objectId}>
+          <Hero 
+            // title={"Let God's Word Be Heard"}
+            subtitle={episode._quote}
+            mainButtonText={"Listen"}
+            mainButtonIcon={playCircle}
+            onClickMain={(e) => handleListenClick(e, index)}
+            subButtonText={"List"}
+            subButtonIcon={addCircleOutline}
+            onClickSub={(e:any) => {
+              if (!user.objectId) return router.push("/signin?message=Log in to save lists")
+              setInspectedEpisode(episode)
+              presentList({
+                onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
+              })
+            }}
+            overlayColor={"rgba(0,0,0,.6)"}
+            bgImageUrl={episode.imageUrl}
+            postImageUrl={episode._bookImageUrl} 
+            postText={episode._fullTitle}
+            isQuote
+            // preImageUrl={"/logo/godible-logo-white.png"}
+            preText={pretext}
+            
+          />
+        </SwiperSlide>
+        )
+      })
+   
+  },[episodes]);
+
+  //Episode List
+  const episodesList = useMemo(() => {
+    if (!episodes) return <></>
+    return episodes.map((episode, index) => {
+      return (
+        <SwiperSlide key={"epcard-"+episode.objectId}>
+          <EpisodeCard 
+            size={episodeWidth}
+            list={{episodes}}
+            index={index}
+            episode={episode}
+            customClickHandler={(e) => {handleListenClick(e, index)}}
+          />
+      </SwiperSlide>
+      )
+    })
+  }, [episodes]);
+
+  //Topic Lists
+  const topicsLists = useMemo(() => {
+    if (!topics) return <></>
+    return topics.map((topic, index) => {
+      return (
+        <SwiperSlide key={"topic-"+topic.name+"-"+index}>
+          <TopicCard 
+            size={topicWidth}
+            topic={topic}
+            index={index}
+            key={topic?.objectId}
+            isInitSearch={false}
+          />
+      </SwiperSlide>
+      )
+    })
+  }, [topics]);
+
+  //Books Lists
+  const booksList = useMemo(() => {
+    if (!books) return;
+    return books.map((book, index) => {
+    return (
+      <SwiperSlide key={"lateps-"+book.objectId}>
+        <BookCard 
+          size={bookWidth}
+          book={book}
+          showTagline
+          onClick={() => {
+            if (book?.slug) router.push("/book/"+book?.slug)
+          }}
+        />
+    </SwiperSlide>
+    )
+  })
+  }, [books])
+
+
+
+  //RENDER HOME PAGE COMPONENT
   return (
     <IonPage>
     <IonHeader>
@@ -162,44 +263,9 @@ const HomePage:React.FC = () => {
             />
           </SwiperSlide>
           }
-            {(episodes && !episodesIsLoading) ? episodes.map((episode, index) => {
-              //offset a few hours since it is published slightly before midnight
-              const publishedAt = episode.publishedAt! + 4.32e+7;
-              const oneWeekAgo = Date.now() - publishedAt > 6.048e+8;
-              let pretext = (!index && Date.now() - publishedAt < 8.64e+7) ? "Today's Episode" : `${oneWeekAgo ? "Last": ""} ${new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(publishedAt)}'s Episode`
-              return (
-              <SwiperSlide key={"ephero-"+episode.objectId}>
-                <Hero 
-                  // title={"Let God's Word Be Heard"}
-                  subtitle={episode._quote}
-                  mainButtonText={"Listen"}
-                  mainButtonIcon={playCircle}
-                  onClickMain={(e) => handleListenClick(e, index)}
-                  subButtonText={"List"}
-                  subButtonIcon={addCircleOutline}
-                  onClickSub={(e:any) => {
-                    if (!user.objectId) return router.push("/signin?message=Log in to save lists")
-                    setInspectedEpisode(episode)
-                    presentList({
-                      onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
-                    })
-                  }}
-                  overlayColor={"rgba(0,0,0,.6)"}
-                  bgImageUrl={episode.imageUrl}
-                  postImageUrl={episode._bookImageUrl} 
-                  postText={episode._fullTitle}
-                  isQuote
-                  // preImageUrl={"/logo/godible-logo-white.png"}
-                  preText={pretext}
-                  
-                />
-              </SwiperSlide>
-              )
-            })
-            :
-            <IonSkeletonText  style={{width:"100%", height:"450px"}} />
-          }
+          {episodesHero}
 
+          {(!episodes && episodesIsLoading) && <IonSkeletonText  style={{width:"100%", height:"450px"}} />}
 
         </SlideList>
         <div className="flex flex-col p-4 sm:p-10">
@@ -213,20 +279,8 @@ const HomePage:React.FC = () => {
           </div>
           
           <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={210}>
-            {episodes ? episodes.map((episode, index) => {
-              return (
-                <SwiperSlide key={"epcard-"+episode.objectId}>
-                  <EpisodeCard 
-                    size={episodeWidth}
-                    list={{episodes}}
-                    index={index}
-                    episode={episode}
-                    customClickHandler={(e) => {handleListenClick(e, index)}}
-                  />
-              </SwiperSlide>
-              )
-            })
-            :
+            {episodesList}
+            {(!episodes && !episodesIsLoading) && 
             Array(6).fill(undefined).map((skel, index) => {
               return (
               <SwiperSlide key={"skeleton-"+index}>
@@ -249,20 +303,7 @@ const HomePage:React.FC = () => {
           </div>
           
           <SlideList isCarousel spaceBetween={5} setItemWidth={setTopicWidth} idealWidth={180}>
-                {topics && topics.map((topic, index) => {
-                  return (
-                    <SwiperSlide key={"topic-"+topic.name+"-"+index}>
-                      <TopicCard 
-                        size={topicWidth}
-                        topic={topic}
-                        index={index}
-                        key={topic?.objectId}
-                        isInitSearch={false}
-                      />
-                </SwiperSlide>
-              )
-            })
-            }
+            {topicsLists}
           </SlideList>
 
         </div>
@@ -277,21 +318,7 @@ const HomePage:React.FC = () => {
           </div>
           
           <SlideList isCarousel spaceBetween={5} setItemWidth={setBookWidth} idealWidth={376}>
-            {books && books.map((book, index) => {
-              return (
-                <SwiperSlide key={"lateps-"+book.objectId}>
-                  <BookCard 
-                    size={bookWidth}
-                    book={book}
-                    showTagline
-                    onClick={() => {
-                      if (book?.slug) router.push("/book/"+book?.slug)
-                    }}
-                  />
-              </SwiperSlide>
-              )
-            })
-            }
+            {booksList}
           </SlideList>
 
         </div>

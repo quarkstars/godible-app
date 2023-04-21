@@ -12,7 +12,7 @@ import { userDefaultLanguage } from 'data/translations'
 import useBooks from 'hooks/useBooks'
 import useEpisodes from 'hooks/useEpisodes'
 import { search } from 'ionicons/icons'
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState, useMemo} from 'react'
 import { resolveLangString } from 'utils/resolveLangString'
 
 const BookPage:React.FC = () => {      
@@ -115,29 +115,55 @@ const BookPage:React.FC = () => {
       router.push(episodes[index]._path!);
   }
 
-useEffect(() => {
-  if (!gotoEpisodes) return;
-  if (gotoEpisodes.length < 1) return;
-  router.push(gotoEpisodes[0]._path!);
-}, [gotoEpisodes]);
+  useEffect(() => {
+    if (!gotoEpisodes) return;
+    if (gotoEpisodes.length < 1) return;
+    router.push(gotoEpisodes[0]._path!);
+  }, [gotoEpisodes]);
 
-useEffect(() => {
-  if (!episodes) return;
-  let max = book?.episodeCount || 0;
-  if (episodes.length >= max) {
-    return setReachedMax(true);
-  };
-}, [episodes]);
+  useEffect(() => {
+    if (!episodes) return;
+    let max = book?.episodeCount || 0;
+    if (episodes.length >= max) {
+      return setReachedMax(true);
+    };
+  }, [episodes]);
 
 
-const fetchMoreEpisodes = async (e) => {
-  console.log("CALL FETCH 1")
-  e.preventDefault();
-  console.log("CALL FETCH 2")
-  let bookIds = (book) ? [book?.objectId] : undefined;
-  await getEpisodes(undefined,{limit: 24, bookIds, sort: "-publishedAt", exclude: ["text"], skip: (skip||0)+1}, true);
-  e.target.complete()
-}
+  const fetchMoreEpisodes = async (e) => {
+    console.log("CALL FETCH 1")
+    e.preventDefault();
+    console.log("CALL FETCH 2")
+    let bookIds = (book) ? [book?.objectId] : undefined;
+    await getEpisodes(undefined,{limit: 24, bookIds, sort: "-publishedAt", exclude: ["text"], skip: (skip||0)+1}, true);
+    e.target.complete()
+  }
+
+  //Render components
+  const episodeListItems = useMemo(() => {
+    if (!episodes) return;
+
+    return episodes.map((episode, index) => (
+      <EpisodeListItem
+        episode={episode}
+        key={"epresult-" + episode.objectId}
+        onPlay={(e) => {
+          handleListenClick(e, index);
+        }}
+      />
+    ));
+  }, [episodes, handleListenClick]);
+  //Select options
+  const episodeSelectOptions = useMemo(() => {
+    const episodeCount = book?.episodeCount || 0;
+    return new Array(episodeCount).fill(undefined).map((item, index) => (
+      <IonSelectOption value={(index + 1).toString()} key={"select-" + index}>
+        {`Episode ${index + 1}`}
+      </IonSelectOption>
+    ));
+  }, [book]);
+  
+
 
   return (
     <IonPage>
@@ -181,12 +207,7 @@ const fetchMoreEpisodes = async (e) => {
                           handleGoto(e, Number(e.detail.value)-1);
                       }}
                     >
-                      {new Array(book?.episodeCount||0).fill(undefined).map((item, index) => { 
-                        return (
-                          <IonSelectOption value={(index+1).toString()} key={"select-"+index}>{`Episode ${index+1}`}</IonSelectOption>
-                          )
-                        })
-                      }
+                      {episodeSelectOptions}
                     </IonSelect>
                     </div>
                   <IonButton fill="clear"  onClick={() => router.push(`/search?book=${book?.slug}`)}>
@@ -194,19 +215,8 @@ const fetchMoreEpisodes = async (e) => {
                     Search Book
                   </IonButton>
                   </div>
-                  {episodes && episodes.map((episode, index) => {
-                    return (
-                        <EpisodeListItem 
-                          episode={episode}  
-                          key={"epresult-"+episode.objectId} 
-                          onPlay={(e) => {
-                            handleListenClick(e, index);
-                          }}
-                          // customSubText='...heres thd her'
-                          // highlightStrings={['heres']}
-                        />
-                    )
-                  })}
+                  {episodeListItems}
+
                   
                 {(!episodes && episodesIsLoading) && Array(12).fill(undefined).map((skel, index) => {
                     return (

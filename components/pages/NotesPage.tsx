@@ -9,7 +9,7 @@ import Toolbar from 'components/ui/Toolbar'
 import { INote } from 'data/types'
 import useNotes from 'hooks/useNotes'
 import { add, arrowForward, chevronDown, chevronUp } from 'ionicons/icons'
-import React, {useEffect, useState, useContext, useRef} from 'react'
+import React, {useEffect, useState, useContext, useRef, useMemo} from 'react'
 
 const NotesPage:React.FC = () => {
 
@@ -109,6 +109,58 @@ const NotesPage:React.FC = () => {
       if (noteCount.current + 12 >= noteCount.current + newNoteCount) setReachedMax(true);
   }
 
+  //User Note List
+  const userNotesList = useMemo(() => {
+    if (!userNotes) return;
+  
+    return userNotes.map((note, index) => {
+      if (typeof editNoteIndex === "number" && editNoteIndex === index) {
+        return (
+          <NoteInput
+            note={note}
+            key={"noteinput-" + note.objectId}
+            isLoading={isUserNoteLoading}
+            onSave={(note) => {
+              handleSaveNote(note);
+            }}
+            onCancel={() => setEditNoteIndex(undefined)}
+          />
+        );
+      } else {
+        return (
+          <Note
+            key={"usernote-" + note.objectId}
+            note={note}
+            isUser={true}
+            onDelete={() => {
+              if (note?.objectId) handleDeleteNote(note.objectId);
+            }}
+            onEdit={() => setEditNoteIndex(index)}
+            isShowingEpisode={true}
+          />
+        );
+      }
+    });
+  }, [userNotes, editNoteIndex, handleSaveNote, handleDeleteNote]);
+
+  //Notes lists
+  const notesList = useMemo(() => {
+    if (!notes) return;
+  
+    return notes.map((note, index) => (
+      <Note
+        key={"usernote-" + note.objectId}
+        note={note}
+        onDelete={() => {
+          if (note?.objectId) handleDeleteNote(note.objectId);
+        }}
+        onEdit={() => setEditNoteIndex(index)}
+        onPost={() => {}}
+        isShowingEpisode={true}
+      />
+    ));
+  }, [notes, handleDeleteNote, setEditNoteIndex]);
+
   return (
     <IonPage>
     <IonHeader>
@@ -141,31 +193,7 @@ const NotesPage:React.FC = () => {
                       )
                     })
                 }
-                {userNotes && userNotes.map((note, index) => {
-                    if (typeof editNoteIndex === "number" && editNoteIndex===index)
-                    return (
-                        <NoteInput 
-                            // episode={note.episode} 
-                            note={note}
-                            key={"noteinput-"+note.objectId}
-                            isLoading={isUserNoteLoading}
-                            onSave={(note: INote) => {handleSaveNote(note);}} 
-                            onCancel={(e) => setEditNoteIndex(undefined)}
-                        />
-                    )
-                    else return (
-                        <Note 
-                            key={"usernote-"+note.objectId}
-                            // episode={episode}
-                            note={note}
-                            isUser={true}
-                            onDelete={(e) => {if (note?.objectId) handleDeleteNote(note.objectId)}}
-                            onEdit={(e) => {setEditNoteIndex(index)}}
-                            isShowingEpisode={true}
-                        />
-                    )
-                })
-                }
+                {userNotesList}
             </div>
             }
             {(!reachedUserMax && showingUserNotes && userNotes && userNotes.length >= 12) &&
@@ -194,21 +222,7 @@ const NotesPage:React.FC = () => {
             :<></>}
             {showingNotes &&
             <div>
-                {notes && notes.map((note, index) => {
-
-                    return (
-                        <Note 
-                            key={"usernote-"+note.objectId}
-                            // episode={episode}
-                            note={note}
-                            onDelete={(e) => {if (note?.objectId) handleDeleteNote(note.objectId)}}
-                            onEdit={(e) => {setEditNoteIndex(index)}}
-                            onPost={(e) => {}}
-                            isShowingEpisode={true}
-                        />
-                    )
-                })
-                }
+                {notesList}
             </div>
             }
             {(!reachedMax && showingNotes && notes && notes.length >= 12) &&

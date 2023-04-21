@@ -24,7 +24,7 @@ import useEpisodes from 'hooks/useEpisodes'
 import useLists from 'hooks/useLists'
 import useTopics from 'hooks/useTopics'
 import { addCircleOutline, bulb, card, chevronDown, closeCircle, filter, grid, list, playCircle } from 'ionicons/icons'
-import React, {useRef, useState, useContext, useEffect} from 'react'
+import React, {useRef, useState, useContext, useEffect, useMemo} from 'react'
 import { SwiperSlide } from 'swiper/react'
 import { resolveLangString } from 'utils/resolveLangString'
 
@@ -353,8 +353,69 @@ const SearchPage = (props: ISearchPageProps) => {
     setBooks(undefined);
     setTopics(undefined);
     setEpisodes(undefined);
-    // setLists(undefined);
   });
+
+  //Render Topic Cards
+  const topicCards = useMemo(() => {
+    if (!topics) return;
+  
+    return topics.map((topic, index) => (
+      <TopicCard
+        size={topicWidth}
+        topic={topic}
+        index={index}
+        key={topic?.objectId}
+        customOnClick={(e) => {
+          topicClickHandler(e, topic);
+        }}
+      />
+    ));
+  }, [topics, topicWidth, topicClickHandler]);
+
+  //Episode List Component
+  const episodeListItems = useMemo(() => {
+    if (!episodes || display === "quote" || display === "card") return;
+  
+    return episodes.map((_episode, index) => {
+      let episode = _episode;
+  
+      return (
+        <EpisodeListItem
+          episode={episode}
+          onPlay={(e) => handleListenClick(e, index)}
+          onAdd={(e: any) => {
+            if (!user.objectId)
+              return router.push("/signin?message=Log in to save lists");
+            setInspectedEpisode(episode);
+            presentList({
+              onDidDismiss: (e: CustomEvent) => {
+                setInspectedEpisode(undefined);
+              },
+            });
+          }}
+          key={"epresult-" + episode.objectId}
+        />
+      );
+    });
+  }, [episodes, display, handleListenClick, user, router, presentList]);
+
+  //Speech List Item
+  const speechListItems = useMemo(() => {
+    if (!speeches) return;
+  
+    return speeches.map((speech, index) => (
+      <SpeechListItem
+        key={"speech-" + speech.objectId}
+        list={speech}
+        onPlay={(e) => {
+          handleSpeechClick(e, index);
+        }}
+      />
+    ));
+  }, [speeches, handleSpeechClick]);
+  
+
+  //Render component
 
   return (
   <IonPage>
@@ -476,18 +537,7 @@ const SearchPage = (props: ISearchPageProps) => {
           {(mode !== "speeches" && !hasFilter) && <div className='flex justify-center w-full'>
             <div className="flex flex-col items-center w-full" style={{maxWidth:"768px"}}>
               <CardList spaceBetween={10} setItemWidth={setTopicWidth} idealWidth={180}>
-                {topics && topics.map((topic, index) => {
-                  return (
-                    <TopicCard 
-                      size={topicWidth}
-                      topic={topic}
-                      index={index}
-                      key={topic?.objectId}
-                      customOnClick={(e) => {topicClickHandler(e, topic)}}
-                    />
-                  )
-                })
-                }
+                {topicCards}
                 {(!topics && topicsIsLoading) && Array(12).fill(undefined).map((skel, index) => {
                     console.log("TOPIC", index)
                     return (
@@ -527,13 +577,13 @@ const SearchPage = (props: ISearchPageProps) => {
             <div className="flex items-center">
               <span>{`${max ? max +" ": ""}Episodes`}</span>
               <IonButton 
-              fill="clear" 
-              color="dark" 
-              onClick={(e: any) => presentDisplay({
-                event: e,
-                onDidDismiss: (e: CustomEvent) => setDisplay(e.detail.role),
-              })}
-            >
+                fill="clear" 
+                color="dark" 
+                onClick={(e: any) => presentDisplay({
+                  event: e,
+                  onDidDismiss: (e: CustomEvent) => setDisplay(e.detail.role),
+                })}
+              >
                 <IonIcon icon={displayIcon} slot={'start'} />
                 <IonIcon icon={chevronDown} slot={'end'} />
               </IonButton>
@@ -594,24 +644,7 @@ const SearchPage = (props: ISearchPageProps) => {
                       }
                   </CardList>
                   }
-                {display!=="quote" && display !== "card" && episodes && episodes.map((_episode, index) => {
-                  let episode = _episode
-
-                  return (
-                      <EpisodeListItem 
-                        episode={episode}  
-                        onPlay={(e) => handleListenClick(e, index)}
-                        onAdd={(e:any) => {
-                          if (!user.objectId) return router.push("/signin?message=Log in to save lists")
-                          setInspectedEpisode(episode)
-                          presentList({
-                            onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
-                          })
-                        }}
-                        key={"epresult-"+episode.objectId} 
-                      />
-                  )
-                })}
+                {episodeListItems}
                 {(!episodes && episodesIsLoading) && Array(12).fill(undefined).map((skel, index) => {
                     return (
                       <IonSkeletonText key={"episodeskel-"+index} style={{width:"100%", height:"48px"}} />
@@ -645,16 +678,7 @@ const SearchPage = (props: ISearchPageProps) => {
             </TextDivider>
             <div className='flex justify-center w-full'>
               <div className="flex flex-col items-stretch w-full" style={{maxWidth:"768px"}}>
-                {speeches  && speeches.map((speech, index) => {
-                  return (
-                    <SpeechListItem 
-                      key={"speech-"+speech.objectId}
-                      list={speech}
-                      onPlay={(e) => {handleSpeechClick(e, index)}}
-                    />
-                  )
-                })
-                }
+                {speechListItems}
                 {!speeches && listsIsLoading && Array(12).fill(undefined).map((skel, index) => {
                       return (
                         <IonSkeletonText key={"speechskel-"+index} style={{width:"100%", height:"75px"}} />
