@@ -257,6 +257,7 @@ const HomePage:React.FC = () => {
                         topic={topic}
                         index={index}
                         key={topic?.objectId}
+                        isInitSearch={false}
                       />
                 </SwiperSlide>
               )

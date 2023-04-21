@@ -13,11 +13,15 @@ interface ITopicCardProps {
     topic: ITopic,
     index: number,
     customOnClick?: Function,
+    isInitSearch?: boolean,
 }
 
 export const TopicCard = (props: ITopicCardProps) => {
 
 	const router = useIonRouter();
+    let {   
+        isInitSearch = true,
+    } = props
 
 
     const {
@@ -35,7 +39,7 @@ export const TopicCard = (props: ITopicCardProps) => {
             props.customOnClick(e);
             return;
         }
-        router.push("/search?topic="+topic.slug!);
+        router.push(`/search?topic=${topic.slug!}${isInitSearch ? "&" : "&init=0"}`);
         setHovering(true);
     }
 
