@@ -1,4 +1,4 @@
-import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonLabel, IonPage, IonRippleEffect, IonSkeletonText, IonTextarea, IonTitle, IonToggle, IonToolbar, useIonModal, useIonRouter, useIonViewWillEnter } from '@ionic/react'
+import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonLabel, IonPage, IonRippleEffect, IonSkeletonText, IonTextarea, IonTitle, IonToggle, IonToolbar, useIonModal, useIonRouter, useIonViewDidLeave, useIonViewWillEnter } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
@@ -43,6 +43,7 @@ const EpisodePage:React.FC = () => {
     getEpisodes,
     episodes,
     getAdjacentEpisodes,
+    setEpisodes,
   } = useEpisodes();
   
   const {user, listReloads, setListReloads, updateUser} = useContext(UserState);
@@ -55,12 +56,15 @@ const EpisodePage:React.FC = () => {
     lists,
     addEpisodeToList,
     removeEpisodeFromList,
+    setLists,
   } = useLists();
   const [hasBookmark, setHasBookmark] = useState<boolean>(false);
   useEffect(() => {
     if (!user.objectId) return setHasBookmark(false);
+    if (!location.pathname.includes("episode")) return setHasBookmark(false);
     getLists(undefined, { sort: "+index", limit: 1, userId: user.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
-  }, [user?.objectId, listReloads]);
+  }, [user?.objectId, listReloads, location.pathname]);
+  
   useEffect(() => {
     if (!lists || !lists?.[0]) return setHasBookmark(false);
     const list = lists[0];
@@ -185,7 +189,6 @@ const EpisodePage:React.FC = () => {
     }
   }
   
-  console.log("GET ADJACENT EPISODES PREV ", adjacentEpisodes[0])
 
   const [showQuote, setShowQuote] = useState(false);  
   useEffect(() => {
@@ -202,10 +205,8 @@ const EpisodePage:React.FC = () => {
     if (showQuote === false && episode.isForbidden) setShowQuote(true);
   }, [episode]);
 
-  console.log("EPISODE TRY SLUG",  location.pathname.substring(location.pathname.lastIndexOf('/') + 1))
 
   
-  console.log("PARAMS START", router.routeInfo.search)
   //Prep episode data
   const quote = (episode?._quote) ? `${episode?._quote}”` : undefined;
   let imageUrl = episode?.imageUrl || "/img/godible-bg.jpg";
@@ -310,6 +311,14 @@ const EpisodePage:React.FC = () => {
   }, [episode,fontStyle, fontSize, fontContrast])
 
 
+  //Clear data when leaving unless it's another episode
+  useIonViewDidLeave(() => {
+    if (location.pathname.includes("episode")) return;
+    setEpisodes(undefined);
+    setLists(undefined);
+    setEpisode(undefined);
+    setAdjacentEpisodes([null, null])
+  });
 
   return (
     <IonPage>

@@ -1,4 +1,4 @@
-import { IonContent, IonFooter, IonHeader, IonPage, IonSkeletonText, IonTitle, IonToolbar, useIonRouter } from '@ionic/react'
+import { IonContent, IonFooter, IonHeader, IonPage, IonSkeletonText, IonTitle, IonToolbar, useIonRouter, useIonViewDidLeave, useIonViewWillEnter } from '@ionic/react'
 import { BookCard } from 'components/ui/BookCard'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
@@ -8,12 +8,15 @@ import React, {useEffect} from 'react'
 
 const BooksPage:React.FC = () => {
 	const router = useIonRouter();
-  const {getBooks, books, isLoading} = useBooks();
+  const {getBooks, books, isLoading, setBooks} = useBooks();
   //Get Books
-  useEffect(() => {
+  useIonViewWillEnter(() => {
     if (books) return;
     getBooks(undefined, {sort: "+index"});
-  }, []);
+  });  //Clear books when leaving
+  useIonViewDidLeave(() => {
+    setBooks(undefined)
+  });
   
   let book = sampleBooks[0]
   return (

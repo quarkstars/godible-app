@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonFooter, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItemDivider, IonPage, IonSelect, IonSelectOption, IonSkeletonText, IonTitle, IonToolbar, useIonRouter, useIonViewDidEnter } from '@ionic/react'
+import { IonButton, IonContent, IonFooter, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItemDivider, IonPage, IonSelect, IonSelectOption, IonSkeletonText, IonTitle, IonToolbar, useIonRouter, useIonViewDidEnter, useIonViewDidLeave } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import { BookCard } from 'components/ui/BookCard'
@@ -21,7 +21,8 @@ const BookPage:React.FC = () => {
     getBooks, 
     books,
     isLoading,
-    error
+    error,
+    setBooks,
   } = useBooks();
 
   const {
@@ -52,6 +53,10 @@ const BookPage:React.FC = () => {
       setReachedMax(false);
       setGotoEpisodes(undefined);
   }, [location.pathname]);
+  useIonViewDidLeave(() => {
+    setBooks(undefined);
+    setEpisodes(undefined);
+  });
   
   const book = (books) ? books[0] : undefined;
 

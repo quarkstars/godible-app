@@ -57,6 +57,7 @@ const useBooks = () => {
         setIsLoading,
         getBooks,
         books,
+        setBooks,
         skip: getBookOptions.current?.skip
     }
 }

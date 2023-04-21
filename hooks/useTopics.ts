@@ -84,6 +84,7 @@ const useTopics = () => {
         setIsLoading,
         getTopics,
         topics,
+        setTopics,
         skip: getTopicOptions.current?.skip
     }
 }

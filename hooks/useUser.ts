@@ -63,6 +63,7 @@ export interface IUserState {
     // highlightedDates: any[],
     dateMap: IDateMap,
     getStreak: Function,
+    setDateMap: Function,
 
     
     listReloads: number,
@@ -421,13 +422,17 @@ const useUser = () => {
     const fetchedMonths = useRef<string[]>([]);
     // const [highlightedDates, setHighlightedDates] = useState<any[]>([]);
     const [dateMap, setDateMap] = useState<IDateMap>({});
-    const getMonth = async (month: string,) => {
+    const getMonth = async (month: string, clearMonths=false) => {
+        console.log("LOCATION GET MONTH", month, clearMonths, user.objectId, fetchedMonths.current.includes(month) && !clearMonths)
         if (!user.objectId) return;
-        if (fetchedMonths.current.includes(month)) return;
+        if (clearMonths) fetchedMonths.current = []
+        if (fetchedMonths.current.includes(month) && !clearMonths) return;
         try {
+            console.log("LOCATION", clearMonths)
             //Listenings
             let listenings = await Parse.Cloud.run("getListenings", {options: {month, hasValidSession: true}}) as IListening[];     
             // let newHighlightedDates:any[] = [];
+            console.log("LOCATION listenings", listenings)
             let newDateMap:IDateMap = {};
             listenings.map((listening) => {
                 if (!listening.date) return;
@@ -524,6 +529,7 @@ const useUser = () => {
         getMonth,
         dateMap,
         getStreak,
+        setDateMap,
     }
 }
 

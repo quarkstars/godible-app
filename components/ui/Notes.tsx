@@ -101,6 +101,8 @@ const Notes = (props: INotesProps) => {
 
     let reachedUserNoteMax = (userNotes && userNotes.length >= 30) ? true : false;
 
+    
+
   return (
     <div className='flex flex-col w-full'>
         <div id="Notes" className="flex flex-col w-full">

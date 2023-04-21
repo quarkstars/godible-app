@@ -14,7 +14,6 @@ import SpeechesPage from './pages/SpeechesPage';
 import SearchPage from './pages/SearchPage';
 import NotesPage from './pages/NotesPage';
 import ProfilePage from './pages/ProfilePage';
-import PlaylistPage from './pages/PlaylistPage';
 import BookPage from './pages/BookPage';
 import SignInResetPage from './pages/SignInResetPage';
 import FAQPage from './pages/FAQPage';
@@ -112,16 +111,7 @@ export const pages:IPage[] = [
     //TODO: Add Payments
     //TODO: Add Subscription
     //TODO: Add Notifications
-    {
-        label: "Playlist",
-        path: "/playlist",
-        variable: "id", 
-        component: PlaylistPage, //PlaylistsPage
-        icon: square,
-        isNav: false,
-        isExact: true,
-        isRedirect: false,
-    }, 
+
     {
         label: "Book",
         path: "/book",

@@ -1,4 +1,4 @@
-import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover, IonFooter, useIonRouter, IonSelect, IonSelectOption, IonSpinner, useIonModal, IonSkeletonText } from '@ionic/react'
+import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover, IonFooter, useIonRouter, IonSelect, IonSelectOption, IonSpinner, useIonModal, IonSkeletonText, useIonViewWillEnter, useIonViewDidLeave } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import { BookCard } from 'components/ui/BookCard'
@@ -60,11 +60,11 @@ const SearchPage = (props: ISearchPageProps) => {
   const [mode, setMode] = useState<string|undefined>(props.defaultMode);
 
   //Get topics
-  const {getTopics, topics, isLoading: topicsIsLoading} = useTopics();
-  useEffect(() => {
+  const {getTopics, topics, isLoading: topicsIsLoading, setTopics} = useTopics();
+  useIonViewWillEnter(() => {
     if (topics) return;
     getTopics(undefined, {sort: "+index"});
-  }, []);
+  });
 
   //Selected Topic
   const [topicFilter, setTopicFilter] = useState<ITopic|undefined>();
@@ -101,8 +101,8 @@ const SearchPage = (props: ISearchPageProps) => {
 
 
   //Get books
-  const {getBooks, books} = useBooks();
-  useEffect(() => {
+  const {getBooks, books, setBooks} = useBooks();
+  useIonViewWillEnter(() => {
     if (books) return;
     getBooks(undefined, {sort: "+index"});
   }, []);
@@ -347,6 +347,14 @@ const SearchPage = (props: ISearchPageProps) => {
   else if (mode === "episodes") hasFilter = true;
   else if (mode === "speeches") hasFilter = true;
   else if (search) hasFilter = true;
+
+  
+  useIonViewDidLeave(() => {
+    setBooks(undefined);
+    setTopics(undefined);
+    setEpisodes(undefined);
+    // setLists(undefined);
+  });
 
   return (
   <IonPage>

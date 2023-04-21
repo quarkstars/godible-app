@@ -40,6 +40,7 @@ export const UserStateDefault = {
   getMonth: () => null,
   // highlightedDates: [],
   dateMap: {},
+  setDateMap: async () => null,
 
   listReloads: 0,
   setListReloads: () => null,

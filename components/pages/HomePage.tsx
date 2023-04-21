@@ -1,4 +1,4 @@
-import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonMenuButton, IonPage, IonSkeletonText, IonText, IonTitle, IonToolbar, useIonModal, useIonRouter } from '@ionic/react'
+import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonMenuButton, IonPage, IonSkeletonText, IonText, IonTitle, IonToolbar, useIonModal, useIonRouter, useIonViewDidLeave, useIonViewWillEnter } from '@ionic/react'
 import Hero from 'components/ui/Hero';
 import SlideList from 'components/ui/SlideList';
 import Toolbar from 'components/ui/Toolbar';
@@ -44,34 +44,27 @@ const HomePage:React.FC = () => {
     isLoading: episodesIsLoading,
     error: episodesError,
     episodes,
+    setEpisodes,
   } = useEpisodes();
-  const {getBooks, books} = useBooks();
-  const {getTopics, topics} = useTopics();
-  const {getLists, lists, postList, reorderEpisodes, reorderLists, addEpisodeToList, deleteList, removeEpisodeFromList} = useLists();
-  const {getNotes, postNote, deleteNote, postNoteFeedback} = useNotes();
+  const {getBooks, books, setBooks} = useBooks();
+  const {getTopics, topics, setTopics} = useTopics();
   //Get episodes
-  useEffect(() => {
-    // if (!user.objectId) return;
-    console.log("GET EPISODES AGAIN!")
+  useIonViewWillEnter(() => {
     getEpisodes(undefined, {limit: 12, sort:"-publishedAt", exclude: ["text"]});
-    // quickTest();
-  }, [user.objectId]);
+  });
 
   //Get topics
-  useEffect(() => {
+  useIonViewWillEnter(() => {
     if (topics) return;
     getTopics(undefined, {limit: 12, sort: "+index"});
-  }, []);
+  });
   //Get Books
-  useEffect(() => {
+  useIonViewWillEnter(() => {
     if (books) return;
     getBooks(undefined, {limit: 12, sort: "+index"});
-  }, []);
+  });
 
-  // useEffect(() => {
-  //   setLatestEpisodes(JSON.parse(latestEpisodesString.current));
-  // }, [player.list])
-  // const latestEpisodesString = useRef(JSON.stringify(sampleEpisodes));
+
 
   // Handle Click
   const handleListenClick = (e, index: number) => {
@@ -96,67 +89,7 @@ const HomePage:React.FC = () => {
       router.push(reversedEpisodes[reversedIndex]?._path!);
   }
 
-  console.log("EPISODES", episodes);
-  async function quickTest() {
-    await getBooks();
-    console.log("BOOKS ALL", books);
-    // await getBooks(["GB8WMxtDTx"]); 
-    // console.log("BOOKS", books);
-    // await getEpisodes();
-    // console.log("EPISODE ALL", episodes); 
-    // console.log("EPISODES only number", episodes); 
-    // await getEpisodes({include: ["number", "text", "quote", "book"]});
-    // console.log("EPISODES only number", episodes);
-    // await getEpisodes({include: ["number"], sort: "-number"});
-    // console.log("EPISODES only -number", episodes);
-    // await getEpisodes({include: ["number"], sort: "+number"});
-    // console.log("EPISODES only +number", episodes);
-    // await getEpisodes({search: "spiritual"});
-    // console.log("EPISODES search spiritual", episodes);
-    // await getEpisodes({search: "spiritual", limit: 1, skip: 1});
-    // console.log("EPISODES search limit 1, skip 1", episodes);
-    // await getEpisodes({bookIds: ["xQUvSz4VSJ"], include: ["book"]});
-    // console.log("EPISODES book filter", episodes)
-    // await getEpisodes({topicIds: ["NtS19tf8UC"]});
-    // console.log("EPISODES topic filter", episodes); 
-    // await getEpisodes(undefined, {limit: 1, skip: 1}); 
-    // console.log("EPISODES get limit 1 skip 1", episodes); 
-    // await getEpisodes({limit: 1, skip: 2});
-    // console.log("EPISODES get limit 1 skip 2", episodes);
-    // await getBooks();
-    // console.log("BOOKS ALL", books);
-    // await getBooks(["GB8WMxtDTx"]);
-    // console.log("BOOKS ID", books);
-    // await postList({name: "Mike's Other List", index: 2});
-    // console.log("USER ID", user);
-    // await getLists(undefined, {userId: user.objectId, sort: "+index"});
-    // await removeEpisodeFromList(3, "vUgJiuslyU") 
-    // await getLists(undefined, {userId: user.objectId, sort: "+index"})
-    // setTimeout(async() => {console.log("NEW ALL", lists)}, 100); 
-    // setTimeout(async() => {await reorderLists(1, 2);}, 500); 
-    // setTimeout(async() => {await postList({name: "New List", index: lists?.length||1});}, 6500); 
-    // setTimeout(async() => {await getLists(undefined, {userId: user.objectId, sort: "+index"})}, 1000); 
-    // setTimeout(async() => {console.log("NEW ALL", lists)}, 2500); 
-    // await postList({name: "Bookmarks", index: 0});  
-    // setTimeout(async() => {await getLists(undefined, {userId: user.objectId, sort: "+index"})}, 7000); 
-    // setTimeout(async() => {console.log("NEW ALL", lists)}, 7500); 
-    // setTimeout(async() => {await removeEpisodeFromList(3, "vUgJiuslyU")}, 8500);  
-    // setTimeout(async() => {await addEpisodeToList(2, "vUgJiuslyU")}, 8500);
-    // setTimeout(async() => {await getLists(undefined, {userId: user.objectId, sort: "+index"})}, 9000); 
-    // setTimeout(async() => {console.log("NEW ALL UPDATE", lists)}, 9500); 
-    // setTimeout(async() => {await deleteList(2)}, 3000); 
-    // setTimeout(async() => {await getLists(undefined, {userId: user.objectId, sort: "+index"})}, 3200); 
-    // setTimeout(async() => {console.log("NEW ALL DELETED", lists)}, 3500);  
-    // console.log("LISTS ID", lists);  
-    // await getTopics();
-    // console.log("TOPICS ALL", topics); 
-    // await getTopics(["NtS19tf8UC"]);
-    // console.log("TOPICS ID", topics);
-    // await postNote({text: "my note", isPublic: true});
-    // await postNoteFeedback({noteId: "hTr5xMpzNa", isHearted: null, isFlagged: null, report: "Hey"}) ;
-    // await getLists(undefined, {userId: user.objectId, sort: "+index"})
-    // await deleteNote("K4gTFvxAEJ");
-  }
+
     //List modal trigger
   const [inspectedEpisode, setInspectedEpisode] = useState<IEpisode|undefined>();
   const [presentList, dimissList] = useIonModal(ListModal, {
@@ -166,7 +99,12 @@ const HomePage:React.FC = () => {
         addEpisodeId: inspectedEpisode?.objectId,
     });
 
-  console.log("EPISODE ALL", episodes); 
+  useIonViewDidLeave(() => {
+    setEpisodes(undefined);
+    setTopics(undefined);
+    setBooks(undefined);
+  });
+
   return (
     <IonPage>
     <IonHeader>

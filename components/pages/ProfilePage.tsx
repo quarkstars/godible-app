@@ -1,4 +1,4 @@
-import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonText, IonTitle, IonToolbar, ItemReorderEventDetail, useIonModal, useIonPopover, useIonRouter, useIonViewDidEnter } from '@ionic/react'
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonText, IonTitle, IonToolbar, ItemReorderEventDetail, useIonModal, useIonPopover, useIonRouter, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import ListListItem from 'components/ui/ListListItem'
@@ -44,6 +44,7 @@ const ProfilePage:React.FC = () => {
     setListReloads,
     listReloads,
     getStreak,
+    setDateMap,
   } = useContext(UserState);
   const lang = (user?.language) ? user.language : userDefaultLanguage;
 
@@ -77,7 +78,6 @@ const ProfilePage:React.FC = () => {
   const unsubscribe = async (email: string) => {
     let result:any;
     try {
-      console.log("UNSUBSCRIBE")
       result = await Parse.Cloud.run("unsubscribe", {email}) as any;  
     } catch (err) {
       result = false;
@@ -86,7 +86,6 @@ const ProfilePage:React.FC = () => {
     presentUnsubscribed({});
   }
   useEffect(() => {  
-    console.log("UNSUBSCRIBE", router.routeInfo.search, emailParam)
     if (!router.routeInfo.search) return;
     if (emailParam && emailParam.length > 0) unsubscribe(emailParam);
   }, [router.routeInfo.search]);
@@ -201,15 +200,6 @@ const player = useContext(Player);
   }, [swiperRef?.activeIndex]);
 
 
-const responsePopOver = ({onDismiss, response}) => {
-  return (    
-    <IonContent class="ion-padding">
-      <div className={'flex w-full flex-col items-center text-center'}>
-        <IonText>{response ? response : ""}</IonText>
-      </div>
-  </IonContent>  
-  )
-}
 
 
   const defaultTab = urlParams.get("tab");
@@ -237,9 +227,10 @@ const responsePopOver = ({onDismiss, response}) => {
 
   
   useEffect(() => {
+    if (!location.pathname.includes("profile")) return setLists(undefined);
     if (!user.objectId) return setLists(undefined);
     getLists(undefined, {limit: 30, userId: user.objectId, sort: "+index", exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
-}, [listReloads, user.objectId]);
+  }, [listReloads, user.objectId, location.pathname]);
 
 
   const dateTime = useRef<HTMLIonDatetimeElement>(null);
@@ -247,27 +238,33 @@ const responsePopOver = ({onDismiss, response}) => {
   const recordRange = useRef(0);
   const initializeDates = async (date: string) => {
     const month = date.slice(0, 7);  
-    await getMonth(month);
+    await getMonth(month, true);
+    console.log("LOCATION DATE INITIALIZED!!!")
     setCurrentDate(date);
     dateTime.current!.value = date;
   }
   useEffect(() => {
-    currentDate
+    console.log("LOCATION DATE MAP CHANGED", dateMap)
   }, [dateMap])
   
   useEffect(() => {
-    if (!dateTime.current) return;
+    console.log("LOCATION CHECK", dateTime.current, location.pathname)
+    if (!dateTime.current) return setDateMap({});
+    if (!location.pathname.includes("profile")) return setDateMap({});
 
     const date = toIsoString(new Date()).slice(0,10); // get YYYY-MM-DD
     dateTime.current.value = date;
     
+    console.log("LOCATION CHECK PASSED", date)
     initializeDates(date);
     
-  }, [dateTime.current, user.objectId]);
+  }, [dateTime.current, user.objectId, location.pathname]);
+
+  
   
   //Create date detail
   const dateDetail = useMemo(() => {
-    if (typeof currentDate !== "string") return <></>
+    if (typeof currentDate !== "string" || !dateMap) return <></>
     const formattedDate = formatDate(currentDate);
     // const hasDate = dateMap.hasOwnProperty(currentDate);
     let records = dateMap[currentDate];
@@ -322,7 +319,7 @@ const responsePopOver = ({onDismiss, response}) => {
         </IonList>
       </div>
     )
-  }, [currentDate, dateMap]);
+  }, [currentDate, dateMap, location.pathname]);
   
   //Refetch Months
   function handleDateChange(e) {
@@ -353,6 +350,8 @@ const responsePopOver = ({onDismiss, response}) => {
   if (user.isTextOn) reminderTextArray.push("Text");
   if (user.isEmailOn) reminderTextArray.push("Email");
   const reminderText = reminderTextArray.join(", ")
+  
+  console.log("LOCATION", dateMap, lists)
 
   return (
   <IonPage>
@@ -537,7 +536,7 @@ const responsePopOver = ({onDismiss, response}) => {
                           handleDateClick(e)
                         }}
                         highlightedDates={(date) => {
-
+                          if (!dateMap) return;
                           if(dateMap.hasOwnProperty(date) && dateMap[date].listenings) return {
                             textColor: '#000000',
                             backgroundColor: '#61eac8'
