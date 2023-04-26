@@ -10,12 +10,14 @@ import { UserState } from 'components/UserStateProvider';
 import usePhoto from 'hooks/usePhoto';
 import { nextSendTime } from 'utils/nextSendTime';
 import { countryCodes } from 'data/countryCodes';
+import Pricing from './Pricing';
 
 interface ISettingsModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
   isProfile?: boolean,
   isScrollToReminders?: number,
   onLogout?: Function,
+  isOnboarding?: Function,
   router?: UseIonRouterResult,
 }
 
@@ -29,11 +31,15 @@ const SettingsModal = (props: ISettingsModalProps) => {
     user,
     updateUser,
     isLoading,
+    reroutePath,
+    setReroutePath,
   } = useContext(UserState);
 
+  const reader = new FileReader();
   const {
     takePhoto,
     isLoading: photoIsLoading,
+    uploadToCloudinary,
   } = usePhoto();
 
   const  {
@@ -48,6 +54,10 @@ const SettingsModal = (props: ISettingsModalProps) => {
   } = user;
   
   const theme = useContext(Theme);
+
+  
+  const [onboardingEdit, setOnboardingEdit] = useState<boolean>(false);
+  const [onboardingUpgrade, setOnboardingUpgrade] = useState<boolean>(false);
   
   //Set up input values from the current logged in user
   const firstNameInput = useRef<HTMLIonInputElement>(null);
@@ -55,21 +65,21 @@ const SettingsModal = (props: ISettingsModalProps) => {
     if (!firstNameInput.current) return;
     if (!user?.objectId) return firstNameInput.current.value = undefined;
     firstNameInput.current.value = user.firstName;
-  }, [user?.objectId, firstNameInput.current]);
+  }, [user?.objectId, firstNameInput.current, onboardingEdit]);
 
   const lastNameInput = useRef<HTMLIonInputElement>(null);
   useEffect(() => {
     if (!lastNameInput.current) return;
     if (!user?.objectId) return lastNameInput.current.value = undefined;
     lastNameInput.current.value = user.lastName;
-  }, [user?.objectId, lastNameInput.current]);
+  }, [user?.objectId, lastNameInput.current, onboardingEdit]);
 
   const emailInput = useRef<HTMLIonInputElement>(null);
   useEffect(() => {
     if (!emailInput.current) return;
     if (!user?.objectId) return emailInput.current.value = undefined;
     emailInput.current.value = user.email;
-  }, [user?.objectId, emailInput.current]);
+  }, [user?.objectId, emailInput.current, onboardingEdit]);
   
   const phoneInput = useRef<HTMLIonInputElement>(null);
   useEffect(() => {
@@ -166,9 +176,14 @@ const SettingsModal = (props: ISettingsModalProps) => {
 
 
 
-  const handleUploadPhoto = async () => {
+  const handleUploadPhoto = async (blobUrl?: any) => {
     if (!user?.objectId) return;
-    let photo = await takePhoto(user?.objectId);
+    let photo:any;
+    if (!blobUrl) photo = await takePhoto(user?.objectId);
+    else {    
+      photo = await uploadToCloudinary(blobUrl, user?.objectId);
+    }
+    console.log("PHOTO RETURNED", photo)
     
     if (!photo?.url) return;
     let imageUrl = photo.url.replace("/upload/", "/upload/c_thumb,w_250,h_250/").replace("http://", "https://");
@@ -198,7 +213,8 @@ const SettingsModal = (props: ISettingsModalProps) => {
   }, [reminders.current, content.current, props.isScrollToReminders]);
   
 
-  return (
+  if (onboardingUpgrade) return (
+    
     <IonPage>
       <IonHeader>
         <IonToolbar>
@@ -209,14 +225,88 @@ const SettingsModal = (props: ISettingsModalProps) => {
             </IonButton>
           </IonButtons>
           <div className="pr-10">
-          <IonTitle>Settings</IonTitle>
+          <IonTitle>Support Godible</IonTitle>
+          </div>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="ion-padding" ref={content}>
+        <h2 className="w-full text-center">Become a donor and get unlimited access</h2>
+        <Pricing 
+          onClick={() => {
+            if (props.router) {
+              setReroutePath(props.router.routeInfo.pathname);
+              props.router?.push("/donation")
+            }
+            props.onDismiss()
+          } } 
+        />
+        
+        <IonButton
+            onClick={async (e) => {
+              props.onDismiss()
+            }}
+            expand="block"
+            color="primary"
+            fill="clear"
+          >
+            Not Now
+          </IonButton>
+      </IonContent>
+    </IonPage>
+  )
+
+  else return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonButton color="medium" onClick={() => props.onDismiss(null, 'close')}>
+              <IonIcon icon={close} slot="icon-only"/>
+              {/* Default */}
+            </IonButton>
+          </IonButtons>
+          <div className="pr-10">
+          <IonTitle>{props?.isOnboarding ? "Account Setup" : "Settings"}</IonTitle>
           </div>
             {/* <IonIcon icon={isLoading ? sync : checkmarkCircle} slot="end" className="ion-padding" /> */}
             {/* <IonSpinner name="dots" slot="end" className="ion-padding" /> */}
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding" ref={content}>
-        {props.isProfile && 
+      {props.isOnboarding && !onboardingEdit &&
+      <div className="flex justify-center w-full">
+        <div className="flex items-center justify-between w-full p-2 space-x-1 bg-gray-100 rounded-md dark:border-gray-800">
+            <div className="flex items-center space-x-2">
+
+              {user.imageUrl ?
+
+                <img 
+                  className='w-10 h-10 rounded-full'
+                  src={user.imageUrl} 
+                  alt="My Profile" 
+                ></img>
+                :
+                <div
+                    className='p-2'
+                >
+                    <InitialsAvatar name={userName}  />
+                </div>
+                }
+
+                <div className="flex flex-col w-full">
+                  <div className="font-medium text-md xs:text-lg line-clamp-1">{`Welcome ${userName}!`}</div>
+                  <div className="text-xs xs:text-sm text-medium line-clamp-1">{`${user.email}`}</div>
+                </div>
+              </div>
+              <IonButtons>
+                <IonButton size="small" onClick={()=>{setOnboardingEdit(true)}}>
+                  Edit
+                </IonButton>
+              </IonButtons>
+        </div>
+      </div>
+      }
+        {(props.isProfile || onboardingEdit) && 
         <>
           <IonItem>  
             {photoIsLoading ?   
@@ -267,6 +357,8 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 Change
               </IonButton>
               </>:
+              <>
+              {!photoIsLoading && !isLoading &&
               <IonButton 
                 size="small" 
                 fill="outline"
@@ -278,16 +370,37 @@ const SettingsModal = (props: ISettingsModalProps) => {
 
               >                
                 <IonIcon icon={camera} slot="start" />
-                Add
+                Take
               </IonButton>
-              
+              }
+              {!photoIsLoading && !isLoading &&
+              <form>
+                <label className="px-4 py-2 text-sm font-medium tracking-wide text-gray-500 uppercase cursor-pointer hover:text-gray-600">
+                Choose
+                <input 
+                  type="file" 
+                  name="photo" 
+                  accept="image/*"
+                  className="hidden" 
+                  onChange={(e) => {
+                    console.log("TRIGGER PHOTO", e.target.value, e.target.files)
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const blobUrl = URL.createObjectURL(file);
+                      handleUploadPhoto(blobUrl);
+                  }}
+                />
+                </label>
+              </form>
+              }
+              </>
               }
             </IonButtons>
           </IonItem>
             <div className="grid w-full grid-cols-2 gap-4">
               <div className="mb-6 form-group">
                   <IonItem>
-                    <IonLabel position='floating'>First name</IonLabel>
+                    <IonLabel position={props.isOnboarding ? 'stacked' : 'floating'}>First name</IonLabel>
                     <IonInput 
                       ref={firstNameInput}
                       placeholder="First" 
@@ -307,7 +420,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
               </div>
               <div className="mb-6 form-group">
                   <IonItem>
-                    <IonLabel position='floating'>Last name</IonLabel>
+                    <IonLabel position={props.isOnboarding ? 'stacked' : 'floating'}>Last name</IonLabel>
                     <IonInput 
                       ref={lastNameInput}
                       placeholder="Last" 
@@ -328,7 +441,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
             </div>
             <div className="w-full">
               <IonItem>
-                <IonLabel position='floating'>Email</IonLabel>
+                <IonLabel position={props.isOnboarding ? 'stacked' : 'floating'}>Email</IonLabel>
                 <IonInput 
                   ref={emailInput}
                   placeholder="Email" 
@@ -349,7 +462,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
             <IonItem lines="none"></IonItem>
             </>}
         <IonList>
-          {!props.isProfile &&
+          {(!props.isProfile && !props.isOnboarding) &&
           <IonItem> 
             <IonIcon icon={volumeIcon} />
             <IonRange
@@ -363,6 +476,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
             />
           </IonItem>
           }
+          {!props.isOnboarding &&
           <IonItem>
             <IonIcon slot={'start'} icon={theme.isDark ?  moonOutline : sunnyOutline} />
             <IonToggle
@@ -371,6 +485,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
               onClick={() => {theme.setIsDark(!theme.isDark)}}
             />
           </IonItem>
+          }
           <IonItem> 
             <IonIcon icon={languageIcon} slot="start" />
             <IonButtons>
@@ -397,7 +512,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
             </IonButtons>
         </IonItem>
         
-        {props.isProfile && <>
+        {(props.isProfile || props.isOnboarding) && <>
         <IonItem lines="none"></IonItem>
         <div ref={reminders}></div>
         <IonItem> 
@@ -533,7 +648,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
               >
                 {countryCodes.map((countryCode)=>{
                   return (
-                    <IonSelectOption key={countryCode.dial_code} value={countryCode.dial_code}>
+                    <IonSelectOption key={countryCode.dial_code+countryCode.name} value={countryCode.dial_code}>
                         {`${countryCode.dial_code} ${countryCode.name} (${countryCode.code})`}
                       </IonSelectOption>
                   )
@@ -560,7 +675,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
         </>
         }
         <IonItem lines="none"></IonItem>
-        {!props.isProfile && <>
+        {(!props.isProfile && !props.isOnboarding) && <>
         <IonItem> 
           <IonIcon icon={text} slot="start" />
           <IonButtons>
@@ -657,7 +772,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
           </IonButtons>
         </IonItem>
         </>}
-        {props.onLogout &&
+        {(props.onLogout && !props.isOnboarding) &&
           <IonItem 
             lines="none" 
           > 
@@ -667,6 +782,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 await props.onLogout();
                 if (props.router) props.router.push("/");
                 props.onDismiss();
+                setTimeout(()=>{if (content.current) content.current.scrollToTop();}, 200)
               }}
               fill="clear"
             >
@@ -674,6 +790,17 @@ const SettingsModal = (props: ISettingsModalProps) => {
               <IonIcon icon={logOutOutline} slot="start"  color="danger"/>    
             </IonButton>
           </IonItem>
+        }
+        {props.isOnboarding && 
+          <IonButton
+            onClick={async (e) => {
+              setOnboardingUpgrade(true)
+            }}
+            expand="block"
+            color="primary"
+          >
+            Next
+          </IonButton>
         }
         </IonList>
       </IonContent>

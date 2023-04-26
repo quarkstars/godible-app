@@ -18,6 +18,16 @@ import useUser, { IUserState } from "hooks/useUser";
 import { initializeParse } from "@parse/react";
 import { PlayerControls } from "./ui/PlayerControls";
 import UserStateProvider from "./UserStateProvider";
+ 
+import {Elements} from "@stripe/react-stripe-js"
+import { loadStripe } from '@stripe/stripe-js';
+
+
+const publicKey = (process.env.NEXT_PUBLIC_STRIPE_LIVE_ENABLED==="true") ? 
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_LIVE : 
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_TEST;
+const stripePromise = loadStripe(publicKey!);
+
 
 setupIonicReact({});
 
@@ -74,20 +84,22 @@ const AppShell: React.FC = () => {
   const player = usePlayer();
 
   return (
-    <UserStateProvider>
-      <Theme.Provider value={theme}>
-        <Player.Provider value={player}>
-          <IonApp>
-            <IonReactRouter>
-              <IonSplitPane contentId="main">
-                <Menu />
-                <Routes />
-              </IonSplitPane>
-            </IonReactRouter>
-          </IonApp>
-        </Player.Provider>
-      </Theme.Provider>
-    </UserStateProvider>
+    <Elements stripe={stripePromise}>
+      <UserStateProvider>
+        <Theme.Provider value={theme}>
+          <Player.Provider value={player}>
+            <IonApp>
+              <IonReactRouter>
+                <IonSplitPane contentId="main">
+                  <Menu />
+                  <Routes />
+                </IonSplitPane>
+              </IonReactRouter>
+            </IonApp>
+          </Player.Provider>
+        </Theme.Provider>
+      </UserStateProvider>
+    </Elements>
   );
 };
 

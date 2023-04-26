@@ -34,7 +34,6 @@ export const BookCard = (props: IBookCardProps) => {
     const lang = (user.language) ? user.language : userDefaultLanguage;
     const book = props.book;
     const buyLink = resolveLangString(book?.buyLink, lang)
-    console.log("BUY LINKS", buyLink)
 
     const [hovering, setHovering] = useState<boolean>(false)
     const [showMore, setShowMore] = useState<boolean>(false)

@@ -12,11 +12,12 @@ interface IThumbnailProps {
     hoveringCornerState?: [boolean, React.Dispatch<React.SetStateAction<boolean>>],
     cornerIsLarger?:boolean,
     backgroundSize?:string,
+    progress?: number,
 }
 
 import { motion, useAnimationControls } from "framer-motion"
 import { bookOutline, eye, search } from 'ionicons/icons';
-import { IonIcon } from '@ionic/react';
+import { IonIcon, IonProgressBar } from '@ionic/react';
 
 
 const Thumbnail = (props: IThumbnailProps) => {
@@ -100,7 +101,11 @@ const Thumbnail = (props: IThumbnailProps) => {
                 }
                 </>
             }
-
+            {props.progress &&
+                <div className="absolute bottom-0 w-full">
+                    <IonProgressBar value={props.progress}></IonProgressBar>
+                </div>
+            }
             </div>
         </motion.div>
     )

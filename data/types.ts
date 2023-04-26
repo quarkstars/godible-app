@@ -36,6 +36,19 @@ export interface IUser extends ParseObjectToJson {
     sendType?: string, // "next" "neweset"
     nextEpisode?: IEpisode,
 
+    //STRIPE
+    customerId?: string,
+    donationAmount?: number,
+    priceId?: number,
+    paymentMethod?: any, //stripe payment method object
+    subscriptionId?: string, 
+    lastPaymentTime?: number,
+    nextPaymentTime?: number, //Get from current_period_end on subscription
+    hasBillingHistory?: boolean,
+    address?: any,
+    isCoveringFee?: boolean,
+    hasAddress?: boolean,
+
     //Responses
     nextSendTime?: number,
     lastNotificationTime?: number,

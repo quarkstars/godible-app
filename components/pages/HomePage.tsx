@@ -252,10 +252,10 @@ const HomePage:React.FC = () => {
               title={"Let God's Word Be Heard"}
               subtitle={"Playable Hoon Dok Hae"}
               mainButtonText={"Sign Up"}
-              onClickMain={() => router.push("/signup")}
+              onClickMain={() => {player.togglePlayPause(false);router.push("/signup")}}
               subButtonText={"Log in"}
               subButtonIcon={arrowForwardOutline}
-              onClickSub={() => router.push("/signin")}
+              onClickSub={() => {player.togglePlayPause(false);router.push("/signin")}}
               overlayColor={"linear-gradient(90deg, rgba(97,219,146,.2) 0%, rgba(0,255,239,.2) 100%)"}
               bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
               preImageUrl={"/logo/godible-logo-white.png"}

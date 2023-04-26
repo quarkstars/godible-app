@@ -102,7 +102,12 @@ const usePlayer = ():IPlayer => {
 
         let audioPath = episode._audioPath;
         if (!audioPath)  {
-            setMessage("Become a donor to access this audio");
+            if (episode?.isForbidden) {
+                setMessage("Become a donor to access this audio");
+            }
+            else {
+                setMessage("Failed to load audio");
+            }
             togglePlayPause(false);
             audio.removeAttribute('src');
             audio?.load();

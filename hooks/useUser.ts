@@ -125,12 +125,17 @@ const useUser = () => {
 
     //Get Current User
     const getCurrentUser = async function (): Promise<IUser> {
+        setIsLoading(true);
         const currentUser: Parse.User|undefined|null = await Parse.User.current();
         if (currentUser) {
+            await currentUser.fetch();
             const currentUserJSON = currentUser.toJSON();
+            console.log("GOT CURRENT USER NEW", currentUserJSON)
             setUser(currentUserJSON);
+            setIsLoading(false);
             return currentUserJSON;
         }
+        setIsLoading(false);
         return getResetUser({});
     };
 
@@ -157,7 +162,7 @@ const useUser = () => {
 
     //set onboarding if created within a minute ago
     useEffect(() => {
-        if (!user) return;
+        if (!user.objectId) return;
         const createdAt = user.createdAt;
         //TODO: Test again
         const createdTime = Math.floor(new Date(createdAt!).getTime());
@@ -165,7 +170,7 @@ const useUser = () => {
         if (Date.now()-60000 < createdTime) {
             setIsOnboarding(true);
         }
-    }, [user]);
+    }, [user.objectId]);
     
 
     //Login Function

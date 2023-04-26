@@ -4,6 +4,7 @@ import { UserState } from 'components/UserStateProvider'
 import ListListItem from 'components/ui/ListListItem'
 import ListModal from 'components/ui/ListModal'
 import { PlayerControls } from 'components/ui/PlayerControls'
+import Pricing from 'components/ui/Pricing'
 import SettingsModal from 'components/ui/SettingsModal'
 import TextDivider from 'components/ui/TextDivider'
 import Toolbar from 'components/ui/Toolbar'
@@ -64,6 +65,7 @@ const ProfilePage:React.FC = () => {
     isScrollToReminders,
     onLogout,
     router,
+    // isOnboarding: true,
 });
 //Handle unsubsribe or reminder in url params
   const urlParams = new URLSearchParams(router.routeInfo.search)
@@ -221,7 +223,7 @@ const player = useContext(Player);
         swiperRef.slideTo(2);
         break;
     }  
-    if (defaultTab && defaultTab.length > 0) router.push("/profile/");
+    // if (defaultTab && defaultTab.length > 0) router.push("/profile/");
   }, [defaultTab, swiperRef]);
 
 
@@ -239,23 +241,17 @@ const player = useContext(Player);
   const initializeDates = async (date: string) => {
     const month = date.slice(0, 7);  
     await getMonth(month, true);
-    console.log("LOCATION DATE INITIALIZED!!!")
     setCurrentDate(date);
     dateTime.current!.value = date;
   }
+
   useEffect(() => {
-    console.log("LOCATION DATE MAP CHANGED", dateMap)
-  }, [dateMap])
-  
-  useEffect(() => {
-    console.log("LOCATION CHECK", dateTime.current, location.pathname)
     if (!dateTime.current) return setDateMap({});
     if (!location.pathname.includes("profile")) return setDateMap({});
 
     const date = toIsoString(new Date()).slice(0,10); // get YYYY-MM-DD
     dateTime.current.value = date;
     
-    console.log("LOCATION CHECK PASSED", date)
     initializeDates(date);
     
   }, [dateTime.current, user.objectId, location.pathname]);
@@ -320,7 +316,6 @@ const player = useContext(Player);
       </div>
     )
   }, [currentDate, dateMap, location.pathname]);
-  
   //Refetch Months
   function handleDateChange(e) {
     if (typeof e.detail.value !== "string") return;
@@ -433,9 +428,9 @@ const player = useContext(Player);
                     <IonChip color="primary"
                     onClick={(e: any) =>
                       presentStreak({
-                          event: e,
+                          // event: e,
                           onDidDismiss: (e: CustomEvent) => {},
-                          side: "left"
+                          // side: "left"
                       })
                       }
                     >
@@ -704,7 +699,7 @@ const player = useContext(Player);
               <SwiperSlide>
                 <div className="flex flex-col items-center w-full px-1 pb-8">
                   <h2 className="w-full text-3xl font-bold text-left dark:text-primary text-light">Become a Godible Donor</h2>
-                  <div className='flex items-center justify-between w-full'>
+                  {/* <div className='flex items-center justify-between w-full'>
                     <div className='flex items-center justify-between w-full'>
                       <div className='flex items-center justify-center space-x-2 text-lg font-medium'>
                         <span className='text-2xl font-bold'>$365</span>
@@ -721,133 +716,27 @@ const player = useContext(Player);
                       style={{width: "21%"}}
                       >
                     </div>
-                  </div>
+                  </div> */}
                   <h5 className="w-full text-left"><span className="font-bold">Let God&apos;s Word Be Heard!</span> Godible is only made possible by listeners like you.</h5>
                   <div className="flex justify-start w-full">
-                    <IonButton color="primary">
-                      Donate Now
+                    <IonButton 
+                    color="primary" 
+                    onClick={() => {player.togglePlayPause(false);
+                      setReroutePath(undefined);
+                      router.push("/donation")}
+                    }
+                    >
+                      {`${user?.subscriptionId ? "Manage Donation" : "Donate Now"}`}
                     </IonButton>
                   </div>
-                  <h2 className="w-full pt-12 text-2xl font-bold dark:text-dark">And Upgrade to Unlimited Access</h2>
-                  <div className="grid w-full grid-cols-1 gap-6 mx-auto xs:grid-cols-2">
-                    
-                  <div className="p-5 bg-white border border-t-4 rounded-lg shadow border-medium dark:bg-gray-800">
-                      <p className="text-sm font-medium text-gray-500 uppercase">
-                        Free Account
-                      </p>
-
-                      <p className="mt-4 text-3xl font-medium text-gray-700 dark:text-gray-100">
-                        $0 <span className="text-base font-normal"></span>
-                      </p>
-
-                      <p className="mt-4 font-medium text-gray-700 dark:text-gray-100">
-                        Not yet supporting Godible
-                      </p>
-
-                      <div className="mt-8">
-                        <ul className="grid grid-cols-1 gap-4">
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pt-1 pr-2">
-                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
-                            </div>
-                            1 newest episode daily
-                          </li>
-
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pt-1 pr-2">
-                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
-                            </div>
-
-                            Email and push daily reminders
-                          </li>
-
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pt-1 pr-2">
-                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
-                            </div>
-
-                            Save lists of episodes
-                          </li>
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pt-1 pr-2">
-                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
-                            </div>
-
-                            Take reading notes
-                          </li>
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pt-1 pr-2">
-                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
-                            </div>
-
-                            Spiritual life calendar
-                          </li>
-                        </ul>
-                      </div>
-
-
-                    </div>
-                    <div className="p-5 bg-white border border-t-4 rounded-lg shadow border-primary dark:bg-gray-800">
-                      <p className="text-sm font-medium text-gray-500 uppercase">
-                        Donor Account
-                      </p>
-
-                      <p className="mt-4 text-3xl font-medium text-gray-700 dark:text-gray-100">
-                        $Any <span className="text-base font-normal">/month</span>
-                      </p>
-
-                      <p className="mt-4 font-medium text-gray-700 dark:text-gray-100">
-                        Support Godible and you get
-                      </p>
-
-                      <div className="mt-8">
-                        <ul className="grid grid-cols-1 gap-4">
-
-
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pt-1 pr-2">
-                              <IonIcon icon={checkmarkCircle} color="primary" size="small" />
-                            </div>
-                              <span><span className="inline font-bold">Full access to all episodes</span> 
-                              <span className="block text-sm">500+ episodes with 100+ speeches & 5 Holy Books</span>
-                            </span>
-                          </li>
-
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pt-1 pr-2">
-                              <IonIcon icon={checkmarkCircle} color="primary" size="small" />
-                            </div>
-
-                            Text daily reminders
-                          </li>                          
-                          <li className="flex items-start text-gray-600 dark:text-gray-200">
-                            <div className="w-6 pt-1 pr-2">
-                              <IonIcon icon={checkmarkCircle} color="medium" size="small" />
-                            </div>
-
-                            All features of a free account
-                          </li>
-                        </ul>
-                      </div>
-
-                      <div className="mt-8">
-                        <IonButton size="large" color="primary" expand="block">
-                          Donate Now
-                        </IonButton>
-                      </div>
-                    </div>
-
-                  </div>
-                <div className="flex flex-col items-start w-full">
-                  <h2>Select your donation <span className="pb-1 border-b-4 border-primary">monthly</span></h2>
-                  <div>
-                    <IonChip><span className="pr-1 text-xs text-light">$</span><span className="text-lg font-bold">7</span></IonChip>
-                    <IonChip><span className="pr-1 text-xs text-light">$</span><span className="text-lg font-bold">12</span></IonChip>
-                    <IonChip><span className="pr-1 text-xs text-light">$</span><span className="text-lg font-bold tracking-tighter">21</span></IonChip>
-                    <IonChip><span className="pr-1 text-xs text-light">$</span><span className="text-lg font-bold">40</span></IonChip>
-                    <IonChip>Enter an amount</IonChip>
-                  </div>
-                </div>
+                  <h2 className="w-full pt-12 text-2xl font-bold dark:text-dark">{user?.subscriptionId ? "Thank you for your donation" : "And Upgrade to Unlimited Access"}</h2>
+                  <Pricing 
+                    onClick={() => {
+                      setReroutePath(undefined);
+                      player.togglePlayPause(false);
+                      router.push("/donation")
+                    }} 
+                    />
                 </div>
               </SwiperSlide>
             </Swiper>

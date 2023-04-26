@@ -12,9 +12,17 @@ import { useParams } from 'react-router';
 
 const SignInPage: React.FC = () => {
   
-
+  
 	const router = useIonRouter();
 
+  const [_message, setMessage] = useState<string|undefined>(undefined);
+  useEffect(() => {
+    //If current episode matches location, get the episode from the server
+    if (!router.routeInfo) return;
+    const urlParams = new URLSearchParams(router.routeInfo.search)
+    const message = urlParams.get("message");
+    if (message) setMessage(message)
+  }, [router.routeInfo])
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -49,6 +57,12 @@ const SignInPage: React.FC = () => {
     }
     else router.push("/profile");
   }, [user.objectId]);
+
+
+  let message:any = _message;
+  if (logInError)  {
+    message = typeof logInError === "string" ? logInError : logInError?.message
+  }
 	
 	return (
 		<IonPage>
@@ -88,8 +102,8 @@ const SignInPage: React.FC = () => {
               disabled={isLoading}
               onClick={()=>{logInWithGoogle()}}
             >
-              <IonIcon icon={logoGoogle} slot="start" />
-              Continue with Google
+              <img src="/img/g-logo.webp" alt="G" className="w-4 h-4 rounded-full" />
+              <span className="px-2">Continue with Google</span>
             </IonButton>
             {/* <IonButton 
               color="medium" 
@@ -101,11 +115,11 @@ const SignInPage: React.FC = () => {
               Continue with Apple
             </IonButton> */}
             <TextDivider>or</TextDivider>
-              {logInError &&
+              {message &&
               <AlertInline
-                message={typeof logInError === "string" ? logInError : logInError?.message}
+                message={message}
                 type="error"
-                onDismiss={()=>{setLogInError(undefined)}}
+                onDismiss={()=>{setLogInError(undefined); setMessage(undefined)}}
               />
               }
               <div className="mb-6 form-group">

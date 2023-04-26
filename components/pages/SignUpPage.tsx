@@ -1,8 +1,9 @@
-import { IonBackButton, IonButton, IonButtons, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRouterLink, IonRow, IonText, IonTitle, IonToolbar, useIonLoading, useIonRouter } from '@ionic/react';
+import { IonBackButton, IonButton, IonButtons, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRouterLink, IonRow, IonText, IonTitle, IonToolbar, useIonLoading, useIonModal, useIonRouter } from '@ionic/react';
 import { Theme } from 'components/AppShell';
 import { UserState } from 'components/UserStateProvider';
 import AlertInline from 'components/ui/AlertInline';
 import LoggedInAlready from 'components/ui/LoggedInAlready';
+import SettingsModal from 'components/ui/SettingsModal';
 import TextDivider from 'components/ui/TextDivider';
 import { isValidEmail } from 'hooks/useUser';
 // import styles from './Signup.module.scss';
@@ -30,6 +31,7 @@ const SignUpPage: React.FC = () => {
     reroutePath,
     setReroutePath,
     logInWithGoogle,
+    isOnboarding,
   } = useContext(UserState);
 
   //Loading When Logging
@@ -41,10 +43,17 @@ const SignUpPage: React.FC = () => {
 
   //TODO: Programmatically check what platform and then show floating only on android
   
-
+  const [presentSettings, dismissSettings] = useIonModal(SettingsModal, {
+      onDismiss: (data: string, role: string) => dismissSettings(data, role),
+      router,
+      isOnboarding: true,
+  });
   //When loggedin user is present, reroute
   useEffect(() => {
     if (!user.objectId) return;
+    // if (isOnboarding) presentSettings();
+    console.log("REDIRECT ONBOARDINH", isOnboarding)
+    if(isOnboarding) presentSettings()
     if (reroutePath) {
       let _reroutePath = reroutePath;
       setReroutePath(undefined);
@@ -90,8 +99,8 @@ const SignUpPage: React.FC = () => {
             disabled={isLoading}
             onClick={()=>{logInWithGoogle()}}
           >
-              <IonIcon icon={logoGoogle} slot="start" />
-              Continue with Google
+              <img src="/img/g-logo.webp" alt="G" className="w-4 h-4 rounded-full" />
+              <span className="px-2">Continue with Google</span>
             </IonButton>
             {/* <IonButton 
               color="medium" 

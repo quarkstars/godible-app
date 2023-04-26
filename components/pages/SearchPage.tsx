@@ -195,27 +195,41 @@ const SearchPage = (props: ISearchPageProps) => {
   } = useLists();
   let speeches = lists as ISpeech[]|undefined;
   //Update episode list everytime parameters change
-  useEffect(() => {
+
+
+  const initializeResults = () => {
+
     if (mode !== "speeches") {
-    let sort = (!search) ? "-publishedAt" : undefined;
-      const bookIds = bookFilter ? [bookFilter.objectId] : undefined;
-      const topicIds = topicFilter ? [topicFilter.objectId!] : undefined;
-      setMax(undefined);
-      setReachedMax(false);
-      setEpisodes(undefined);
-      getEpisodes(undefined, {search, bookIds, topicIds, limit: 24, sort,  exclude: ["text"] });
-    }
-    if (mode !== "episodes") {
-      let sort = (!search) ? "-createdTime" : undefined;
-      const bookId = bookFilter ? bookFilter.objectId: undefined;
-      const topicId = topicFilter ? topicFilter.objectId! : undefined;
-      setListMax(undefined);
-      setReachedListMax(false);
-      setLists(undefined);
-      getLists(undefined, {search, bookId, topicId, limit: 24, isSpeech: true,sort, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
-    }
+      let sort = (!search) ? "-publishedAt" : undefined;
+        const bookIds = bookFilter ? [bookFilter.objectId] : undefined;
+        const topicIds = topicFilter ? [topicFilter.objectId!] : undefined;
+        setMax(undefined);
+        setReachedMax(false);
+        setEpisodes(undefined);
+        getEpisodes(undefined, {search, bookIds, topicIds, limit: 24, sort,  exclude: ["text"] });
+      }
+      if (mode !== "episodes") {
+        let sort = (!search) ? "-createdTime" : undefined;
+        const bookId = bookFilter ? bookFilter.objectId: undefined;
+        const topicId = topicFilter ? topicFilter.objectId! : undefined;
+        setListMax(undefined);
+        setReachedListMax(false);
+        setLists(undefined);
+        getLists(undefined, {search, bookId, topicId, limit: 24, isSpeech: true,sort, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+      }
+  }
+
+
+  useEffect(() => {
+    initializeResults()
     
   }, [search, bookFilter, topicFilter, mode]);
+
+  useIonViewDidEnter(() => {
+    if (typeof episodes === "undefined" || typeof speeches === "undefined") initializeResults();
+    if (searchBar.current) searchBar.current.value = undefined
+    
+  }, []);
   
   //get the max count
   useEffect(() => {
@@ -351,6 +365,7 @@ const SearchPage = (props: ISearchPageProps) => {
   
   useIonViewDidLeave(() => {
     setBooks(undefined);
+    setLists(undefined);
     setTopics(undefined);
     setEpisodes(undefined);
   });
@@ -399,6 +414,67 @@ const SearchPage = (props: ISearchPageProps) => {
     });
   }, [episodes, display, handleListenClick, user, router, presentList]);
 
+  const episodeQuotes = useMemo(() => {
+    if (!episodes) return;
+  
+    return episodes.map((episode, index) => {
+      const publishedAt = episode.publishedAt!;
+      const oneWeekAgo = Date.now() - publishedAt > 6.048e+8;
+  
+      return (
+        <SwiperSlide key={"ephero-" + episode.objectId}>
+          <Hero
+            subtitle={episode._quote}
+            mainButtonText={"Listen"}
+            mainButtonIcon={playCircle}
+            onClickMain={(e) => handleListenClick(e, index)}
+            subButtonText={"List"}
+            subButtonIcon={addCircleOutline}
+            onClickSub={(e: any) => {
+              if (!user.objectId)
+                return router.push("/signin?message=Log+in+to+save+lists");
+              setInspectedEpisode(episode);
+              presentList({
+                onDidDismiss: (e: CustomEvent) => {
+                  setInspectedEpisode(undefined);
+                },
+              });
+            }}
+            overlayColor={"rgba(0,0,0,.6)"}
+            bgImageUrl={episode.imageUrl}
+            postImageUrl={episode._bookImageUrl}
+            postText={episode._fullTitle}
+            scrollIsHidden
+            isQuote
+          />
+        </SwiperSlide>
+      );
+    });
+  }, [episodes, handleListenClick, user, router, presentList]);
+
+
+  const episodeCards = useMemo(() => {
+    if (display !== "card" || !episodes) return;
+  
+    return (
+      <CardList spaceBetween={10} setItemWidth={setEpisodeWidth} idealWidth={180}>
+        {episodes.map((episode, index) => (
+          <EpisodeCard
+            size={episodeWidth}
+            list={{ episodes }}
+            key={"epcard-" + episode.objectId}
+            index={index}
+            episode={episode}
+            customClickHandler={(e) => {
+              handleListenClick(e, index);
+            }}
+          />
+        ))}
+      </CardList>
+    );
+  }, [display, episodes, episodeWidth, handleListenClick]);
+
+
   //Speech List Item
   const speechListItems = useMemo(() => {
     if (!speeches) return;
@@ -443,7 +519,7 @@ const SearchPage = (props: ISearchPageProps) => {
           placeholder={'Search...'} 
           debounce={500} 
           mode={'ios'} 
-          onIonChange={(e)=>searchChangeHandler(e)}
+          onIonChange={(e)=>{console.log("DEBOUNCE NOT WORKING"); searchChangeHandler(e)}}
         />
 
       </IonToolbar>
@@ -595,55 +671,10 @@ const SearchPage = (props: ISearchPageProps) => {
             <div className="flex flex-col items-stretch w-full overflow-hidden rounded-lg" style={{maxWidth:display==="quote" ? undefined: "768px"}}>
               {display === "quote" &&
                   <SlideList >
-                    {episodes && episodes.map((episode, index) => {
-                      const publishedAt = episode.publishedAt!;
-                      const oneWeekAgo = Date.now() - publishedAt > 6.048e+8;
-                      return (
-                      <SwiperSlide key={"ephero-"+episode.objectId}>
-                        <Hero 
-                          subtitle={episode._quote}
-                          mainButtonText={"Listen"}
-                          mainButtonIcon={playCircle}
-                          onClickMain={(e) => handleListenClick(e, index)}
-                          subButtonText={"List"}
-                          subButtonIcon={addCircleOutline}
-                          onClickSub={(e:any) => {
-                            if (!user.objectId) return router.push("/signin?message=Log in to save lists")
-                            setInspectedEpisode(episode)
-                            presentList({
-                              onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
-                            })
-                          }}
-                          overlayColor={"rgba(0,0,0,.6)"}
-                          bgImageUrl={episode.imageUrl}
-                          postImageUrl={episode._bookImageUrl} 
-                          postText={episode._fullTitle}
-                          scrollIsHidden
-                          isQuote
-                        />
-                      </SwiperSlide>
-                      )
-                    })
-                    }
+                    {episodeQuotes}
                 </SlideList>
                 }
-                {display === "card" &&
-                  <CardList spaceBetween={10} setItemWidth={setEpisodeWidth} idealWidth={180}>
-                      {episodes && episodes.map((episode, index) => {
-                        return (
-                          <EpisodeCard 
-                            size={episodeWidth}
-                            list={{episodes}}
-                            key={"epcard-"+episode.objectId}
-                            index={index}
-                            episode={episode}
-                            customClickHandler={(e) => {handleListenClick(e, index)}}
-                          />
-                        )
-                      })
-                      }
-                  </CardList>
-                  }
+                {display === "card" && episodeCards}
                 {episodeListItems}
                 {(!episodes && episodesIsLoading) && Array(12).fill(undefined).map((skel, index) => {
                     return (

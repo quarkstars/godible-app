@@ -1,4 +1,5 @@
 import { IonAvatar, IonBackButton, IonButton, IonButtons, IonIcon, IonLabel, IonMenuButton, IonToolbar, useIonRouter } from '@ionic/react'
+import { Player } from 'components/AppShell';
 import { UserState } from 'components/UserStateProvider';
 import { arrowForward } from 'ionicons/icons';
 import React, { useContext } from 'react'
@@ -7,6 +8,7 @@ import 'react-initials-avatar/lib/ReactInitialsAvatar.css';
 
 const Toolbar = ({children}) => {
 
+    const player = useContext(Player);
     const {
         user
       } = useContext(UserState);
@@ -47,7 +49,10 @@ const Toolbar = ({children}) => {
                 :
                     <IonButton 
                         fill="clear" 
-                        onClick={()=>{router.push("/signin");}}
+                        onClick={()=>{
+                            player.togglePlayPause(false);
+                            router.push("/signin");
+                        }}
                     >
                         <IonIcon icon={arrowForward} />
                         <span className="px-2">Log in</span>

@@ -25,6 +25,8 @@
     "@ionic/react": "^6.6.2",
     "@ionic/react-router": "^6.6.2",
     "@parse/react": "^0.0.1-alpha.18",
+    "@stripe/react-stripe-js": "^2.1.0",
+    "@stripe/stripe-js": "^1.52.1",
     "@tailwindcss/line-clamp": "^0.4.2",
     "@testing-library/user-event": "^12.6.3",
     "@types/jest": "^26.0.20",

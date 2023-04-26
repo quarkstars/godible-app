@@ -13,8 +13,8 @@ const LoggedInAlready = () => {
       if (!user.objectId) return <></>
     return (
         <div className="flex flex-col justify-center max-w-md p-6 py-8 bg-white rounded-lg dark:bg-light">
-            <span className="w-full font-bold text-center">{`${user.firstName} ${user.lastName}`}</span>
-            <span className="w-full pb-4 font-medium text-center">{`You are logged in as ${user.email}`}</span>
+            {/* <span className="w-full font-bold text-center">{`${user.firstName} ${user.lastName}`}</span>
+            <span className="w-full pb-4 font-medium text-center">{`You are logged in as ${user.email}`}</span> */}
             <IonButton 
                 color="primary" 
                 expand="block"
@@ -29,7 +29,7 @@ const LoggedInAlready = () => {
                 expand="block"
                 fill="clear"
                 onClick={() => {
-                if (!user) return
+                if (!user.objectId) return
                 logOut()
                 }}
             >

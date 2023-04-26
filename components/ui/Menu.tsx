@@ -169,9 +169,12 @@ const Menu: React.FC = () => {
                 :
                   <IonItem 
                     lines="none" 
-                    routerLink={"/profile?tab=lists"}
                     routerDirection="none"  
                     button 
+                    onClick={()=>{
+                      player.togglePlayPause(false);
+                      router.push("/signin?message=Log in to save bookmarks");
+                    }}
                   >
                     <IonIcon slot="start" icon={bookmark} />
                     <IonLabel>Bookmarks</IonLabel>

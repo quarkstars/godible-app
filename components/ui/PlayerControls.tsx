@@ -173,7 +173,7 @@ export const PlayerControls = () => {
                             <div className="flex-row items-center justify-center hidden w-full h-auto max-w-sm xs:flex">
                                 <IonButtons>
                                     <IonButton                                            
-                                        //TODO: Ion Modal - Player Episode Modal *
+                                        //Ion Modal - Player Episode Modal *
                                         id="open-modal"
                                         onClick={()=>{
                                             openListModal()
@@ -185,11 +185,13 @@ export const PlayerControls = () => {
                                 <IonButtons>
                                     <IonButton
                                         onClick={() => {
-                                            if (!userState.user.objectId) router.push("/signin?message=Log in to bookmark.")
+                                            if (!userState.user.objectId) {
+                                                player.togglePlayPause(false);
+                                                router.push("/signin?message=Log in to bookmark.");
+                                            }
                                             handleBookmark(!hasBookmark)
                                         }}
                                     >
-                                        {/* TODO: Bookmark */}
                                         <IonIcon slot="icon-only" icon={hasBookmark? bookmark : bookmarkOutline} />
                                     </IonButton>
                                 </IonButtons>
@@ -201,7 +203,6 @@ export const PlayerControls = () => {
                                 <div className="block xs:hidden">
                                     <IonButtons>
                                         <IonButton                                            
-                                             //TODO: Ion Modal - Player Episode Modal 
                                             onClick={()=>{
                                                 openListModal()
                                             }}
@@ -338,7 +339,14 @@ export const PlayerControls = () => {
                                             exit={{opacity: 0,  scale: 0}}
                                             transition={{ scale: "easeInOut" }}
                                         >
-                                            <span>{player.message}</span>
+                                            <span 
+                                                onClick={() => {if (player.message?.includes("donor")) {
+                                                    userState.setReroutePath(router.routeInfo.pathname);
+                                                    router.push("/profile?tab=donation")}
+                                                } 
+                                            }>
+                                                    {player.message}
+                                                </span>
                                             {typeof player.timeTilNext === "number" && 
                                                 <span
                                                  className={'block border-b-2 cursor-pointer'}

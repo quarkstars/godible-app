@@ -59,6 +59,7 @@ export const EpisodeCard = (props: IEpisodeCardProps) => {
                 imageUrl={episode.thumbUrl}
                 onClick = {() => {/* Handle Episode click on parent */}}
                 scale={hovering ? 1.05 : 1}
+                progress={episode?.position?.progress}
             >
                 <span className="text-4xl font-bold text-white dark:text-white">
                     {episode.number}

@@ -18,6 +18,7 @@ import BookPage from './pages/BookPage';
 import SignInResetPage from './pages/SignInResetPage';
 import FAQPage from './pages/FAQPage';
 import TermsPage from './pages/TermsPage';
+import DonationPage from './pages/DonationPage';
 
 interface ILocalLizedLabels {
   japanese?: string,
@@ -107,10 +108,15 @@ export const pages:IPage[] = [
         isExact: true,
         isRedirect: false,
     }, 
-    //TODO: Add Transactions (Billing History)
-    //TODO: Add Payments
-    //TODO: Add Subscription
-    //TODO: Add Notifications
+    {
+        label: "Donation",
+        path: "/donation", //ProfilePage
+        component: DonationPage,
+        icon: square,
+        isNav: false,
+        isExact: true,
+        isRedirect: false,
+    }, 
 
     {
         label: "Book",

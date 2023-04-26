@@ -46,7 +46,7 @@ const EpisodePage:React.FC = () => {
     setEpisodes,
   } = useEpisodes();
   
-  const {user, listReloads, setListReloads, updateUser} = useContext(UserState);
+  const {user, listReloads, setListReloads, updateUser, setReroutePath} = useContext(UserState);
   const lang = (user?.language) ? user.language : userDefaultLanguage;
 
 
@@ -101,10 +101,17 @@ const EpisodePage:React.FC = () => {
   if (user.fontContrast==="low") fontContrast = "text-gray-500";
   if (user.fontContrast==="high") fontContrast = "text-black dark:text-white";
   let fontSize = "text-lg";
-  if (user.fontSize==="small") fontSize = "text-sm";
-  if (user.fontSize==="large") fontSize = "text-xl";
-  let fontStyle = "font-serif";
-  if (user.fontStyle==="sanserif") fontStyle = "";
+  let paddingSize = "pb-4";
+  if (user.fontSize==="small") {
+    fontSize = "text-sm";
+    paddingSize = "pb-2";
+  }
+  if (user.fontSize==="large") {
+    fontSize = "text-xl";
+    paddingSize = "pb-6";
+  }
+  let fontStyle = "sanserif";
+  if (user.fontStyle==="serif") fontStyle = "font-serif";
 
 
 
@@ -217,7 +224,7 @@ const EpisodePage:React.FC = () => {
       else controls.start({ rotate: 0 })
   }, [showQuote]);
   const metaControls = useAnimationControls();
-  const [showMeta, setShowMeta] = useState(false);  
+  const [showMeta, setShowMeta] = useState(true);  
   useEffect(() => {
       if (showMeta) {
         metaControls.start({ width: 120 });
@@ -252,19 +259,23 @@ const EpisodePage:React.FC = () => {
   });
   
   const episodeText = useMemo(() => {
-    return episode?._textBlocks && episode._textBlocks.map((line, index) => {
+    return episode?._textBlocks && episode._textBlocks.map((_line, index) => {
         // if (index === 0) return;
+        let line = _line;
         const fontWeight = line[0] === '#' ? 'bold' : 'normal';
         let hCount = 0;
         if (line[0] === "#") hCount=1;
         if (line[1] === "#") hCount=2;
         if (line[2] === "#") hCount=3;
         if (line[3] === "#") hCount=4;
+        if (/^\d+\s/.test(line)) {
+          line = line.replace(/^(\d+)\s/, '$1\u00A0\u00A0');
+        }
         switch (hCount) {
           case 1:
             return(
               <h1
-                className=""
+                className="w-full text-left"
                 key={line}
               >
                 {line.replace(/#/g,'')}
@@ -274,7 +285,7 @@ const EpisodePage:React.FC = () => {
           case 2:
             return(
               <h2
-                className=""
+                className="w-full text-left"
               >
                 {line.replace(/#/g,'')}
               </h2>
@@ -283,7 +294,7 @@ const EpisodePage:React.FC = () => {
           case 3:
             return(
               <h3
-                className=""
+                className="w-full text-left"
               >
                 {line.replace(/#/g,'')}
               </h3>
@@ -292,7 +303,7 @@ const EpisodePage:React.FC = () => {
           case 4:
             return(
               <h4
-                className=""
+                className="w-full text-left"
               >
                 {line.replace(/#/g,'')}
               </h4>
@@ -301,7 +312,7 @@ const EpisodePage:React.FC = () => {
           default:
             return(
               <p
-                className={`pb-2 leading-relaxed ${fontStyle} ${fontSize} ${fontContrast}`}
+                className={`leading-relaxed ${paddingSize} ${fontStyle} ${fontSize} ${fontContrast}`}
               >
                 {line.replace(/#/g,'')}
               </p>
@@ -353,8 +364,9 @@ const EpisodePage:React.FC = () => {
           style={{
             maxWidth: "100vw",
             backgroundImage: "url(" + imageUrl + ")",
-            backgroundSize: "100%",
+            backgroundSize: "cover",
             backgroundPosition: "center center",
+            backgroundRepeat: "none none",
           }}
           >
           <div className="flex flex-col items-center justify-center w-full bg-black bg-opacity-50">
@@ -454,7 +466,7 @@ const EpisodePage:React.FC = () => {
                     }
                     <div className="-ml-2 sm:ml-0">
                     <IonButtons>
-                      <IonButton size="small" color="medium"  onClick={()=>setShowMeta(prev => !prev)} >
+                      <IonButton size="small" color="medium"  onClick={()=>{if (episode?._bookPath) router.push(episode?._bookPath)}} >
                         <IonIcon icon={bookOutline} color="medium" size="small" slot="start" />
                         Book
                       </IonButton>
@@ -505,8 +517,21 @@ const EpisodePage:React.FC = () => {
               new Array(20).fill(undefined).map((item, index) => { return <IonSkeletonText key={"skel-"+index} animated={true} style={{ 'width': '100%' }}></IonSkeletonText>})
             }
           <Copyright />
-          <div id="topics" className="flex flex-col w-full p-8 py-4 rounded-lg bg-dark dark:bg-light">
-              <h4 className="leading-relaxed">Godible is possible because of the support of listeners like you</h4>
+          <div id="topics" className="flex flex-col items-center w-full p-8 py-4 rounded-lg bg-dark dark:bg-light">
+              {episode?.isForbidden && <h3 className="font-bold leading-relaxed text-center text-light dark:text-dark">Become a donor to access this episode</h3>}
+              <h4 className="pb-2 leading-relaxed text-center">{user?.subscriptionId ? `Godible is possible because of your support. Thank you.` : `Godible is possible because of the support of listeners like you`}</h4>
+              {!user?.subscriptionId &&
+              <div className="flex justify-center w-full">
+                <IonButton 
+                  color="primary" 
+                  onClick={() => {
+                    setReroutePath(router.routeInfo.pathname);
+                    router.push("/donation");
+                  }}>
+                  Become a Donor
+                </IonButton>
+              </div>
+              }
               <div className="flex items-center w-full space-x-2">
               </div>
           </div>
