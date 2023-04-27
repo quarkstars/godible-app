@@ -19,6 +19,7 @@ interface IHeroProps {
   preText?: string,
   postImageUrl?: string,
   postText?: string,
+  isRounded?: boolean,
 }
 
 const Hero = (props: IHeroProps) => {
@@ -41,6 +42,7 @@ const {
   isQuote,
   preImageUrl,
   preText,
+  isRounded,
 } = props;
 
   return (
@@ -51,6 +53,8 @@ const {
         backgroundSize: "cover",
         backgroundPosition: "center center",
         backgroundRepeat: "no-repeat",
+        borderRadius: isRounded ? "10px" : undefined,
+        overflow:"hidden",
       }}
 
     >

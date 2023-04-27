@@ -159,7 +159,7 @@ export const PlayerControls = () => {
                             <div className="flex-shrink-0 hidden w-22 h-22 xs:block">
                                 <Thumbnail 
                                     size={88}
-                                    imageUrl={episode?.imageUrl}
+                                    imageUrl={episode?.thumbUrl || episode?.imageUrl}
                                     onCornerClick={() => {if (episode?._bookPath) router.push(episode._bookPath)}}
                                     cornerImageUrl={episode?._bookImageUrl}
                                     onClick={() => {if (episode) router.push(episode._path!)}}

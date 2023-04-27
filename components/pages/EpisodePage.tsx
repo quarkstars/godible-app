@@ -1,4 +1,4 @@
-import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonLabel, IonPage, IonRippleEffect, IonSkeletonText, IonTextarea, IonTitle, IonToggle, IonToolbar, useIonModal, useIonRouter, useIonViewDidLeave, useIonViewWillEnter } from '@ionic/react'
+import { IonBreadcrumb, IonBreadcrumbs, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonLabel, IonPage, IonRippleEffect, IonSkeletonText, IonTextarea, IonTitle, IonToggle, IonToolbar, useIonModal, useIonRouter, useIonViewDidEnter, useIonViewDidLeave, useIonViewWillEnter } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Toolbar from 'components/ui/Toolbar'
@@ -226,14 +226,16 @@ const EpisodePage:React.FC = () => {
   const metaControls = useAnimationControls();
   const [showMeta, setShowMeta] = useState(true);  
   useEffect(() => {
+    if (!episode?._metaDataBlocks) return;
+      let width = episode?._metaDataBlocks && episode._metaDataBlocks.length > 1 ? 120 : 60;
       if (showMeta) {
-        metaControls.start({ width: 120 });
+        metaControls.start({ width });
 
       }
       else {
         metaControls.start({ width: 60 });
       }
-  }, [showMeta]);
+  }, [showMeta, episode?._metaDataBlocks]);
 
   const [presentNotes, dismissNotes] = useIonModal(EpisodeNotes, {
     onDismiss: (data: string, role: string) => dismissNotes(data, role),
@@ -323,13 +325,22 @@ const EpisodePage:React.FC = () => {
 
 
   //Clear data when leaving unless it's another episode
+  useIonViewDidEnter(() => {
+
+    if (!player.list?.episodes?.[player.index]?.audioPath) player.setIsVisible(true)
+  }, [])
+
   useIonViewDidLeave(() => {
     if (location.pathname.includes("episode")) return;
     setEpisodes(undefined);
     setLists(undefined);
     setEpisode(undefined);
     setAdjacentEpisodes([null, null])
+
+    if (!player.list?.episodes?.[player.index]?.audioPath && player.isVisible) player.setIsVisible(false);
   });
+
+  console.log("BOOK RENDERED", episode?._bookImageUrl, episode)
 
   return (
     <IonPage>
@@ -431,7 +442,7 @@ const EpisodePage:React.FC = () => {
                 }
             </div>     
             <div className="flex flex-wrap justify-center w-full pb-8">
-              <div className={`flex items-start justify-center sm:items-center w-auto`}>
+              <div className={`rounded-md p-2 flex items-start justify-center sm:items-center ${!episode ? "py-6": ""} ${showMeta ? "bg-gray-100 dark:bg-gray-700": ""} ${!episode?._metaDataBlocks ? "w-full" : ""} ${episode?._metaDataBlocks && episode?._metaDataBlocks.length > 1 ? "w-full" : ""}`}>
                 <motion.div className="overflow-hidden rounded-md pointer-cursor" onClick={()=>setShowMeta(prev => !prev)} animate={metaControls}>
                   
                   {episode ? 
@@ -440,10 +451,8 @@ const EpisodePage:React.FC = () => {
                       className="w-full cursor-pointer"
                     />
                     :
-                    <div className="flex flex-col w-full">
-                      <IonSkeletonText animated={true} style={{ 'width': '180px', }}></IonSkeletonText>
+                    <div className="flex flex-col items-center w-full">
                       <IonSkeletonText animated={true} style={{ 'width': '90px','height': '90px' }}></IonSkeletonText>
-                      <IonSkeletonText animated={true} style={{ 'width': '150px', }}></IonSkeletonText>
                     </div>
                   }
                 </motion.div>
@@ -464,14 +473,16 @@ const EpisodePage:React.FC = () => {
                     })
                     
                     }
-                    <div className="-ml-2 sm:ml-0">
-                    <IonButtons>
-                      <IonButton size="small" color="medium"  onClick={()=>{if (episode?._bookPath) router.push(episode?._bookPath)}} >
-                        <IonIcon icon={bookOutline} color="medium" size="small" slot="start" />
-                        Book
-                      </IonButton>
-                    </IonButtons>
+                    {episode &&
+                    <div className="-ml-2 ">
+                      <IonButtons>
+                        <IonButton size="small" color="medium"  onClick={()=>{if (episode?._bookPath) router.push(episode?._bookPath)}} >
+                          <IonIcon icon={bookOutline} color="medium" size="small" slot="start" />
+                          Book
+                        </IonButton>
+                      </IonButtons>
                     </div>
+                    }
                   </motion.div>
                   }
                 </AnimatePresence>
@@ -488,6 +499,11 @@ const EpisodePage:React.FC = () => {
                     fill="clear" 
                     size="small"  
                     onClick={()=>{
+                      if (!user?.objectId)  {
+                        setReroutePath(router.routeInfo.pathname)
+                        router.push("/signin?message=Log in to save bookmarks")
+                        return;
+                      }
                       handleBookmark(!hasBookmark);
                     }}
                   >

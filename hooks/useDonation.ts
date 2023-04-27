@@ -41,6 +41,18 @@ const useDonation = () => {
     }
   };
 
+  //TODO: Update customer when email changes
+  const getMonthlyDonation = async () => {
+
+    try {
+      // Call the createStripeCustomer cloud function
+      return await Parse.Cloud.run("getLatestCalendarMonthRevenue") || 0;
+
+    } catch (error) {
+      return 0;
+    } 
+  };
+
   const updateCustomer = async (updateData: any) => {
     if (!user?.objectId) return;
     setIsLoading(true);
@@ -201,6 +213,7 @@ const useDonation = () => {
     setEvents,
     getPaymentEvents,
     setError,
+    getMonthlyDonation,
   };
 };
 

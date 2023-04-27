@@ -115,7 +115,10 @@ const HomePage:React.FC = () => {
         //offset a few hours since it is published slightly before midnight
         const publishedAt = episode.publishedAt! + 4.32e+7;
         const oneWeekAgo = Date.now() - publishedAt > 6.048e+8;
-        let pretext = (!index && Date.now() - publishedAt < 8.64e+7) ? "Today's Episode" : `${oneWeekAgo ? "Last": ""} ${new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(publishedAt)}'s Episode`
+        let pretext;
+        if (publishedAt) {
+          pretext = (!index && Date.now() - publishedAt < 8.64e+7) ? "Today's Episode" : `${oneWeekAgo ? "Last": ""} ${new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(publishedAt)}'s Episode`
+        }
         return (
         <SwiperSlide key={"ephero-"+episode.objectId}>
           <Hero 
@@ -265,7 +268,7 @@ const HomePage:React.FC = () => {
           }
           {episodesHero}
 
-          {(!episodes && episodesIsLoading) && <IonSkeletonText  style={{width:"100%", height:"450px"}} />}
+          {(!episodes && episodesIsLoading && user?.objectId) && <IonSkeletonText  style={{width:"100%", height:"450px"}} />}
 
         </SlideList>
         <div className="flex flex-col p-4 sm:p-10">

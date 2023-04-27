@@ -93,7 +93,8 @@ const useEpisodes = () => {
     
     const appendEpisodeStrings = (episode: IEpisode): IEpisode => {
         const _lang = (user?.language) ? user?.language : userDefaultLanguage;
-        const _bookImageUrl = episode?.book?.thumbUrl;
+        const _bookImageUrl = episode?.book?.thumbUrl || episode?.book?.imageUrl;
+        console.log("BOOK IMAGE", episode?.book?.thumbUrl, _bookImageUrl)
         const _authorImageUrl = episode?.book?.authorImageUrl;
         const _bookPath = (episode?.book?.slug) ? "/book/" + episode?.book?.slug : undefined;
         const metaData = resolveLangString(episode?.metaData, _lang);

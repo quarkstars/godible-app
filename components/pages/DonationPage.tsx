@@ -57,6 +57,7 @@ const DonationPage: React.FC = () => {
   }, [user?.hasAddress]);
   
   
+  
   let selectingAmount = (changingAmount) ? true : false;
   if (enteringCustomAmount) selectingAmount = true;
   if (!user?.donationAmount) selectingAmount = true

@@ -91,8 +91,7 @@ const ListModal = (props: IPlayerListModalProps) => {
     let newEpisodeOrder = event.detail.complete(_list.episodes);
 
     const newList = {..._list, episodes: newEpisodeOrder};
-    if (!setList) return;
-    setList(newList);
+    if (setList) setList(newList);
 
     // if the list has an id, update the server
     if (user.objectId && _list.objectId) {
@@ -221,6 +220,8 @@ const ListModal = (props: IPlayerListModalProps) => {
         episode: inspectedEpisode,
         handleRemoveEpisode,
     });
+    console.log("LIST USER ID", list, user?.objectId)
+  const reorderable = (setList || _list?.userId === user?.objectId)
 
 
     console.log("SAVE LIST", _list, user)
@@ -443,14 +444,14 @@ const ListModal = (props: IPlayerListModalProps) => {
               }
             </span>
           }
-          {setList && !isNamingList && _list?.episodes && _list?.episodes.length > 1 &&
+          {reorderable && !isNamingList && _list?.episodes && _list?.episodes.length > 1 &&
             <IonButton size="small" fill="clear" color={isReordering ? "primary" : "medium"}
               onClick={()=>{setIsReordering(prev=>!prev)}}
             >
               <IonIcon icon={swapVertical} slot="start" color={isReordering ? "primary" : "medium"} />
               {isReordering ? "Done" : "Reorder"}
             </IonButton>
-        }
+          }
         </div>
         <IonList>
         {/* The reorder gesture is disabled by default, enable it to drag and drop items */}

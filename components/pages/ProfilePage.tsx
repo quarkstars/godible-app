@@ -1,6 +1,7 @@
 import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonText, IonTitle, IonToolbar, ItemReorderEventDetail, useIonModal, useIonPopover, useIonRouter, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
+import Hero from 'components/ui/Hero'
 import ListListItem from 'components/ui/ListListItem'
 import ListModal from 'components/ui/ListModal'
 import { PlayerControls } from 'components/ui/PlayerControls'
@@ -8,11 +9,13 @@ import Pricing from 'components/ui/Pricing'
 import SettingsModal from 'components/ui/SettingsModal'
 import TextDivider from 'components/ui/TextDivider'
 import Toolbar from 'components/ui/Toolbar'
+import TrailerModal from 'components/ui/TrailerModal'
 import { sampleEpisodes } from 'data/sampleEpisodes'
 import { userDefaultLanguage } from 'data/translations'
 import { IList } from 'data/types'
+import useDonation from 'hooks/useDonation'
 import useLists from 'hooks/useLists'
-import { arrowForward, calendar, card, cardOutline, documentText, chevronForward, checkmarkCircle, today, pencil, play, flame, settingsSharp, person, swapVertical, add, ban, closeCircle, timeOutline, logOutOutline } from 'ionicons/icons'
+import { arrowForward, calendar, card, cardOutline, documentText, chevronForward, checkmarkCircle, today, pencil, play, flame, settingsSharp, person, swapVertical, add, ban, closeCircle, timeOutline, logOutOutline, playCircle } from 'ionicons/icons'
 import { list } from 'postcss'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import InitialsAvatar from 'react-initials-avatar';
@@ -120,6 +123,11 @@ const player = useContext(Player);
     }
   }, [user?.objectId])
 
+    //List modal trigger
+    const [presentTrailer, dismissTrailer] = useIonModal(TrailerModal, {
+      onDismiss: (data: string, role: string) => dismissTrailer(data, role),
+
+    })
 
   //Focus name input
   const nameListInput = useRef<HTMLIonInputElement>(null);
@@ -201,7 +209,27 @@ const player = useContext(Player);
     // contentRef.current && contentRef.current.scrollToTop();
   }, [swiperRef?.activeIndex]);
 
-
+  //Monthly donation
+  //donation is an array of two items: amount in cents and # of donors
+  const [donations, setDonations] = useState<number[]>([0, 0]);
+  const {getMonthlyDonation} = useDonation();
+  useEffect(() => {
+    const getAmount = async () => {
+      const newDonations = await getMonthlyDonation();
+      if (newDonations) setDonations(newDonations);
+    }
+    getAmount();
+  }, [])
+  const goal = 5000;
+  //amount is in cents so it already makes meter a percentage of 100
+  let meter = donations[0]/goal;
+  if (meter > 100) meter = 100;
+  if (meter === 0) meter = 1;
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const thisMonth = monthNames[new Date().getMonth()]
+  
 
 
   const defaultTab = urlParams.get("tab");
@@ -272,7 +300,7 @@ const player = useContext(Player);
         <h5 className="text-center">{formattedDate}</h5>
         {(!listening?.positions && !notes) && 
           <span className="flex justify-center w-full py-4 text-medium">
-            No listenings or notes
+            {user?.objectId ? "No listenings or notes" : "Track your listenings and notes here"}
           </span>
         }
         <IonList>
@@ -336,7 +364,7 @@ const player = useContext(Player);
   
   
   let userName = `${user?.firstName ? user?.firstName:""}${user?.lastName ? " "+user?.lastName:""}`
-  if (userName.length === 0) userName = "Not Logged In"
+  if (userName.length === 0) userName = "Your Hoon Dok Hae Profile!"
 
 
   //Construct Reminder Button Text
@@ -352,7 +380,7 @@ const player = useContext(Player);
   <IonPage>
     <IonHeader>
     <IonToolbar>
-            <IonButtons slot="start">
+          <IonButtons slot="start">
             <IonMenuButton />
                 <div className="hidden px-2 sm:block">
                     <IonBackButton />
@@ -360,7 +388,7 @@ const player = useContext(Player);
             </IonButtons>
             <IonTitle>
               <div className={'flex justify-center items-center text-lg'}>
-              My Profile
+              {user?.objectId ? "My Profile" : "Welcome to Godible"}
               {user?.objectId &&
                 <IonButtons>
                   <IonButton 
@@ -378,6 +406,7 @@ const player = useContext(Player);
               }
               </div>
             </IonTitle>
+            {user?.objectId &&
             <IonButtons slot="end">
                 <IonButton
                     onClick={(e: any) =>{
@@ -393,18 +422,38 @@ const player = useContext(Player);
                   <span className="text-xs mobile:text-md">Settings</span>
                 </IonButton>
             </IonButtons>
+            }
         </IonToolbar>
       </IonHeader>
       <IonContent className='ion-padding' ref={contentRef}>
         
         <div className='flex justify-center w-full'>
           <div className="flex flex-col items-center w-full" style={{maxWidth:"768px"}}>
+            {!user?.objectId && 
+              <div className="flex flex-col w-full pb-2">
+                <Hero 
+                  title={"Let God's Word Be Heard"}
+                  // subtitle={"Playable Hoon Dok Hae"}
+                  mainButtonText={"Get Started"}
+                  onClickMain={() => {player.togglePlayPause(false);router.push("/signup")}}
+                  subButtonText={"Trailers"}
+                  subButtonIcon={playCircle}
+                  onClickSub={() => {presentTrailer({})}}
+                  overlayColor={"linear-gradient(90deg, rgba(97,219,146,.2) 0%, rgba(0,255,239,.2) 100%)"}
+                  bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
+                  preImageUrl={"/logo/godible-logo-white.png"}
+                  postText={"Now available as an Android and iOS Phone App"}
+                  isRounded
+                /> 
+              </div>
+            }
             <div className='flex items-center justify-between w-full p-4 rounded-lg bg-dark dark:bg-light'>
               
               <IonAvatar
                     onClick={()=>{
                       setIsScrollToReminders(false);
-                      presentSettings()
+                      if (user?.objectId) presentSettings()
+                      else router.push("/signin")
                     }}
                 >
                   {user.imageUrl ?
@@ -417,7 +466,7 @@ const player = useContext(Player);
                       <div
                           className='p-2'
                       >
-                          <InitialsAvatar name={userName}  />
+                          <InitialsAvatar name={user?.objectId ? userName : "→"}  />
                       </div>
                   }
               </IonAvatar>
@@ -426,16 +475,20 @@ const player = useContext(Player);
                   <span className="w-full pl-3 font-medium text-md xs:text-2xl mobile:text-lg">{userName}</span>
                   <div className="block xs:hidden" style={{zoom:.7}}>
                     <IonChip color="primary"
-                    onClick={(e: any) =>
-                      presentStreak({
-                          // event: e,
-                          onDidDismiss: (e: CustomEvent) => {},
-                          // side: "left"
-                      })
+                    onClick={(e: any) => {
+                        if (user?.objectId) {
+                            presentStreak({
+                              // event: e,
+                              onDidDismiss: (e: CustomEvent) => {},
+                              // side: "left"
+                          })
+                        }
+                        else router.push("/signin")
+                        }
                       }
                     >
-                      <IonIcon icon={flame} color="primary" />
-                      <span className="font-black ">{user.currentStreak||0}</span>
+                      {user?.objectId && <IonIcon icon={flame} color="primary" />}
+                      {user?.objectId ? <span className="font-black ">{user.currentStreak||0}</span> : <span className="font-medium ">Login</span>}
                     </IonChip>   
                   </div>
                 </div>
@@ -459,16 +512,20 @@ const player = useContext(Player);
               </div>
               <div className="hidden xs:block">
                     <IonChip color="primary"
-                    onClick={(e: any) =>
-                      presentStreak({
-                          event: e,
-                          onDidDismiss: (e: CustomEvent) => {},
-                          side: "left"
-                      })
+                    onClick={(e: any) =>{
+                      if (user?.objectId) {
+                          presentStreak({
+                            // event: e,
+                            onDidDismiss: (e: CustomEvent) => {},
+                            // side: "left"
+                        })
                       }
+                      else router.push("/signin")
+                      }
+                    }
                     >
-                    <IonIcon icon={flame} color="primary" />
-                    <span className="font-black">{user.currentStreak||0}</span>
+                    <IonIcon icon={user?.objectId ? flame : arrowForward} color="primary" />
+                    {user?.objectId ? <span className="font-black ">{user.currentStreak||0}</span> : <span className="font-medium ">Log In</span>}
                   </IonChip>      
               </div>
               <div className="block xs:hidden"></div>
@@ -551,6 +608,10 @@ const player = useContext(Player);
                   </div>
                   <button 
                     onClick={()=>{
+                      if (!user?.objectId)  {
+                        router.push("/signin")
+                        return;
+                      }
                       setIsScrollToReminders(true);
                       presentSettings({
                       })
@@ -561,7 +622,7 @@ const player = useContext(Player);
                     {(user?.isPushOn || user?.isTextOn || user?.isEmailOn) ?
                       <span className='text-lg text-center'>{`${reminderText} daily reminder at `}<span className="font-bold">{`${(user.sendHour||5) > 13 ? (user.sendHour! - 12) + "PM" : user?.sendHour == 0 ? "12AM" : user.sendHour+"AM"}`}</span></span>
                       :
-                      <span className='text-lg text-center'>Daily Reminders OFF</span>
+                      <span className='text-lg text-center'>{user?.objectId ? "Daily Reminders OFF" : "Get Daily Text, Email, Push Reminders"}</span>
                     }
                             <IonIcon size="small" icon={pencil} slot="icon-only" />
                   </button>
@@ -586,17 +647,19 @@ const player = useContext(Player);
                   />
                   }
                   <div className="flex items-center justify-between w-full pt-8">
-                    <span className="font-medium text-light dark:text-dark">My Saved Lists</span>
+                    {user?.objectId && lists && lists.length > 1 && <span className="font-medium text-light dark:text-dark">My Saved Lists</span>}
+                    {(lists && lists.length > 1) && 
                     <IonButton size="small" fill="clear" color={isReordering ? "primary" : "medium"}
                       onClick={()=>{setIsReordering(prev=>!prev)}}
                     >
                       <IonIcon icon={swapVertical} slot="start" color={isReordering ? "primary" : "medium"} />
                       {isReordering ? "Done" : "Reorder"}
                     </IonButton>
+                    }
                   </div>
                   </IonList>
                   <IonList>
-                    <IonReorderGroup disabled={!isReordering} onIonItemReorder={(e) => {handleReorder(e)}}>
+                  <IonReorderGroup disabled={!isReordering} onIonItemReorder={(e) => {handleReorder(e)}}>
                         {lists && [...lists].slice(1,lists.length).map((list, _index) => {
                           return (
                           <IonReorder key={"mylists-"+list.objectId}>
@@ -676,9 +739,14 @@ const player = useContext(Player);
                       <IonButton 
                         color="medium" 
                         fill="clear" 
+                        expand="block"
                         className="ion-padding" 
                         disabled={listsIsLoading}
                         onClick={(e) => {
+                          if (!user?.objectId) {
+                            router.push("/signin")
+                            return;
+                          }
                           if (!isNamingList) {
                             setIsReordering(false);
                             setIsNamingList(true);
@@ -688,8 +756,14 @@ const player = useContext(Player);
                           } else setIsNamingList(false);
                         }}  
                       >
+                        {user?.objectId ? <>
                           <IonIcon icon={add} slot="start"/>
                           {listsIsLoading ? "Loading..." : "Create a List"}
+                        </>
+                        :
+                        <span>Save your favorite episodes</span>
+                        
+                      }
                       </IonButton>
                       }
                     </>
@@ -698,25 +772,25 @@ const player = useContext(Player);
               </SwiperSlide>
               <SwiperSlide>
                 <div className="flex flex-col items-center w-full px-1 pb-8">
-                  <h2 className="w-full text-3xl font-bold text-left dark:text-primary text-light">Become a Godible Donor</h2>
-                  {/* <div className='flex items-center justify-between w-full'>
+                  {!user?.subscriptionId &&<h2 className="w-full text-3xl font-bold text-left dark:text-primary text-light">Become a Godible Donor</h2>}
+                  <div className='flex items-center justify-between w-full'>
                     <div className='flex items-center justify-between w-full'>
                       <div className='flex items-center justify-center space-x-2 text-lg font-medium'>
-                        <span className='text-2xl font-bold'>$365</span>
-                        <span className='text-sm text-medium'>from 26 donors</span> 
+                        <span className='text-2xl font-bold'>{`$${Math.floor(donations[0]/100)}`}</span>
+                        <span className='text-sm text-medium'>{`from ${donations[1]} donors`}</span> 
                       </div>
                       <span className='text-sm font-medium text-medium'>
-                        $2.5k March goal <span className="hidden xs:inline">covers expenses</span>
+                        {`$${Math.floor(goal/100)/10}k ${thisMonth} goal `}<span className="hidden xs:inline">covers expenses</span>
                       </span>
                     </div>
                   </div>
                   <div className="w-full h-8 p-1 overflow-hidden bg-gray-200 border rounded-lg dark:bg-gray-600">
                     <div
                       className="bg-primary flex justify-center items-center p-0.5 h-6 rounded-md text-xs font-medium leading-none overflow-hidden text-dark"
-                      style={{width: "21%"}}
+                      style={{width: `${meter}%`}}
                       >
                     </div>
-                  </div> */}
+                  </div>
                   <h5 className="w-full text-left"><span className="font-bold">Let God&apos;s Word Be Heard!</span> Godible is only made possible by listeners like you.</h5>
                   <div className="flex justify-start w-full">
                     <IonButton 

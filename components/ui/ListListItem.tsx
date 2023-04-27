@@ -60,7 +60,7 @@ const ListListItem = (props: IListListItemProps) => {
       }
     >
      <Thumbnail
-      imageUrl={list.name === "Bookmarks" ? firstEpisode?.imageUrl : lastEpisode?.imageUrl }
+      imageUrl={list.name === "Bookmarks" ? firstEpisode?.thumbUrl : lastEpisode?.thumbUrl }
       size={64}
       overlayColor='#000000'
      >
