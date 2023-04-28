@@ -42,13 +42,19 @@ const TrailerModal = (props: ISettingsModalProps) => {
       <IonContent className="ion-padding">
         <SlideList hasDots>
           <SwiperSlide>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/aptk_auyQcY" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+            <div className="video-wrapper">
+              <iframe src="https://www.youtube.com/embed/aptk_auyQcY" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+            </div>
           </SwiperSlide>
           <SwiperSlide>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/AlEmobLlavo" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+            <div className="video-wrapper">
+              <iframe src="https://www.youtube.com/embed/AlEmobLlavo" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+            </div>
           </SwiperSlide>
           <SwiperSlide>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/wIsTYXlzJ_c" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+            <div className="video-wrapper">
+              <iframe src="https://www.youtube.com/embed/wIsTYXlzJ_c" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+            </div>
           </SwiperSlide>
         </SlideList>
       </IonContent>

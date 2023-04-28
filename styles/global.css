@@ -507,8 +507,16 @@ ion-popover::part(content) {
 /* MODAL RADIUS */
 /* TODO: When under certain size, then. Not sure how to control if modal is sheet or not */
 ion-modal::part(content) {
-  border-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
+
+@media (min-width: 768px) {
+  ion-modal::part(content) {
+    border-radius: 10px;
+  }
+}
+
 /* END MODAL RADIUS */
 
 
@@ -537,3 +545,15 @@ ion-breadcrumbs {
  }
  
 
+/* REPONSIVE VIDEOS */
+
+.video-wrapper {
+  aspect-ratio: 16 / 9;
+}
+
+.video-wrapper iframe {
+  width: 100%;
+  height: 100%;
+}
+
+/* End response videos */

@@ -101,7 +101,7 @@ const {
                         <img src={postImageUrl} className="w-full h-full"/>
                       </div>
                     }
-                    {postText && <span className="pl-2 text-xs italic text-white dark:text-white">{postText}</span>}
+                    {postText && <span className="pl-2 text-xs italic text-center text-white dark:text-white">{postText}</span>}
                   </div>
                   <div className="mt-4 -ml-5 sm:ml-0">
                     {mainButtonText &&
