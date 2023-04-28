@@ -121,7 +121,7 @@ const Menu: React.FC = () => {
               <div className="items-center justify-center w-full">
                 <IonList id="inbox-list" >
                   <IonListHeader>
-                    <img src='/logo/godible-logo.png' className='w-32 mb-4'/>
+                    <img src='/logo/godible-logo.png' className='w-32 mb-4' onClick={() => router.push("/")} />
                   </IonListHeader>
                   {pages.map((page, index) => {
                     if (!page.isNav) return;

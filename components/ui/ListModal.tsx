@@ -220,8 +220,7 @@ const ListModal = (props: IPlayerListModalProps) => {
         episode: inspectedEpisode,
         handleRemoveEpisode,
     });
-    console.log("LIST USER ID", list, user?.objectId)
-  const reorderable = (setList || _list?.userId === user?.objectId)
+  const reorderable = (setList || (_list?.userId && _list?.userId === user?.objectId))
 
 
     console.log("SAVE LIST", _list, user)

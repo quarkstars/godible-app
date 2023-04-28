@@ -24,8 +24,9 @@ Consenting to our use of cookies in accordance with the terms of this policy whe
 The following types of personal information may be collected, stored, and used:\n
 \n
 information about your computer including your IP address, geographical location, browser type and version, and operating system;\n
-information about your visits to and use of this website including the referral source, length of visit, page views, and website navigation paths;\n
-information, such as your email address, that you enter when you register with our website;\n
+information about your visits to and use of this website including the referral source, length of visit, page views, listening time, and website navigation paths;\n
+information, such as your email address and your name that you enter when you register with our website;\n
+information, such as your email address, profile photo, and your name when you register or login via social login (ie Continue with Google);\n
 information that you enter when you create a profile on our website - your name, address, and phone number;\n
 information that you enter while using the services on our website;\n
 information that is generated while using our website, including when, how often, and under what circumstances you use it;\n
@@ -63,6 +64,7 @@ We may disclose your personal information to any of our employees, officers, ins
 We may disclose your personal information:\n
 \n
 to the extent that we are required to do so by law;\n
+to payment processor partners (ie Stripe) to complete transactions you have specifically requested;\n
 in connection with any ongoing or prospective legal proceedings;\n
 in order to establish, exercise, or defend our legal rights (including providing information to others for the purposes of fraud prevention and reducing credit risk);\n
 to the purchaser (or prospective purchaser) of any business or asset that we are (or are contemplating) selling; and\n
@@ -111,7 +113,7 @@ Our website uses cookies. A cookie is a file containing an identifier (a string 
 We use both session and persistent cookies on our website.\n
 \n
 The names of the cookies that we use on our website, and the purposes for which they are used, are set out below:\n
-we use Google Analytics and Shopify Analytics on our website to recognize a computer when a user visits the website / track users as they navigate the website / enable the use of a shopping cart on the website / improve the website’s usability / analyze the use of the website / administer the website / prevent fraud and improve the security of the website / personalize the website for each user;\n
+we use Google Analytics on our website to recognize a computer when a user visits the website / track users as they navigate the website / enable the use of a shopping cart on the website / improve the website’s usability / analyze the use of the website / administer the website / prevent fraud and improve the security of the website / personalize the website for each user;\n
 Most browsers allow you to refuse to accept cookies\n
 Blocking all cookies will have a negative impact upon the usability of many websites. If you block cookies, you will not be able to use all the features on our website.\n
 You can delete cookies already stored on your computer\n
@@ -122,5 +124,5 @@ If you have any questions about this Privacy Policy, please contact us at suppor
 ####M. Changes to Our Privacy Policy \n
 We may modify or update this Privacy Policy from time to time to reflect the changes in our services and practices, and so you should review this page periodically. When we change the policy in a material manner we will let you know and update the ‘last modified’ date at the bottom of this page.\n
 \n
-This Privacy Policy was last modified on October 23, 2019.\n
+This Privacy Policy was last modified on April 28, 2023.\n
 `

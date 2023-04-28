@@ -67,32 +67,31 @@ const DonationPage: React.FC = () => {
   let enteringAddress = false;
   if (user?.hasAddress && !user?.address) enteringAddress = true 
   if (changingAddress) enteringAddress = true;
-  console.log("ENTERING ", enteringAddress)
 
   useEffect(() => {
     if (!user?.objectId) return;
     if (line1.current) line1.current.value = user?.address?.line1
 
-  }, [user?.address, line1.current, changingAddress]);
+  }, [user?.address, line1, changingAddress]);
   useEffect(() => {
     if (!user?.objectId) return;
     if (line2.current) line2.current.value = user?.address?.line2
-  }, [user?.address, line2.current, changingAddress]);
+  }, [user?.address, line2, changingAddress]);
   useEffect(() => {
     if (!user?.objectId) return;
     if (city.current) city.current.value = user?.address?.city
-  }, [user?.address, city.current, changingAddress]);
+  }, [user?.address, city, changingAddress]);
   useEffect(() => {
     if (!user?.objectId) return;
     if (state.current) {
       state.current.value = user?.address?.state
     }
   }, [user?.address, state.current, changingAddress]);
-  console.log("STATE", state.current)
+  console.log("STATE", state)
   useEffect(() => {
     if (!user?.objectId) return;
     if (postal_code.current) postal_code.current.value = user?.address?.postal_code
-  }, [user?.address, postal_code.current, changingAddress]);
+  }, [user?.address, postal_code, changingAddress]);
   
   
   const handleSelectDonation = async (amount: number) => {
@@ -161,7 +160,7 @@ const DonationPage: React.FC = () => {
             
 
             <div className="flex justify-center w-full">
-              <div className="flex items-center justify-between w-full p-2 space-x-1 bg-gray-100 rounded-md dark:border-gray-800">
+              <div className="flex items-center justify-between w-full p-2 space-x-1 bg-gray-100 rounded-md dark:bg-gray-700">
                   <div className="flex items-center space-x-2">
 
                     {user.imageUrl ?
@@ -212,10 +211,18 @@ const DonationPage: React.FC = () => {
                     <span className="pr-2 text-5xl font-bold">{user?.donationAmount}</span>
                   </div>
                   }
-                  {(!user?.donationAmount || selectingAmount) &&
-                    <span className="px-2 text-2xl font-medium">Select your donation </span>
+                  {(!user?.donationAmount || selectingAmount) ?
+                    <span className="px-2 text-2xl font-medium text-center">Select your donation monthly</span>
+                  :
+                  <div className="flex items-center"><span className="pb-1 text-2xl font-medium border-b-4 border-primary">monthly</span></div>
                   }
-                  <span className="pb-1 text-2xl font-medium border-b-4 border-primary">monthly</span>
+                  {(!selectingAmount && user?.donationAmount) && 
+                  <div className="flex items-center justify-center w-full">
+                    <IonButton size="small" fill="clear" onClick={() => {setChangingAmount(true);setShowingAmountNote(false);}}>
+                      <IonIcon slot="icon-only" icon={pencil} size="small" />
+                    </IonButton>
+                  </div>
+                  }
                 </div>
               }
               {(!enteringCustomAmount && selectingAmount) &&
@@ -305,13 +312,6 @@ const DonationPage: React.FC = () => {
 
               </IonItem>
             }
-            {(!selectingAmount && user?.donationAmount) && 
-            <div className="flex justify-center w-full pb-8">
-              <IonButton size="small" fill="clear" onClick={() => {setChangingAmount(true);setShowingAmountNote(false);}}>
-                Change Amount
-              </IonButton>
-            </div>
-            }
             {(selectingAmount && user?.donationAmount) && 
               <IonButton size="small" fill="clear" disabled={isLoading} onClick={() => {setChangingAmount(false);setEnteringCustomAmount(false)}}>
                 Cancel
@@ -338,8 +338,18 @@ const DonationPage: React.FC = () => {
             }
             {enteringMethod &&
             <>
-              <form className="py-2 border-b">
-                <CardElement />
+              <form className="p-1 overflow-hidden bg-white rounded-lg">
+              <CardElement
+                options={{
+                  style: {
+                    base: {
+                      fontWeight: '500',
+                      backgroundColor: '#FFFFFF',
+                      padding: '6px',
+                    },
+                  },
+                }}
+              />
               </form>
               
             <div className='flex items-center w-full space-x-0.5'>
@@ -389,10 +399,10 @@ const DonationPage: React.FC = () => {
               
               ></IonCheckbox>
               <div className="hidden xs:inline">
-                <IonLabel><span className="text-md">{`Help cover the $${fee} transaction fee`}</span></IonLabel>
+                <IonLabel><span className="text-md">{`Help cover the $${fee} transaction fee?`}</span></IonLabel>
               </div>
               <div className="inline xs:hidden">
-                <IonLabel><span className="text-sm">{`Cover transaction fee ($${fee})`}</span></IonLabel>
+                <IonLabel><span className="text-sm">{`Cover transaction fee ($${fee})?`}</span></IonLabel>
               </div>
             </IonItem>
             <IonItem>

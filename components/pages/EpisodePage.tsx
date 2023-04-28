@@ -442,13 +442,13 @@ const EpisodePage:React.FC = () => {
                 }
             </div>     
             <div className="flex flex-wrap justify-center w-full pb-8">
-              <div className={`rounded-md p-2 flex items-start justify-center sm:items-center ${!episode ? "py-6": ""} ${showMeta ? "bg-gray-100 dark:bg-gray-700": ""} ${!episode?._metaDataBlocks ? "w-full" : ""} ${episode?._metaDataBlocks && episode?._metaDataBlocks.length > 1 ? "w-full" : ""}`}>
+              <div className={`rounded-md p-2 flex justify-center sm:items-center ${!episode ? "py-6": ""} ${showMeta ? "bg-gray-100 dark:bg-gray-800": ""} ${!episode?._metaDataBlocks ? "w-full" : ""} ${episode?._metaDataBlocks && episode?._metaDataBlocks.length > 1 ? "w-full" : ""}`}>
                 <motion.div className="overflow-hidden rounded-md pointer-cursor" onClick={()=>setShowMeta(prev => !prev)} animate={metaControls}>
                   
                   {episode ? 
                     <img 
                       src={episode?._bookImageUrl}
-                      className="w-full cursor-pointer"
+                      className="w-full rounded-md cursor-pointer"
                     />
                     :
                     <div className="flex flex-col items-center w-full">
