@@ -58,16 +58,16 @@ const DonationPage: React.FC = () => {
   
   
   
-  let selectingAmount = (changingAmount) ? true : false;
-  if (enteringCustomAmount) selectingAmount = true;
-  if (!user?.donationAmount) selectingAmount = true
+  let selectingAmount = false;
   let enteringMethod = false;
-  if (!user?.subscriptionId && !user?.paymentMethod && user?.donationAmount) enteringMethod = true;
-  if (changingMethod) enteringMethod = true;
   let enteringAddress = false;
-  if (user?.hasAddress && !user?.address) enteringAddress = true 
-  if (changingAddress) enteringAddress = true;
-
+  
+  if(user) {
+    selectingAmount = enteringCustomAmount || changingAmount || !user.donationAmount ? true: false;
+    enteringMethod = changingMethod || (!user.subscriptionId && !user.paymentMethod && user.donationAmount) ? true: false;
+    enteringAddress = changingAddress || (user.hasAddress && !user.address) ? true: false;
+  }
+  
   useEffect(() => {
     if (!user?.objectId) return;
     if (line1.current) line1.current.value = user?.address?.line1
@@ -374,7 +374,9 @@ const DonationPage: React.FC = () => {
             <div className='flex flex-col px-8 pt-4 pb-8 border rounded-md'>
               <div className="flex items-center justify-between">
                 <h5 className="text-sm xs:text-lg">Payment Method</h5>
-                <IonButton size="small" fill="clear" onClick={(e) => {setChangingMethod(true)}}>Change</IonButton>
+                <IonButton size="small" fill="clear" onClick={(e) => {setChangingMethod(true)}}>
+                  <IonIcon icon={pencil} slot="icon-only" size="small" />
+                </IonButton>
               </div>
               <div className="flex justify-between text-sm font-medium text-medium">
               <span>{user.paymentMethod.card.brand}</span>
