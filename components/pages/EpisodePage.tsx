@@ -512,7 +512,7 @@ const EpisodePage:React.FC = () => {
                 </IonButtons>
                 <IonButtons>
                   <IonButton fill="clear" size="small"  onClick={(e)=>{
-                      if (!user?.objectId) return router.push("/login?message=Login to save lists")
+                      if (!user?.objectId) return router.push("/signin?message=Log in to save lists")
                       presentList({
 
                       })
