@@ -39,12 +39,12 @@ const NotesPage:React.FC = () => {
 
     useIonViewWillEnter(() => {
 
-        getNotes(undefined, { sort: "-createdTime", userIdNot: user.objectId, flagDifference: 2,/*heartCount:2,*/ limit: 12 });
-        if (!user.objectId)  {
+        getNotes(undefined, { sort: "-createdTime", userIdNot: user?.objectId, flagDifference: 2,/*heartCount:2,*/ limit: 12 });
+        if (!user?.objectId)  {
             setUserNotes(undefined);
             return;
         }
-        getUserNotes(undefined, { sort: "-createdTime", limit: 12, userId: user.objectId });
+        getUserNotes(undefined, { sort: "-createdTime", limit: 12, userId: user?.objectId });
     }, [user?.objectId]);
 
     
@@ -61,7 +61,7 @@ const NotesPage:React.FC = () => {
 
     //Saving when editing
     async function handleSaveNote(note: INote) {
-        if (!user.objectId) return;
+        if (!user?.objectId) return;
         let newNote = await postUserNote(note);
         if (!newNote) return 
         setUserNotes(prev => {
@@ -75,7 +75,7 @@ const NotesPage:React.FC = () => {
 
     async function handleDeleteNote(objectId: string) {
         await deleteUserNote(objectId);
-        getUserNotes(undefined, { sort: "-createdTime", limit: 12, userId: user.objectId });
+        getUserNotes(undefined, { sort: "-createdTime", limit: 12, userId: user?.objectId });
     }
     
     
@@ -89,7 +89,7 @@ const NotesPage:React.FC = () => {
   const fetchMoreUserNotes = async (e) => {
       e.preventDefault();
       if (!notes) return;         
-      const newUserNotes = await getUserNotes(undefined, { sort: "-createdTime", limit: 12, userId: user.objectId, skip: (skip||0)+1 }, true);
+      const newUserNotes = await getUserNotes(undefined, { sort: "-createdTime", limit: 12, userId: user?.objectId, skip: (skip||0)+1 }, true);
       const newUserNoteCount = (newUserNotes) ? newUserNotes.length : 0;
       if (userNoteCount.current + 12 >= userNoteCount.current + newUserNoteCount) setReachedUserMax(true);
   }
@@ -104,7 +104,7 @@ const NotesPage:React.FC = () => {
   const fetchMoreNotes = async (e) => {
       e.preventDefault();
       if (!notes) return;
-      const newNotes = await getNotes(undefined, { sort: "-createdTime", userIdNot: user.objectId, flagDifference: 2, /*heartCount:2,*/  limit: 12, skip: (skip||0)+1 }, true);
+      const newNotes = await getNotes(undefined, { sort: "-createdTime", userIdNot: user?.objectId, flagDifference: 2, /*heartCount:2,*/  limit: 12, skip: (skip||0)+1 }, true);
       const newNoteCount = (newNotes) ? newNotes.length : 0;
       if (noteCount.current + 12 >= noteCount.current + newNoteCount) setReachedMax(true);
   }

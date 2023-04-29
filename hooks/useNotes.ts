@@ -68,12 +68,12 @@ const useNotes = () => {
     //Creat or update a note
     const postNote = async (note: INote) => {
         setIsLoading(true);
-        if (!user.objectId) return undefined;
+        if (!user?.objectId) return undefined;
         let newNote:INote|undefined;
         let userPointer = (note.user) ? {
             __type: 'Pointer',
             className: '_User',
-            objectId: note.user.objectId,
+            objectId: note.user?.objectId,
             } : undefined;
         let episodePointer = (note.episode || note.episodeId) ? {
             __type: 'Pointer',
@@ -102,7 +102,7 @@ const useNotes = () => {
     //Creat or update a note
     const postNoteFeedback = async (noteFeedback?: INoteFeedback) => {
         setIsLoading(true);
-        if (!user.objectId) return;
+        if (!user?.objectId) return;
         try {
             if (!noteFeedback) return;        
 
@@ -121,7 +121,7 @@ const useNotes = () => {
 
     //Will delete a note
     const deleteNote = async (objectId: string) => {    
-        if (!user.objectId) return;
+        if (!user?.objectId) return;
         try {
             setIsLoading(true);
             //TODO: Notify user on specific note information that has been deleted

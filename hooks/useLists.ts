@@ -77,7 +77,7 @@ const useLists = () => {
 
     //Reorders list from one index to another
     const reorderEpisodes = async (from: number, to: number, listIndex = 0) => {
-        if (!user.objectId) return;
+        if (!user?.objectId) return;
         let list = lists?.[listIndex];
         if (!list) return;
         if (list.episodes.length < 2) return;
@@ -102,7 +102,7 @@ const useLists = () => {
 
     // Reorders list from one index to another
     const reorderLists = async (from: number, to: number) => {
-        if (!user.objectId) return;
+        if (!user?.objectId) return;
         //Cannot reorder to or from 0 (This is reserved for Bookmark)
         // if (!from || !to) return;
         // if (!lists || !lists?.[0] || lists.length < to) return;
@@ -131,7 +131,7 @@ const useLists = () => {
 
     const postList = async (list: IPostListParams) => {
         setIsLoading(true);
-        if (!user.objectId) return undefined;
+        if (!user?.objectId) return undefined;
         let result;
         try {
             if (!list) return;        
@@ -166,11 +166,11 @@ const useLists = () => {
 
     //Will Add episode to a list
     const addEpisodeToList = async (listIndex = 0, episodeId: string, isPrepending = false) => {
-        if (!user.objectId) return undefined;
+        if (!user?.objectId) return undefined;
         let listToUpdate = lists?.[listIndex] as any;
         // if (!listToUpdate && listIndex === 0) {
         //     listToUpdate = {
-        //         slug: `${user.objectId}-0-bookmarks}`,
+        //         slug: `${user?.objectId}-0-bookmarks}`,
         //         episodes: [],
         //         name: "Bookmarks"
         //     }
@@ -205,7 +205,7 @@ const useLists = () => {
 
     //Delete episode from list
     const removeEpisodeFromList = async (_listToUpdate: IList, episodeId: string) => {
-        if (!user.objectId) return;
+        if (!user?.objectId) return;
         let listToUpdate = _listToUpdate;
         
         let episodeIndex = -1;
@@ -224,8 +224,8 @@ const useLists = () => {
         try {
         //If the list is the user's update the list on the server
             let result;
-            console.log("NOT SENDING UPDATE", listToUpdate, user.objectId, listToUpdate.userId, listToUpdate.objectId && listToUpdate.userId === user.objectId)
-            if (listToUpdate.objectId && listToUpdate.userId === user.objectId) result = await postList(listToUpdate);
+            console.log("NOT SENDING UPDATE", listToUpdate, user?.objectId, listToUpdate.userId, listToUpdate.objectId && listToUpdate.userId === user?.objectId)
+            if (listToUpdate.objectId && listToUpdate.userId === user?.objectId) result = await postList(listToUpdate);
             if (result){ 
                 if (result.episodes) result.episodes = result.episodes.map((episode) => {
                     return appendEpisodeStrings(episode);
@@ -245,7 +245,7 @@ const useLists = () => {
     //Will delete a list
     const deleteList = async (listId: string) => {    
         //Cannot delete 0 Bookmarks    
-        if (!user.objectId) return;
+        if (!user?.objectId) return;
         if (!lists) return;
 
         let listToDelete;

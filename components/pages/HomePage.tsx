@@ -130,7 +130,7 @@ const HomePage:React.FC = () => {
             subButtonText={"List"}
             subButtonIcon={addCircleOutline}
             onClickSub={(e:any) => {
-              if (!user.objectId) return router.push("/signin?message=Log in to save lists")
+              if (!user?.objectId) return router.push("/signin?message=Log in to save lists")
               setInspectedEpisode(episode)
               presentList({
                 onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
@@ -235,7 +235,7 @@ const HomePage:React.FC = () => {
         :
         <IonTitle>
           <div className="flex items-center justify-center w-full py-2 md:hidden">
-            {user.objectId ? 
+            {user?.objectId ? 
               <img src='/logo/godible-logo.png' className='w-24'/>
             :
               <span>Welcome</span>
@@ -249,7 +249,7 @@ const HomePage:React.FC = () => {
       <IonContent>
       <div className="flex flex-col justify-start w-full min-h-full">
         <SlideList >
-          {!user.objectId && 
+          {!user?.objectId && 
           <SwiperSlide>
             <Hero 
               title={"Let God's Word Be Heard"}

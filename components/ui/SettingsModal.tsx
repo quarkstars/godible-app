@@ -523,7 +523,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
               interface="action-sheet" 
               slot="end" 
               onIonChange={(e) => {
-                if (user.objectId) updateUser(
+                if (user?.objectId) updateUser(
                   {
                     sendHour: e.detail.value, 
                     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -566,7 +566,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                   ref={sendType} 
                   slot="end"
                   onIonChange={(e) => {
-                    if (user.objectId) updateUser({sendType: e.detail.value})
+                    if (user?.objectId) updateUser({sendType: e.detail.value})
                   }}
                 >
                   <IonSelectOption value="newest">Newest release</IonSelectOption>
@@ -592,7 +592,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
               ref={isEmailOn}
               // checked={theme.isDark}
               onIonChange={(e) => {
-                if (user.objectId) updateUser({isEmailOn: e.detail.checked})
+                if (user?.objectId) updateUser({isEmailOn: e.detail.checked})
               }}
             />
         </IonItem>
@@ -605,7 +605,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
               ref={isPushOn}
               // checked={theme.isDark}
               onIonChange={(e) => {
-                if (user.objectId) updateUser({isPushOn: e.detail.checked, pushErrorCount: 0, lastPushResponse: null})
+                if (user?.objectId) updateUser({isPushOn: e.detail.checked, pushErrorCount: 0, lastPushResponse: null})
               }}
             />
         </IonItem>
@@ -629,7 +629,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
               ref={isTextOn}
               // checked={theme.isDark}
               onIonChange={(e) => {
-                if (user.objectId) updateUser({isTextOn: e.detail.checked})
+                if (user?.objectId) updateUser({isTextOn: e.detail.checked})
               }}
             />
         </IonItem>
@@ -643,7 +643,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 selectedText={countryCode}
                 onIonChange={(e) => {
                   setCountryCode(e.detail.value);
-                  if (user.objectId) updateUser({countryCode: e.detail.value, textErrorCount: 0, lastTextResponse: null});
+                  if (user?.objectId) updateUser({countryCode: e.detail.value, textErrorCount: 0, lastTextResponse: null});
                 }}
               >
                 {countryCodes.map((countryCode)=>{

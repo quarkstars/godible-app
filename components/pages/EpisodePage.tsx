@@ -60,9 +60,9 @@ const EpisodePage:React.FC = () => {
   } = useLists();
   const [hasBookmark, setHasBookmark] = useState<boolean>(false);
   useEffect(() => {
-    if (!user.objectId) return setHasBookmark(false);
+    if (!user?.objectId) return setHasBookmark(false);
     if (!location.pathname.includes("episode")) return setHasBookmark(false);
-    getLists(undefined, { sort: "+index", limit: 1, userId: user.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+    getLists(undefined, { sort: "+index", limit: 1, userId: user?.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
   }, [user?.objectId, listReloads, location.pathname]);
   
   useEffect(() => {
@@ -185,12 +185,12 @@ const EpisodePage:React.FC = () => {
     }
 
     // If the user remains on the same episode for 2 minutes, assign the next episode to the user
-    if (user.objectId) setTimeout(() => saveNextEpisode(episode!.slug), 120000)
+    if (user?.objectId) setTimeout(() => saveNextEpisode(episode!.slug), 120000)
 
   }
 
   const saveNextEpisode = async(expectedSlug: string) => {
-    if (!user.objectId || !adjacentEpisodes[1]) return; 
+    if (!user?.objectId || !adjacentEpisodes[1]) return; 
     if (expectedSlug === episode?.slug) {
       updateUser({nextEpisode: adjacentEpisodes[1]});
     }
@@ -512,7 +512,7 @@ const EpisodePage:React.FC = () => {
                 </IonButtons>
                 <IonButtons>
                   <IonButton fill="clear" size="small"  onClick={(e)=>{
-                      if (!user.objectId) return router.push("/login?message=Login to save lists")
+                      if (!user?.objectId) return router.push("/login?message=Login to save lists")
                       presentList({
 
                       })

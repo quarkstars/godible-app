@@ -66,7 +66,7 @@ const ListModal = (props: IPlayerListModalProps) => {
   const [internalList, setInternalList] = useState<IList|undefined>();
   useEffect(() => {
     if (!_isAddingEpisode) return;
-    getLists(undefined, { sort: "+index", limit: 30, userId: user.objectId });
+    getLists(undefined, { sort: "+index", limit: 30, userId: user?.objectId });
   }, [_isAddingEpisode]);
   
 
@@ -94,7 +94,7 @@ const ListModal = (props: IPlayerListModalProps) => {
     if (setList) setList(newList);
 
     // if the list has an id, update the server
-    if (user.objectId && _list.objectId) {
+    if (user?.objectId && _list.objectId) {
       postList(newList);
     }
 
@@ -172,7 +172,7 @@ const ListModal = (props: IPlayerListModalProps) => {
     let userLists;
     let index = 1
     if (typeof _list.index !== "number") {
-        userLists = await getLists(undefined, { limit:30, userId: user.objectId, exclude:["episodes"] });
+        userLists = await getLists(undefined, { limit:30, userId: user?.objectId, exclude:["episodes"] });
         if (userLists && userLists.length >= 30) {
           setSaveListText("Failed! 30 List Max")
           throw "30 list max"
@@ -201,7 +201,7 @@ const ListModal = (props: IPlayerListModalProps) => {
     else return setListReloads(prev => prev + 1);
     const updatedList = await postList(saveList);
     setListReloads(prev => prev + 1);
-    getLists(undefined, { sort: "+index", limit: 30, userId: user.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+    getLists(undefined, { sort: "+index", limit: 30, userId: user?.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
   }
 
   //Focus name input
@@ -376,7 +376,7 @@ const ListModal = (props: IPlayerListModalProps) => {
             <IonIcon icon={isLoading ? sync : checkmarkCircle}  className="ion-padding"  slot="end" size="small" color="medium" />
           :
           <IonButtons slot="end">
-            {user.objectId && list?.name !== "Bookmarks" &&
+            {user?.objectId && list?.name !== "Bookmarks" &&
               <IonButton onClick={(e) => {
                 if (!isNamingList) {
                   setIsReordering(false);
@@ -389,8 +389,8 @@ const ListModal = (props: IPlayerListModalProps) => {
               }}  
                 size="small"
               >
-              <IonIcon icon={isNamingList ? closeCircle : _list ?.userId === user.objectId ? pencil : addCircleOutline} slot="start" />
-                {isNamingList ? "Cancel" : _list?.userId === user.objectId ? "" : saveListText }
+              <IonIcon icon={isNamingList ? closeCircle : _list ?.userId === user?.objectId ? pencil : addCircleOutline} slot="start" />
+                {isNamingList ? "Cancel" : _list?.userId === user?.objectId ? "" : saveListText }
               </IonButton>
             }
 

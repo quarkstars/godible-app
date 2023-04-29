@@ -61,7 +61,7 @@ const ProfilePage:React.FC = () => {
 
 
   const [isScrollToReminders, setIsScrollToReminders] = useState(false);
-  const onLogout = (user.objectId) ? logOut : undefined
+  const onLogout = (user?.objectId) ? logOut : undefined
   const [presentSettings, dismissSettings] = useIonModal(SettingsModal, {
     onDismiss: (data: string, role: string) => dismissSettings(data, role),
     isProfile: true,
@@ -116,7 +116,7 @@ const player = useContext(Player);
     if (!user?.objectId) return;
     getStreak();
     //If reminder param is 1, then open settings
-    if (reminders == "1" && user.objectId) {
+    if (reminders == "1" && user?.objectId) {
       setIsScrollToReminders(true);
       presentSettings({
       })
@@ -258,9 +258,9 @@ const player = useContext(Player);
   
   useEffect(() => {
     if (!location.pathname.includes("profile")) return setLists(undefined);
-    if (!user.objectId) return setLists(undefined);
-    getLists(undefined, {limit: 30, userId: user.objectId, sort: "+index", exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
-  }, [listReloads, user.objectId, location.pathname]);
+    if (!user?.objectId) return setLists(undefined);
+    getLists(undefined, {limit: 30, userId: user?.objectId, sort: "+index", exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+  }, [listReloads, user?.objectId, location.pathname]);
 
 
   const dateTime = useRef<HTMLIonDatetimeElement>(null);
@@ -282,7 +282,7 @@ const player = useContext(Player);
     
     initializeDates(date);
     
-  }, [dateTime.current, user.objectId, location.pathname]);
+  }, [dateTime.current, user?.objectId, location.pathname]);
 
   
   

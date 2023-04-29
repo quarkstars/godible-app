@@ -50,7 +50,7 @@ const SignUpPage: React.FC = () => {
   });
   //When loggedin user is present, reroute
   useEffect(() => {
-    if (!user.objectId) return;
+    if (!user?.objectId) return;
     // if (isOnboarding) presentSettings();
     console.log("REDIRECT ONBOARDINH", isOnboarding)
     if(isOnboarding) presentSettings()
@@ -60,7 +60,7 @@ const SignUpPage: React.FC = () => {
       router.push(_reroutePath);
     }
     else router.push("/profile");
-  }, [user.objectId]);
+  }, [user?.objectId, isOnboarding]);
   
 	
 	return (
@@ -88,7 +88,7 @@ const SignUpPage: React.FC = () => {
       <IonContent>
       <div className="flex flex-col items-center justify-center w-full min-h-full p-4 space-y-4 sm:bg-green-800">
         <img src='/logo/godible-logo.png' className='w-40'></img>
-        {user.objectId ?
+        {user?.objectId ?
           <LoggedInAlready />
         :
           <div className="block max-w-md p-6 bg-white rounded-lg dark:bg-light">
@@ -156,7 +156,7 @@ const SignUpPage: React.FC = () => {
               expand="block" 
                 onClick={() => {
                   //Validate
-                  if (user.objectId) return setSignUpError("Already logged in");
+                  if (user?.objectId) return setSignUpError("Already logged in");
                   if (email==="" && password==="") return setSignUpError("Create your credentials");
                   if (!isValidEmail(email)) return setSignUpError("Invalid email");
                   if (password==="") return setSignUpError("Create a password");

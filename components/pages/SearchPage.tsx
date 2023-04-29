@@ -399,7 +399,7 @@ const SearchPage = (props: ISearchPageProps) => {
           episode={episode}
           onPlay={(e) => handleListenClick(e, index)}
           onAdd={(e: any) => {
-            if (!user.objectId)
+            if (!user?.objectId)
               return router.push("/signin?message=Log in to save lists");
             setInspectedEpisode(episode);
             presentList({
@@ -431,7 +431,7 @@ const SearchPage = (props: ISearchPageProps) => {
             subButtonText={"List"}
             subButtonIcon={addCircleOutline}
             onClickSub={(e: any) => {
-              if (!user.objectId)
+              if (!user?.objectId)
                 return router.push("/signin?message=Log+in+to+save+lists");
               setInspectedEpisode(episode);
               presentList({

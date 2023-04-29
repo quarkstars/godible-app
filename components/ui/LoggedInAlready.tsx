@@ -10,7 +10,7 @@ const LoggedInAlready = () => {
         logOut,
       } = useContext(UserState);
 
-      if (!user.objectId) return <></>
+      if (!user?.objectId) return <></>
     return (
         <div className="flex flex-col justify-center max-w-md p-6 py-8 bg-white rounded-lg dark:bg-light">
             {/* <span className="w-full font-bold text-center">{`${user.firstName} ${user.lastName}`}</span>
@@ -29,7 +29,7 @@ const LoggedInAlready = () => {
                 expand="block"
                 fill="clear"
                 onClick={() => {
-                if (!user.objectId) return
+                if (!user?.objectId) return
                 logOut()
                 }}
             >

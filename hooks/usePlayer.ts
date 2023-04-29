@@ -227,7 +227,7 @@ const usePlayer = ():IPlayer => {
     useEffect(() => {
 
         //save Listening and Position every 10 seconds
-        if (user.objectId && duration && !isNaN(duration) && currentSeconds > savedSeconds.current + 10) {
+        if (user?.objectId && duration && !isNaN(duration) && currentSeconds > savedSeconds.current + 10) {
             let episode = list?.episodes[index];
             if (!episode) return;
             let episodePointer:Pointer|undefined;

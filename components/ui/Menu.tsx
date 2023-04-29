@@ -32,7 +32,6 @@ import { IList } from 'data/types';
     title: string;
   }
   
-  const titles = ['Bookmarks', 'My List', ];
   
 const Menu: React.FC = () => {
     const location = useLocation();
@@ -65,13 +64,13 @@ const Menu: React.FC = () => {
 
 
   useEffect(() => {
-      if (!user.objectId) return setLists(undefined);
-      getLists(undefined, {limit: 5, userId: user.objectId, sort: "+index", exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
-  }, [listReloads, user.objectId]);
+      if (!user?.objectId) return setLists(undefined);
+      getLists(undefined, {limit: 5, userId: user?.objectId, sort: "+index", exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+  }, [listReloads, user?.objectId]);
 
   //Create a Bookmarks list by default
   useEffect(() => {
-    if (!user.objectId || !lists) return;
+    if (!user?.objectId || !lists) return;
     if (lists.length === 0) postList({name: "Bookmarks", index: 0});
     if (listReloads === 0) setTimeout(() => {setListReloads(prev => prev + 1)}, 5000)
   }, [lists]);
@@ -172,7 +171,7 @@ const Menu: React.FC = () => {
                     routerDirection="none"  
                     button 
                     onClick={()=>{
-                      player.togglePlayPause(false);
+                      if (player) player.togglePlayPause(false);
                       router.push("/signin?message=Log in to save bookmarks");
                     }}
                   >

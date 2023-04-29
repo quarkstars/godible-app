@@ -62,10 +62,10 @@ const Note = (props: INoteProps) => {
         if (!note) return;
         if (isFlagged) {
             setIsFlagged(null);
-            postNoteFeedback({userId: user.objectId, noteId: note.objectId, isFlagged: null});
+            postNoteFeedback({userId: user?.objectId, noteId: note.objectId, isFlagged: null});
         } else {
             setIsFlagged(true);
-            postNoteFeedback({userId: user.objectId, noteId: note.objectId, isFlagged: true});
+            postNoteFeedback({userId: user?.objectId, noteId: note.objectId, isFlagged: true});
         }
     }
 
@@ -73,11 +73,11 @@ const Note = (props: INoteProps) => {
         if (!note) return;
         if (isHearted) {
             setIsHearted(null);
-            postNoteFeedback({userId: user.objectId, noteId: note.objectId, isHearted: null});
+            postNoteFeedback({userId: user?.objectId, noteId: note.objectId, isHearted: null});
             if (heartCount) setHeartCount(prev => prev! - 1);
         } else {
             setIsHearted(true);
-            postNoteFeedback({userId: user.objectId, noteId: note.objectId, isHearted: true});
+            postNoteFeedback({userId: user?.objectId, noteId: note.objectId, isHearted: true});
             setHeartCount(prev => {
                 return (prev) ? prev + 1 : 1;
             });

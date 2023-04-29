@@ -1,6 +1,6 @@
 {
 	"appId": "com.godible.app",
-	"appName": "godible-app",
+	"appName": "Godible",
 	"bundledWebRuntime": false,
 	"npmClient": "npm",
 	"webDir": "out",

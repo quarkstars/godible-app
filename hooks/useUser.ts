@@ -156,13 +156,13 @@ const useUser = () => {
     //Get Current User
     useEffect(() => {
         if (!Parse) return;
-        if (user.objectId) return;
+        if (user?.objectId) return;
         getCurrentUser();
     }, [Parse]);
 
     //set onboarding if created within a minute ago
     useEffect(() => {
-        if (!user.objectId) return;
+        if (!user?.objectId) return;
         const createdAt = user.createdAt;
         //TODO: Test again
         const createdTime = Math.floor(new Date(createdAt!).getTime());
@@ -170,7 +170,7 @@ const useUser = () => {
         if (Date.now()-60000 < createdTime) {
             setIsOnboarding(true);
         }
-    }, [user.objectId]);
+    }, [user?.objectId]);
     
 
     //Login Function
@@ -403,7 +403,7 @@ const useUser = () => {
         }
         setUser(newUser);
         //If user is logged in, save updates to the server or reverse them if failed.
-        if (!user.objectId) return newUser;
+        if (!user?.objectId) return newUser;
         try {
             // setIsLoading(true);
             const currentParseUser: Parse.User|undefined|null = await Parse.User.current();
@@ -428,8 +428,8 @@ const useUser = () => {
     // const [highlightedDates, setHighlightedDates] = useState<any[]>([]);
     const [dateMap, setDateMap] = useState<IDateMap>({});
     const getMonth = async (month: string, clearMonths=false) => {
-        console.log("LOCATION GET MONTH", month, clearMonths, user.objectId, fetchedMonths.current.includes(month) && !clearMonths)
-        if (!user.objectId) return;
+        console.log("LOCATION GET MONTH", month, clearMonths, user?.objectId, fetchedMonths.current.includes(month) && !clearMonths)
+        if (!user?.objectId) return;
         if (clearMonths) fetchedMonths.current = []
         if (fetchedMonths.current.includes(month) && !clearMonths) return;
         try {
@@ -453,7 +453,7 @@ const useUser = () => {
                 }
             });
             //Notes (specify the user's notes only)
-            const notes = await Parse.Cloud.run("getNotes", {options: {month, sort: "-createdTime", userId: user.objectId}});     
+            const notes = await Parse.Cloud.run("getNotes", {options: {month, sort: "-createdTime", userId: user?.objectId}});     
             
             let pastNotes: INote[]
             notes.map((note) => {   

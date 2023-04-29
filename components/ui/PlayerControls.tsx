@@ -69,8 +69,8 @@ export const PlayerControls = () => {
   } = useLists();
   const [hasBookmark, setHasBookmark] = useState<boolean>(false);
   useEffect(() => {
-    if (!userState.user.objectId) return setHasBookmark(false);
-    getLists(undefined, { sort: "+index", limit: 1, userId: userState.user.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+    if (!userState.user?.objectId) return setHasBookmark(false);
+    getLists(undefined, { sort: "+index", limit: 1, userId: userState.user?.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
   }, [userState.user?.objectId, userState.listReloads]);
   useEffect(() => {
     if (!lists || !lists?.[0]) return setHasBookmark(false);
@@ -185,7 +185,7 @@ export const PlayerControls = () => {
                                 <IonButtons>
                                     <IonButton
                                         onClick={() => {
-                                            if (!userState.user.objectId) {
+                                            if (!userState.user?.objectId) {
                                                 player.togglePlayPause(false);
                                                 router.push("/signin?message=Log in to bookmark.");
                                             }

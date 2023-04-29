@@ -49,14 +49,14 @@ const SignInPage: React.FC = () => {
   //TODO: Programmatically check what platform and then show floating only on android
   //When user is present, reroute
   useEffect(() => {
-    if (!user.objectId) return;
+    if (!user?.objectId) return;
     if (reroutePath) {
       let _reroutePath = reroutePath;
       setReroutePath(undefined);
       router.push(_reroutePath);
     }
     else router.push("/profile");
-  }, [user.objectId]);
+  }, [user?.objectId]);
 
 
   let message:any = _message;
@@ -91,7 +91,7 @@ const SignInPage: React.FC = () => {
 
       <div className="flex flex-col items-center justify-center w-full min-h-full p-4 space-y-4 sm:bg-gray-100 dark:bg-light">
         <img src='/logo/godible-logo.png' className='w-40'></img>
-        {user.objectId ? 
+        {user?.objectId ? 
           <LoggedInAlready />
         :
           <div className="block max-w-md p-6 bg-white rounded-lg dark:bg-light">
@@ -141,7 +141,7 @@ const SignInPage: React.FC = () => {
                 disabled={isLoading}
                 onClick={() => {
                   //Validations
-                  if (user.objectId) return setLogInError("Already logged in");
+                  if (user?.objectId) return setLogInError("Already logged in");
                   if (email==="" && password==="") return setLogInError("Missing Credentials");
                   if (!isValidEmail(email)) return setLogInError("Invalid Email");
                   if (password==="") return setLogInError("Missing Password");

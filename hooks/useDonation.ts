@@ -80,7 +80,7 @@ const useDonation = () => {
       //Update isCoveringFee if specified
       if (typeof isCoveringFee === "boolean") await updateUser({isCoveringFee})
       // Call the updateDonationAmount cloud function
-      const response = await Parse.Cloud.run("updateDonationAmount", {newAmount});
+      const response = await Parse.Cloud.run("updateDonationAmount", {newAmount, isCoveringFee});
       if (!response) setDonationAmount(currentDonationAmount);
 
       // Update user with the new donationAmount and priceId

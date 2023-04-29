@@ -55,12 +55,12 @@ const Notes = (props: INotesProps) => {
             setUserNotes(undefined);
             return;
         }
-        getNotes(undefined, { sort: "+heartCount", userIdNot: user.objectId, episodeId: episode?.objectId, flagDifference: 2,  limit: 30 });
-        if (!user.objectId)  {
+        getNotes(undefined, { sort: "+heartCount", userIdNot: user?.objectId, episodeId: episode?.objectId, flagDifference: 2,  limit: 30 });
+        if (!user?.objectId)  {
             setUserNotes(undefined);
             return;
         }
-        getUserNotes(undefined, { sort: "-createdTime", episodeId: episode?.objectId, limit: 30, userId: user.objectId });
+        getUserNotes(undefined, { sort: "-createdTime", episodeId: episode?.objectId, limit: 30, userId: user?.objectId });
     }, [user?.objectId, episode]);
     console.log("NOTES PUBLIC", notes)
 
@@ -73,7 +73,7 @@ const Notes = (props: INotesProps) => {
     }, [isUserNoteLoading, userNotes]);
     
     async function handleSaveNewNote(note: INote) {
-        if (!user.objectId) return;
+        if (!user?.objectId) return;
         let newNote = await postUserNote(note);
         console.log("NOTES", newNote);
         if (!newNote) return 
@@ -82,7 +82,7 @@ const Notes = (props: INotesProps) => {
     }
     //Saving when editing
     async function handleSaveNote(note: INote) {
-        if (!user.objectId) return;
+        if (!user?.objectId) return;
         let newNote = await postUserNote(note);
         if (!newNote) return 
         setUserNotes(prev => {
@@ -96,7 +96,7 @@ const Notes = (props: INotesProps) => {
 
     async function handleDeleteNote(objectId: string) {
         await deleteUserNote(objectId);
-        getUserNotes(undefined, { sort: "-createdTime", episodeId: episode?.objectId, limit: 30, userId: user.objectId });
+        getUserNotes(undefined, { sort: "-createdTime", episodeId: episode?.objectId, limit: 30, userId: user?.objectId });
     }
 
     let reachedUserNoteMax = (userNotes && userNotes.length >= 30) ? true : false;

@@ -26,7 +26,7 @@ const Toolbar = ({children}) => {
             </IonButtons>
             {children}
             <IonButtons slot="end">
-                {user.objectId ?
+                {user?.objectId ?
                     <div className="cursor-pointer hover:opacity-80">
                         <IonAvatar
                             onClick={()=>{router.push("/profile/");}}

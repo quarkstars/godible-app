@@ -338,12 +338,12 @@ const DonationPage: React.FC = () => {
             }
             {enteringMethod &&
             <>
-              <form className="p-1 overflow-hidden bg-white rounded-lg">
+              <form className="p-1 overflow-hidden bg-white border-b rounded-lg dark:border-none">
               <CardElement
                 options={{
                   style: {
                     base: {
-                      fontWeight: '500',
+                      fontWeight: "bold",
                       backgroundColor: '#FFFFFF',
                       padding: '6px',
                     },
@@ -564,7 +564,7 @@ const DonationPage: React.FC = () => {
               </IonButton>
             </div>
             }
-            {!user.objectId && <>
+            {!user?.objectId && <>
               <div className="flex items-start justify-center w-full py-2 space-x-1">
                 <IonIcon icon={personCircleOutline} size="large" />
                 <div className="flex flex-col w-full">

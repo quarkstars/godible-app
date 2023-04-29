@@ -15,7 +15,7 @@
     "ionic:serve": "npm run start"
   },
   "dependencies": {
-    "@capacitor/android": "^4.0.0",
+    "@capacitor/android": "4.3.0",
     "@capacitor/camera": "^4.1.4",
     "@capacitor/core": "^4.0.0",
     "@capacitor/ios": "^4.0.0",
