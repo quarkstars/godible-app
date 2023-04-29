@@ -232,7 +232,7 @@ const useUser = () => {
             currentUser.set('username', googleUser.email);
             currentUser.set('email', googleUser.email);
             currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
-            currentUser.set('sendHour', 5);
+            currentUser.set('sendHour', "5");
             currentUser.set('nextSendTime', nextSendTime(5));
             if (googleUser.givenName) currentUser.set('firstName', googleUser.givenName);
             if (googleUser.familyName) currentUser.set('lastName', googleUser.familyName);
@@ -347,7 +347,7 @@ const useUser = () => {
                     lastName: last,
                     language,
                     timeZone:  Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    sendHour: 5,
+                    sendHour: "5",
                     nextSendTime: nextSendTime(5),
                 },
             )
