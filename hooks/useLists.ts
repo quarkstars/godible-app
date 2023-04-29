@@ -197,6 +197,7 @@ const useLists = () => {
             // Set loading state
             setIsLoading(false);
         }
+        console.log("UPDATED LIST", updatedList)
         return updatedList;
     }
 
