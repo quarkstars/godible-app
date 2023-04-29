@@ -38,10 +38,10 @@ const Menu: React.FC = () => {
     const router = useIonRouter();
 
     let hideClass:string|undefined;
-    // Removing this because it causes bugs
-    // if (location.pathname === "/signup" || location.pathname === "/signin") {
-    //   hideClass = "hide"
-    // }
+    if (location.pathname === "/signup" || location.pathname === "/signin") {
+      // If there are url params, don't hide menu beacuse it can cause bugs
+      if (!router.routeInfo.search) hideClass = "hide"
+    }
 
   const player = useContext(Player);
     
