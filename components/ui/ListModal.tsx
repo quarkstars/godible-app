@@ -235,7 +235,7 @@ const ListModal = (props: IPlayerListModalProps) => {
     });
   const reorderable = (setList || (_list?.userId && _list?.userId === user?.objectId))
 
-  console.log(238)
+  console.log(238, user, lists, _list, player)
 
   let isPlayerList = false;
   if (!_list?.objectId) isPlayerList = true
