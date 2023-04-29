@@ -44,14 +44,13 @@ const ListModal = (props: IPlayerListModalProps) => {
     isViewOnly,
   } = props;
 
-  console.log(47)
+
   const player = useContext(Player);
   const {
     user,
     setListReloads,
   } = useContext(UserState);
 
-  console.log(52)
   //User Lists
   const {
     postList,
@@ -62,18 +61,15 @@ const ListModal = (props: IPlayerListModalProps) => {
     addEpisodeToList,
   } = useLists();
 
-  console.log(65)
   //When adding an episode, show the fetch the user's lists and show the lists
   const [_isAddingEpisode, setIsAddingEpisode] = useState(isAddingEpisode||false);
   const [internalList, setInternalList] = useState<IList|undefined>();
   useEffect(() => {
     if (!_isAddingEpisode) return;
-    console.log("GET LIST", user)
-    getLists(undefined, { sort: "+index", limit: 30, userId: user?.objectId });
+    getLists(undefined, { sort: "+index", limit: 30, userId: user.objectId });
   }, [_isAddingEpisode]);
   
 
-  console.log(75)
   const _list = (internalList) ? internalList :  list;
   
   const [isReordering, setIsReordering] = useState(false);
@@ -92,31 +88,28 @@ const ListModal = (props: IPlayerListModalProps) => {
       }
   }
   
-  console.log(93)
-    let newEpisodeOrder = event.detail.complete(_list?.episodes);
+    let newEpisodeOrder = event.detail.complete(_list.episodes);
 
     const newList = {..._list, episodes: newEpisodeOrder};
     if (setList) setList(newList);
 
     // if the list has an id, update the server
-    if (user?.objectId && _list?.objectId) {
+    if (user.objectId && _list.objectId) {
       postList(newList);
     }
 
   }
 
-  console.log(107)
   async function handleRemoveEpisode(event: CustomEvent<ItemReorderEventDetail>, episodeId: string) {
     if (!_list) return;
     //Remove from list (possibly on the server too)
     player.setIsMutatingList(true);
     const newList = await removeEpisodeFromList(_list, episodeId);
 
-    console.log(114)
     //Find episode to decide if you want to move index
     let removedIndex:number|undefined = undefined;
-    for (let i = 0; i < _list?.episodes.length; i++) {
-      if (_list?.episodes[i]?.objectId === episodeId) {
+    for (let i = 0; i < _list.episodes.length; i++) {
+      if (_list.episodes[i].objectId === episodeId) {
         removedIndex = i;
         break;
       }
@@ -125,14 +118,12 @@ const ListModal = (props: IPlayerListModalProps) => {
     if (!newList || !setList || !setIndex) return player.setIsMutatingList(false);
     setList(newList);
 
-    console.log(127)
     if (newList.episodes?.length === 0) {
       player.setIsMutatingList(false);
       onDismiss(undefined, "emptied list");
       return;
     }
 
-    console.log(134)
     //Adjust the index if necessary
     let indexAdjust = (typeof index === "number" && removedIndex && removedIndex <= index) ? -1 : 0;
     let newIndex:number|undefined;
@@ -142,22 +133,19 @@ const ListModal = (props: IPlayerListModalProps) => {
     setTimeout(() => player.setIsMutatingList(false), 500);
   }
 
-  console.log(144, _list?.name)
   const [listName, setListName] = useState<string|undefined>();
   useEffect(() => {
-    console.log(147)
     if (!_list) return;
-    if (!_list?.name) return;
-    setListName(_list?.name);
+    if (!_list.name) return;
+    setListName(_list.name);
   }, [_list?.name])
 
 
 
-  console.log(154)
   async function handlePlay(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, episodeIndex: number, isDismissing = true) {
     
     if (!_list) return;
-    const episodes = _list?.episodes;
+    const episodes = _list.episodes;
     if (!episodes) return;
     if (episodes.length < 1) return;
     //Reverse episodes because playlist should be incremental
@@ -168,6 +156,7 @@ const ListModal = (props: IPlayerListModalProps) => {
       player.setIndex(episodeIndex);
       if (!player.isPlaying) player.togglePlayPause(true);
       if (isDismissing) {
+        console.log("ROUTER PUSH", episodes[episodeIndex]._path!)
         if (router) router.push(episodes[episodeIndex]._path!);
         setTimeout(() => player.setIsMutatingList(false), 500);
         onDismiss(undefined, "play")
@@ -178,13 +167,12 @@ const ListModal = (props: IPlayerListModalProps) => {
   const [saveListText, setSaveListText] = useState<string>("Save as List");
   async function handleSaveList(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, _name?: string) {
     
-  console.log(180)
     if (!_list) return;
     let name = (_name === "Bookmarks") ? "More Bookmarks" : _name;
     let userLists;
     let index = 1
-    if (typeof _list?.index !== "number") {
-        userLists = await getLists(undefined, { limit:30, userId: user?.objectId, exclude:["episodes"] });
+    if (typeof _list.index !== "number") {
+        userLists = await getLists(undefined, { limit:30, userId: user.objectId, exclude:["episodes"] });
         if (userLists && userLists.length >= 30) {
           setSaveListText("Failed! 30 List Max")
           throw "30 list max"
@@ -194,7 +182,7 @@ const ListModal = (props: IPlayerListModalProps) => {
           await postList({name: "Bookmarks", index: 0});
         }
     } else {
-      index = _list?.index;
+      index = _list.index;
     }
     if (isBookmarks) index = 0; 
     const updatedList = await postList({..._list, name, index});
@@ -205,17 +193,15 @@ const ListModal = (props: IPlayerListModalProps) => {
   }
 
   
-  console.log(207)
   //List saving
   async function handleSaveListToAdd(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, _name?: string) {
-    console.log(210)
     let saveList;
     let name = (_name === "Bookmarks") ? "More Bookmarks" : _name;
     if (lists && lists.length >= 1) saveList = {name, index: lists.length};
     else return setListReloads(prev => prev + 1);
     const updatedList = await postList(saveList);
     setListReloads(prev => prev + 1);
-    getLists(undefined, { sort: "+index", limit: 30, userId: user?.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+    getLists(undefined, { sort: "+index", limit: 30, userId: user.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
   }
 
   //Focus name input
@@ -234,13 +220,15 @@ const ListModal = (props: IPlayerListModalProps) => {
         episode: inspectedEpisode,
         handleRemoveEpisode,
     });
-  const reorderable = (setList || (_list?.userId && _list?.userId === user?.objectId))
+    console.log("LIST USER ID", list, user?.objectId)
+  const reorderable = (setList || _list?.userId === user?.objectId)
 
-  console.log(238, user, internalList, lists, _list)
 
+    console.log("SAVE LIST", _list, user)
   let isPlayerList = false;
   if (!_list?.objectId) isPlayerList = true
-  else if (_list?.objectId === player.list?.objectId) isPlayerList = true;
+  else if (_list.objectId === player.list?.objectId) isPlayerList = true;
+  console.log('LIST IS MISSING ONE OF THESE', player.index, index)
   if (_isAddingEpisode) {
     return (
     <IonPage>
@@ -274,7 +262,97 @@ const ListModal = (props: IPlayerListModalProps) => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
+        <IonList>
 
+          {lists && lists.map((list, _index) => {
+            return (
+              <ListListItem
+                list={list}
+                key={"userlists-"+list.objectId}
+                isAddingEpisode
+                disabled={listsIsLoading}
+                onClick={async (e) => {
+                  let isPrepending = (_index) ? false : true;
+                  if (!addEpisodeId) return;
+                  let updatedList = await addEpisodeToList(_index, addEpisodeId, isPrepending);
+                  setIsAddingEpisode(false);
+                  setInternalList(updatedList);
+                  setListReloads(prev => prev + 1);
+                }}
+              />
+            )
+          })}
+          
+          {(lists && lists.length >= 30) ?
+            <IonItem color="medium" fill="outline" lines="none" className="ion-padding">
+                <IonIcon icon={ban} slot="start"/>
+                You have reached the 30 list limit. (Delete a list to make a new one)
+            </IonItem>
+            :
+            <>
+              
+              {isNamingList ?
+              <div className="flex w-full">
+                <div className="w-full">
+              <IonItem>
+                <IonInput 
+                  placeholder="Name your list..." 
+                  ref={nameListInput}
+                  onIonChange={(e) => {
+                    if (typeof e.detail.value !== "string") return;
+                  }}
+                >
+                </IonInput>
+              </IonItem>
+              </div>
+              <IonButtons slot="end">
+                <IonButton onClick={(e) => {
+                  const name = typeof nameListInput.current?.value === "string" ? nameListInput.current?.value : undefined
+                  handleSaveListToAdd(e, name?.slice(0,250));
+                  setIsNamingList(false);
+                }}  
+                  size="small"
+                  color="primary"
+                  fill="clear"
+                >
+                <IonIcon icon={checkmarkCircle} slot="start" />
+                  Save
+                </IonButton>
+                <IonButton onClick={(e) => {
+                  setIsNamingList(false);
+                }}  
+                  size="small"
+                  color="medium"
+                  fill="clear"
+                >
+                <IonIcon icon={closeCircle} slot="start" />
+                  Cancel
+                </IonButton>
+              </IonButtons>
+              </div>
+              :
+              <IonButton 
+                color="medium" 
+                fill="clear" 
+                className="ion-padding" 
+                disabled={listsIsLoading}
+                onClick={(e) => {
+                  if (!isNamingList) {
+                    setIsReordering(false);
+                    setIsNamingList(true);
+                    setTimeout(async () => {
+                      await nameListInput.current?.setFocus();
+                    }, 200);
+                  } else setIsNamingList(false);
+                }}  
+              >
+                  <IonIcon icon={listsIsLoading ? sync : add} slot="start"/>
+                  {listsIsLoading ? "Loading..." : "Create a List"}
+              </IonButton>
+              }
+            </>
+            }
+        </IonList>
       </IonContent>
     </IonPage>
     )
@@ -283,11 +361,188 @@ const ListModal = (props: IPlayerListModalProps) => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonButton 
+              color="dark" 
+              onClick={() => {
+                setIsReordering(false);
+                onDismiss(null, 'close');
+              }}
+            >
+              <IonIcon icon={close} slot="icon-only" />
+            </IonButton>
+          </IonButtons>
+          {isAddingEpisode && <IonTitle>Added!</IonTitle>}
+          {isLoading ?
+            <IonIcon icon={isLoading ? sync : checkmarkCircle}  className="ion-padding"  slot="end" size="small" color="medium" />
+          :
+          <IonButtons slot="end">
+            {user.objectId && list?.name !== "Bookmarks" &&
+              <IonButton onClick={(e) => {
+                if (!isNamingList) {
+                  setIsReordering(false);
+                  setIsNamingList(true);
+                  setTimeout(async () => {
+                    if (nameListInput.current) nameListInput.current.value = listName;
+                    await nameListInput.current?.setFocus();
+                  }, 200);
+                } else setIsNamingList(false);
+              }}  
+                size="small"
+              >
+              <IonIcon icon={isNamingList ? closeCircle : _list ?.userId === user.objectId ? pencil : addCircleOutline} slot="start" />
+                {isNamingList ? "Cancel" : _list?.userId === user.objectId ? "" : saveListText }
+              </IonButton>
+            }
 
+          </IonButtons>
+          }
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
         
+        <div className="flex items-center justify-between w-full">
+
+          
+          {isNamingList ?
+          <div className="flex w-full">
+            <div className="w-full">
+          <IonItem>
+            <IonInput 
+              placeholder="Name your list..." 
+              ref={nameListInput}
+              onIonChange={(e) => {
+                if (typeof e.detail.value !== "string") return;
+                setListName(e.detail.value);
+              }}
+            >
+            </IonInput>
+          </IonItem>
+          </div>
+          <IonButtons slot="end">
+            <IonButton onClick={(e) => {
+              const name = typeof nameListInput.current?.value === "string" ? nameListInput.current?.value : undefined
+              handleSaveList(e, name?.slice(0,250));
+              setIsNamingList(false);
+            }}  
+              size="small"
+              color="primary"
+              fill="outline"
+            >
+            <IonIcon icon={checkmarkCircle} slot="start" />
+              Save
+            </IonButton>
+          </IonButtons>
+          </div>
+          :
+            <span className="font-medium text-light dark:text-dark">
+              {isLoading ? 
+                `Saving...`
+              :
+            
+              <>{listName ? listName : "Listening Now"}</>
+              }
+            </span>
+          }
+          {reorderable && !isNamingList && _list?.episodes && _list?.episodes.length > 1 &&
+            <IonButton size="small" fill="clear" color={isReordering ? "primary" : "medium"}
+              onClick={()=>{setIsReordering(prev=>!prev)}}
+            >
+              <IonIcon icon={swapVertical} slot="start" color={isReordering ? "primary" : "medium"} />
+              {isReordering ? "Done" : "Reorder"}
+            </IonButton>
+          }
+        </div>
+        <IonList>
+        {/* The reorder gesture is disabled by default, enable it to drag and drop items */}
+        <IonReorderGroup disabled={!isReordering} onIonItemReorder={(e) => handleReorder(e)}>
+        {_list?.episodes && _list.episodes.map((episode, _index) => {
+          //Will it be highlighted?
+          let weight:string|undefined;
+          let highlight:string|undefined;
+          let isCurrent:boolean|undefined;
+          let isPlaying:boolean|undefined;
+          //Check if current episode matches the current one in the player
+          if (typeof index === "number" && typeof index === "number" && episode.objectId === player.list?.episodes?.[player.index]?.objectId ) {
+            weight = (player.index === _index) ? "font-bold" : "font-medium";
+            highlight = (typeof index === "number" && player.index === _index) ? "light" : undefined;
+            isCurrent = (typeof index === "number" && player.index === _index);
+            isPlaying = (isCurrent && player.isPlaying)
+          }
+
+          return(
+            <IonReorder key={"list-"+episode.objectId} >
+              <IonItem 
+                // key={"list-"+episode.objectId} 
+                color={highlight}
+                onClick={(e: any) => {
+                    if (isReordering) return;
+                    handlePlay(e, _index, true);                
+                    onDismiss(episode.slug, "read");
+                }}
+                button={isReordering ? false : true}
+              >
+                {/* <IonReorder slot="start"></IonReorder> */}
+                <div className="w-10 h-10 overflow-hidden rounded-lg cursor-pointer" 
+                  onClick={(e: any) => {
+                      e.stopPropagation();
+                      setInspectedEpisode(episode);
+                      presentDetails({
+                      event: e,
+                      onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
+                      side: "right",
+                    })
+                  }}
+                >
+                  <img  src={episode._bookImageUrl ? episode._bookImageUrl : episode.imageUrl} alt={episode._bookTitle} />
+                </div>
+                <div className='flex flex-col'>
+                  <span className={`pl-3 truncated ${weight}`}>{`Episode ${episode.number}`}</span>
+                  <div className={`hidden xs:flex space-x-1 pl-3 text-medium font-medium text-xs items-center ${weight}`}>
+                    <span className="truncated">{episode?._bookTitle}</span>
+                    {episode?._chapterName && <IonIcon icon={chevronForward} /> }
+                    {episode?._chapterName && <span className="truncated">{episode?._chapterName}</span>}
+                    </div>
+                </div>
+                {isReordering ? 
+                  <IonIcon icon={swapVertical} color="primary" slot="end" />
+                :
+                <IonButtons slot="end">
+                  <IonButton
+                      onClick={(e: any) => {
+                        e.stopPropagation();
+                        if (isReordering) return;
+                        if (!isPlaying) handlePlay(e, _index, true);                
+                        else player.togglePlayPause();
+                        
+                    }}
+                  >
+                    <IonIcon icon={isPlaying ? pauseCircle : playCircle} slot="icon-only" />
+                  </IonButton>
+                  {!isViewOnly &&
+                  <IonButton
+                    onClick={(e: any) => {
+                        e.stopPropagation();
+                        setInspectedEpisode(episode);
+                        presentMenu({
+                        event: e,
+                        onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
+                        side: "left",
+                      })
+                    }}
+                  >
+                    <IonIcon icon={ellipsisVertical} slot="icon-only" />
+                  </IonButton>
+                  }
+                </IonButtons>
+                }
+              </IonItem>
+            </IonReorder>
+          )
+        })
+        }
+        </IonReorderGroup>
+        </IonList>
       </IonContent>
     </IonPage>
   )
