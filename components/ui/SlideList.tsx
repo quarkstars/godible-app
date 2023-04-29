@@ -38,7 +38,6 @@ export default function SlideList(props:ISlideListProps) {
         props.setItemWidth(itemWidth)
         setItemCount(itemCount);
     }, [bounds.width, props.idealWidth, props.setItemWidth])
-    console.log(itemCount)
 
     return (
         <div ref={slideContainer}>

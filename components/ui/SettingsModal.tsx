@@ -183,7 +183,6 @@ const SettingsModal = (props: ISettingsModalProps) => {
     else {    
       photo = await uploadToCloudinary(blobUrl, user?.objectId);
     }
-    console.log("PHOTO RETURNED", photo)
     
     if (!photo?.url) return;
     let imageUrl = photo.url.replace("/upload/", "/upload/c_thumb,w_250,h_250/").replace("http://", "https://");
@@ -383,7 +382,6 @@ const SettingsModal = (props: ISettingsModalProps) => {
                   accept="image/*"
                   className="hidden" 
                   onChange={(e) => {
-                    console.log("TRIGGER PHOTO", e.target.value, e.target.files)
                       const file = e.target.files?.[0];
                       if (!file) return;
                       const blobUrl = URL.createObjectURL(file);

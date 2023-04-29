@@ -87,7 +87,6 @@ const DonationPage: React.FC = () => {
       state.current.value = user?.address?.state
     }
   }, [user?.address, state.current, changingAddress]);
-  console.log("STATE", state)
   useEffect(() => {
     if (!user?.objectId) return;
     if (postal_code.current) postal_code.current.value = user?.address?.postal_code
@@ -95,7 +94,6 @@ const DonationPage: React.FC = () => {
   
   
   const handleSelectDonation = async (amount: number) => {
-    console.log("AMOUNT", Math.floor(amount))
     await updateDonationAmount(Math.floor(amount));
     setChangingAmount(false);
     setEnteringCustomAmount(false);

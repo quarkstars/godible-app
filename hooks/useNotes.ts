@@ -53,7 +53,6 @@ const useNotes = () => {
             } else {
                 setNotes(newNotes);
             }
-            console.log("LIST ALL", results)
             setError(undefined);
         } catch (error) {
             setError(error);

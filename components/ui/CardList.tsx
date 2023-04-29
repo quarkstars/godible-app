@@ -19,17 +19,15 @@ export default function CardList(props:ISlideListProps) {
     useLayoutEffect(() => {
         if (!bounds.width || !props?.idealWidth || !props.setItemWidth) return;
         let itemCount = Math.round(bounds.width/props.idealWidth);
-        console.log('itemCount', itemCount, bounds.width)
         let itemWidth = (props.spaceBetween) ? (bounds.width/itemCount)-(props.spaceBetween) : bounds.width/props.idealWidth;
         props.setItemWidth(itemWidth)
         setItemCount(itemCount);
     }, [bounds.width, props.idealWidth, props.setItemWidth])
-    console.log(itemCount)
 
     return (
         <div 
             ref={container} 
-            className="w-full flex flex-wrap"
+            className="flex flex-wrap w-full"
             style={{
                 gap: props.spaceBetween || 10,
             }}

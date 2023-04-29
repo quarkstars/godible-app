@@ -111,7 +111,9 @@ const ListListItem = (props: IListListItemProps) => {
                   presentMenu({
                   event: e,
                   onDidDismiss: (e: CustomEvent) => {},
+                  alignment: "start",
                   side: "left",
+                  reference: "event",
                 })
               }}
             

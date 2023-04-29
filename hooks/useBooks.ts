@@ -34,7 +34,6 @@ const useBooks = () => {
               skip,
             }
             const results = await Parse.Cloud.run("getBooks", params);
-            console.log("BOOK RESULTS", results, options)
             if (isAppending && books) {
                 setBooks((prev) =>{ return [...prev!, ...results]});
             } else {

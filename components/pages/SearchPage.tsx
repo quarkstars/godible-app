@@ -139,7 +139,6 @@ const SearchPage = (props: ISearchPageProps) => {
       router.push(`${router.routeInfo.pathname}?${topicParam}`);
       setBookFilter(undefined);
     }
-    console.log("ROUTER", router.routeInfo.pathname)
 
 
   //Focus search bar when entering the page
@@ -150,7 +149,8 @@ const SearchPage = (props: ISearchPageProps) => {
     const urlParams = new URLSearchParams(router.routeInfo.search)
     const init = urlParams.get("init");
     if (init == "0" || props.isNotInitSearch) return;
-    setTimeout(async () => {await searchBar.current!.setFocus()}, 200);
+    //Try without initing search on start, because it seems to impact performance
+    // setTimeout(async () => {await searchBar.current!.setFocus()}, 200);
   }, [searchBar.current]);
 
   //Search bar query
@@ -221,11 +221,14 @@ const SearchPage = (props: ISearchPageProps) => {
 
 
   useEffect(() => {
+    //Only load episodes if defined search
+    if (!search && !bookFilter && !topicFilter && mode !== "speeches" && mode !== "episodes") return;
     initializeResults()
     
   }, [search, bookFilter, topicFilter, mode]);
 
   useIonViewDidEnter(() => {
+    if (!search && !bookFilter && !topicFilter && mode !== "speeches" && mode !== "episodes") return;
     if (typeof episodes === "undefined" || typeof speeches === "undefined") initializeResults();
     if (searchBar.current) searchBar.current.value = undefined
     
@@ -265,7 +268,6 @@ const SearchPage = (props: ISearchPageProps) => {
     if (displayCount >= newMax) setReachedListMax(true);
     setListMax(newMax);
   }, [lists]);
-  console.log("LIST", reachedListMax, lists)
   
 
   
@@ -274,26 +276,26 @@ const SearchPage = (props: ISearchPageProps) => {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const fetchMoreEpisodes = async (e) => {
     e.preventDefault();
-    if (!max) return setReachedMax(true);
+    // if (!max) return setReachedMax(true);
+    
     const displayCount = 24 + ((skip||0)*24);
-    if (displayCount >= max) return setReachedMax(true);
+    if (max && displayCount >= max) return setReachedMax(true);
+    let sort = (!search) ? "-publishedAt" : undefined;
     const bookIds = bookFilter ? [bookFilter.objectId] : undefined;
     const topicIds = topicFilter ? [topicFilter.objectId!] : undefined;
-    await getEpisodes(undefined,{limit: 24, search, bookIds, topicIds, skip: (skip||0)+1, exclude: ["text"]}, true);
+    await getEpisodes(undefined,{limit: 24, search, bookIds, topicIds, sort, skip: (skip||-1)+1, exclude: ["text"]}, true);
     setIsLoadingMore(false);
   }
   //Fetch more Lists
   const [listIsLoadingMore, setListIsLoadingMore] = useState<boolean>(false);
   const fetchMoreLists = async (e) => {
     e.preventDefault();
-    if (!max) return setReachedListMax(true);
     const displayCount = 24 + ((listSkip||0)*24);
-    if (displayCount >= max) return setReachedListMax(true);
+    if (max && displayCount >= max) return setReachedListMax(true);
     let sort = (!search) ? "-createdTime" : undefined;
     const bookId = bookFilter ? bookFilter.objectId: undefined;
     const topicId = topicFilter ? topicFilter.objectId! : undefined;
-    console.log("LIST SKIKP", listSkip)
-    await getLists(undefined, {search, bookId, topicId, limit: 24, sort, isSpeech: true, skip: (listSkip||0)+1, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] }, true);
+    await getLists(undefined, {search, bookId, topicId, limit: 24, sort, isSpeech: true, skip: (listSkip||-1)+1, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] }, true);
     setListIsLoadingMore(false);
   }
   // Handle Episode Listen
@@ -335,7 +337,6 @@ const SearchPage = (props: ISearchPageProps) => {
         episodes: speech.episodes,
         description: speech.description,
       };
-      console.log("PUSH", list);
       player.setIsAutoPlay(true);
       player.setList(list);
       player.setIndex(epIndex);
@@ -519,7 +520,7 @@ const SearchPage = (props: ISearchPageProps) => {
           placeholder={'Search...'} 
           debounce={500} 
           mode={'ios'} 
-          onIonChange={(e)=>{console.log("DEBOUNCE NOT WORKING"); searchChangeHandler(e)}}
+          onIonChange={(e)=>{searchChangeHandler(e)}}
         />
 
       </IonToolbar>
@@ -615,9 +616,8 @@ const SearchPage = (props: ISearchPageProps) => {
               <CardList spaceBetween={10} setItemWidth={setTopicWidth} idealWidth={180}>
                 {topicCards}
                 {(!topics && topicsIsLoading) && Array(12).fill(undefined).map((skel, index) => {
-                    console.log("TOPIC", index)
                     return (
-                      <IonSkeletonText key={"topicskel-"+index} style={{width:"180px", height:"180px"}} />
+                      <IonSkeletonText key={"topicskel-"+index} style={{width:topicWidth, height:topicWidth}} />
                     )
                   })
                 }
@@ -695,7 +695,10 @@ const SearchPage = (props: ISearchPageProps) => {
                   {isLoadingMore ?
                     "Loading..."
                   :
-                    "Load More"
+                    (max && episodes) ?
+                      "Load More"
+                    :
+                      "Load Episodes"
                   }
                 </IonButton>
                 }
@@ -729,7 +732,11 @@ const SearchPage = (props: ISearchPageProps) => {
                   {listIsLoadingMore ?
                     "Loading..."
                   :
-                    "Load More"
+                    
+                    (listMax && speeches) ?
+                      "Load More"
+                    :
+                      "Load Speeches"
                   }
                 </IonButton>
                 }

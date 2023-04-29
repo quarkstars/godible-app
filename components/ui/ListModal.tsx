@@ -156,7 +156,6 @@ const ListModal = (props: IPlayerListModalProps) => {
       player.setIndex(episodeIndex);
       if (!player.isPlaying) player.togglePlayPause(true);
       if (isDismissing) {
-        console.log("ROUTER PUSH", episodes[episodeIndex]._path!)
         if (router) router.push(episodes[episodeIndex]._path!);
         setTimeout(() => player.setIsMutatingList(false), 500);
         onDismiss(undefined, "play")
@@ -223,11 +222,9 @@ const ListModal = (props: IPlayerListModalProps) => {
   const reorderable = (setList || (_list?.userId && _list?.userId === user?.objectId))
 
 
-    console.log("SAVE LIST", _list, user)
   let isPlayerList = false;
   if (!_list?.objectId) isPlayerList = true
   else if (_list.objectId === player.list?.objectId) isPlayerList = true;
-  console.log('LIST IS MISSING ONE OF THESE', player.index, index)
   if (_isAddingEpisode) {
     return (
     <IonPage>
@@ -489,7 +486,9 @@ const ListModal = (props: IPlayerListModalProps) => {
                       presentDetails({
                       event: e,
                       onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
-                      side: "right",
+                      alignment: "start",
+                      side: "left",
+                      reference: "event",
                     })
                   }}
                 >
@@ -526,7 +525,10 @@ const ListModal = (props: IPlayerListModalProps) => {
                         presentMenu({
                         event: e,
                         onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
+                        alignment: "start",
                         side: "left",
+                        reference: "event",
+                        
                       })
                     }}
                   >

@@ -68,7 +68,6 @@ const useLists = () => {
         finally {
             setIsLoading(false);
         }
-        console.log("USER LIST RESULTS", updatedLists)
         return updatedLists;
     };
 
@@ -107,7 +106,6 @@ const useLists = () => {
         // if (!from || !to) return;
         // if (!lists || !lists?.[0] || lists.length < to) return;
         if (!lists) return;
-        console.log("NEW ORDER", from, to)
         // Rearrange the array of lists
         const newList = [...lists].slice(1, lists.length)
         const [removed] = newList.splice(from, 1);
@@ -151,7 +149,6 @@ const useLists = () => {
                 return appendEpisodeStrings(episode);
             });
             result.episodes = updatedEpisodes;
-            console.log("EPISODES RESULT", result, "EPISODESUPDATE", updatedEpisodes)
             setError(undefined);
         } catch (error) { 
             // Set error state
@@ -224,7 +221,6 @@ const useLists = () => {
         try {
         //If the list is the user's update the list on the server
             let result;
-            console.log("NOT SENDING UPDATE", listToUpdate, user?.objectId, listToUpdate.userId, listToUpdate.objectId && listToUpdate.userId === user?.objectId)
             if (listToUpdate.objectId && listToUpdate.userId === user?.objectId) result = await postList(listToUpdate);
             if (result){ 
                 if (result.episodes) result.episodes = result.episodes.map((episode) => {
@@ -238,7 +234,6 @@ const useLists = () => {
         } finally {
           setIsLoading(false);
         }
-        console.log("HANDLE REMOVE result from remove", listToUpdate)
         return listToUpdate;
       };
 

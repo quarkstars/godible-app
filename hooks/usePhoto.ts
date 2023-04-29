@@ -18,7 +18,6 @@ const usePhoto = () => {
     });
 
     const response = await uploadToCloudinary(photo.webPath, userId);
-    console.log("PHOTO", response);
 
     return response;
   };
@@ -26,13 +25,10 @@ const usePhoto = () => {
   const uploadToCloudinary = async (photoURI, publicId: string) => {
     const cloudName = process.env.NEXT_PUBLIC_CLOUD_NAME!
     setIsLoading(true);
-    console.log("PHOTO RETURNED photoURI", photoURI)
     try {
         const { signature, timestamp } = await Parse.Cloud.run('getCloudinarySignature');
-        console.log("PHOTO RETURNED signature", signature)
         if (!signature) throw "No signature"
         const base64Image = await blobUrlToBase64(photoURI);
-        console.log("PHOTO RETURNED base64Image", base64Image)
         if (typeof base64Image !== "string") throw "Failed to convert to base64"
 
         const data = new FormData();

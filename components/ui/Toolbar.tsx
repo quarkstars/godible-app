@@ -13,7 +13,6 @@ const Toolbar = ({children}) => {
         user
       } = useContext(UserState);
 
-    console.log("user", user)
 	const router = useIonRouter();
     return (
         

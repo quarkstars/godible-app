@@ -57,7 +57,6 @@ const useTopics = () => {
         const _lang = (user?.language) ? user?.language : userDefaultLanguage;
 
         const _name = resolveLangString(topic?.name, _lang);
-        //console.log('getEpisodes', getEpisodes())
 
         return {
             ...topic,

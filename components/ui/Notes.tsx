@@ -62,7 +62,6 @@ const Notes = (props: INotesProps) => {
         }
         getUserNotes(undefined, { sort: "-createdTime", episodeId: episode?.objectId, limit: 30, userId: user?.objectId });
     }, [user?.objectId, episode]);
-    console.log("NOTES PUBLIC", notes)
 
     const [isCreatingNewNote, setIsCreatingNewNote] = useState<boolean>(true);
     const [editNoteIndex, setEditNoteIndex] = useState<number|undefined>();
@@ -75,7 +74,6 @@ const Notes = (props: INotesProps) => {
     async function handleSaveNewNote(note: INote) {
         if (!user?.objectId) return;
         let newNote = await postUserNote(note);
-        console.log("NOTES", newNote);
         if (!newNote) return 
         setUserNotes(prev => {return [newNote!, ...(prev||[])]});
         setIsCreatingNewNote(false);

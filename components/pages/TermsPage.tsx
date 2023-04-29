@@ -11,12 +11,13 @@ const TermsPage:React.FC = () => {
   const [response, setResponse] = useState<any>()
   //Get Current User with Streak
 
-  async function testNotification () {
-      try {
-        const response = await Parse.Cloud.run("notificationTest");
-        setResponse(response)
-      } catch (err) {console.log("ERROR", err)}
-    };
+  //TODO: Add Notifications
+  // async function testNotification () {
+  //     try {
+  //       const response = await Parse.Cloud.run("notificationTest");
+  //       setResponse(response)
+  //     } catch (err) {console.error("ERROR", err)}
+  //   };
 
 
     const text = useMemo(() => {

@@ -90,7 +90,7 @@ const {
                     </div>
                     }
                     {subtitle &&
-                    <p className={`font-serif  text-white text-md mobile:text-lg dark:text-white xs:text-2xl ${isQuote ? "text-left xs:text-center" : "text-center"}`} style={{marginTop: isQuote ? "-15px" : "0px"}}>
+                    <p className={`font-serif  text-white text-md mobile:text-lg dark:text-white xs:text-2xl ${isQuote ? "text-left xs:text-center pl-3" : "text-center"}`} style={{marginTop: isQuote ? "-15px" : "0px"}}>
                       {`${subtitle}${isQuote?"”":""}`}
                     </p>
                     }

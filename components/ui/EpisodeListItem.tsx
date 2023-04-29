@@ -49,7 +49,6 @@ const EpisodeListItem = (props: IEpisodeListItemProps) => {
   return (
     <IonItem color={highlight}
       onClick={(e: any) => {
-        console.log('clicked')
         e.preventDefault();
         if (props.onPlay) props.onPlay(e)
       }}

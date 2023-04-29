@@ -374,7 +374,6 @@ const player = useContext(Player);
   if (user.isEmailOn) reminderTextArray.push("Email");
   const reminderText = reminderTextArray.join(", ")
   
-  console.log("LOCATION", dateMap, lists)
 
   return (
   <IonPage>
@@ -396,7 +395,10 @@ const player = useContext(Player);
                     onClick={(e: any) => {presentLogoutMenu({
                       event: e,
                       onDidDismiss: (e: CustomEvent) => {},
-                      side: "left"
+                      alignment: "start",
+                      side: "left",
+                      reference: "event",
+                      
                     })}}
                     color="medium"
                   >
@@ -448,7 +450,7 @@ const player = useContext(Player);
               </div>
             }
             <div className='flex items-center justify-between w-full p-4 rounded-lg bg-dark dark:bg-light'>
-              
+              <div className="flex items-center">
               <IonAvatar
                     onClick={()=>{
                       setIsScrollToReminders(false);
@@ -472,15 +474,17 @@ const player = useContext(Player);
               </IonAvatar>
               <div className='flex flex-col justify-start'>
                 <div className="flex items-center justify-start">
-                  <span className="w-full pl-3 font-medium text-md xs:text-2xl mobile:text-lg">{userName}</span>
-                  <div className="block xs:hidden" style={{zoom:.7}}>
+                  <span className="w-full pl-3 font-medium text-md mobile:text-2xl">{userName}</span>
+                  <div className="block mobile:hidden" style={{zoom:.7}}>
                     <IonChip color="primary"
                     onClick={(e: any) => {
                         if (user?.objectId) {
                             presentStreak({
-                              // event: e,
+                              event: e,
                               onDidDismiss: (e: CustomEvent) => {},
-                              // side: "left"
+                              alignment: "start",
+                              side: "left",
+                              reference: "event",
                           })
                         }
                         else router.push("/signin")
@@ -510,14 +514,17 @@ const player = useContext(Player);
                 </IonButton>
                 }
               </div>
-              <div className="hidden xs:block">
+              </div>
+              <div className="hidden mobile:block">
                     <IonChip color="primary"
                     onClick={(e: any) =>{
                       if (user?.objectId) {
                           presentStreak({
-                            // event: e,
+                            event: e,
                             onDidDismiss: (e: CustomEvent) => {},
-                            // side: "left"
+                            alignment: "start",
+                            side: "left",
+                            reference: "event",
                         })
                       }
                       else router.push("/signin")
@@ -525,10 +532,10 @@ const player = useContext(Player);
                     }
                     >
                     <IonIcon icon={user?.objectId ? flame : arrowForward} color="primary" />
-                    {user?.objectId ? <span className="font-black ">{user.currentStreak||0}</span> : <span className="font-medium ">Log In</span>}
+                    {user?.objectId ? <span className="font-black">{user.currentStreak||0}</span> : <span className="font-medium "  style={{minWidth: "50px"}}>Log in</span>}
                   </IonChip>      
               </div>
-              <div className="block xs:hidden"></div>
+              <div className="block mobile:hidden"></div>
             </div>
             <div className='flex w-full mt-4 mb-6 border-b justify-evenly'>
               {/* <IonTabBar slot="bottom"> */}
@@ -648,7 +655,7 @@ const player = useContext(Player);
                   }
                   <div className="flex items-center justify-between w-full pt-8">
                     {user?.objectId && lists && lists.length > 1 && <span className="font-medium text-light dark:text-dark">My Saved Lists</span>}
-                    {(lists && lists.length > 1) && 
+                    {(lists && lists.length > 2) && 
                     <IonButton size="small" fill="clear" color={isReordering ? "primary" : "medium"}
                       onClick={()=>{setIsReordering(prev=>!prev)}}
                     >

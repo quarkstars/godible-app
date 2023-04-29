@@ -176,7 +176,6 @@ const EpisodePage:React.FC = () => {
     setIsAdjacentEpisodesFromList(_isAdjacentEpisodeFromList);
     if (!_isAdjacentEpisodeFromList[0] || !_isAdjacentEpisodeFromList[1]) {
       const [previousEpisode, nextEpisode] = await getAdjacentEpisodes(episode!, !_isAdjacentEpisodeFromList[0], !_isAdjacentEpisodeFromList[1]);
-      console.log("PREVIOUS EPISODE RETURNED", previousEpisode)
       setAdjacentEpisodes(adjacentEps => {
         if (previousEpisode) adjacentEps[0] = previousEpisode;
         if (nextEpisode) adjacentEps[1] = nextEpisode;
@@ -204,7 +203,6 @@ const EpisodePage:React.FC = () => {
     const currentPlayerEpisode = (typeof player.index === "number") ? player.list?.episodes?.[player.index] : undefined;
     //only load it if the currently playing episode is different and we are on an episode page 
     if (!player.isMutatingList && currentPlayerEpisode?.objectId !== episode.objectId && location.pathname.includes("episode")) {
-      console.log("EPISODE TRY CURRENT", currentPlayerEpisode?.slug, episode.slug, currentPlayerEpisode?.objectId, episode.objectId)
       player.setList({episodes: [episode]});
       player.setIndex(0);
     }
@@ -340,7 +338,6 @@ const EpisodePage:React.FC = () => {
     if (!player.list?.episodes?.[player.index]?.audioPath && player.isVisible) player.setIsVisible(false);
   });
 
-  console.log("BOOK RENDERED", episode?._bookImageUrl, episode)
 
   return (
     <IonPage>
@@ -442,7 +439,7 @@ const EpisodePage:React.FC = () => {
                 }
             </div>     
             <div className="flex flex-wrap justify-center w-full pb-8">
-              <div className={`rounded-md p-2 flex justify-center sm:items-center ${!episode ? "py-6": ""} ${showMeta ? "bg-gray-100 dark:bg-gray-800": ""} ${episode?._metaDataBlocks && episode?._metaDataBlocks.length > 1 ? "w-full" : ""}`}>
+              <div className={`rounded-md p-2 flex justify-center items-start ${!episode ? "py-6": ""} ${showMeta ? "bg-gray-100 dark:bg-gray-800": ""} ${episode?._metaDataBlocks && episode?._metaDataBlocks.length > 1 ? "w-full" : ""}`}>
                 <motion.div className="overflow-hidden rounded-md pointer-cursor" onClick={()=>setShowMeta(prev => !prev)} animate={metaControls}>
                   
                   {episode ? 

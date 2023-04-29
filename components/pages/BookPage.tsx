@@ -47,7 +47,6 @@ const BookPage:React.FC = () => {
       setEpisodes(undefined);
       //If current episode matches location, get the episode from the server
       const currentSlug = location.pathname.substring(location.pathname.lastIndexOf('/') + 1);
-      console.log("BOOK CURRENTSLUG", currentSlug);
       //set a preliminary episode lite only once from player if it matches
       getBooks(undefined, {limit: 12, slug: currentSlug});
       setReachedMax(false);
@@ -64,12 +63,9 @@ const BookPage:React.FC = () => {
   useEffect(() => {
     //TODO: set to 24
     if (!books) return;
-    console.log("BOOK TO EP", books);
     let bookIds = (book) ? [book?.objectId] : undefined;
-    console.log("BOOK TO EP", bookIds);
     getEpisodes(undefined, {limit: 24, bookIds, sort: "-publishedAt", exclude: ["text"]});
   }, [books]);
-  console.log("BOOK TO EPISODES", episodes);
 
 	const router = useIonRouter();
   const player = useContext(Player);
@@ -106,7 +102,6 @@ const BookPage:React.FC = () => {
       const startIndex = (typeof reversedIndex === "number" && reversedIndex - 3 >= 0) ? reversedIndex -3 : 0;
       const endIndex = (typeof reversedIndex === "number" && reversedIndex + 4 <= reversedEpisodes.length-1) ? reversedIndex +4 : reversedEpisodes.length-1;
       const newEpisodes = [...reversedEpisodes].slice(startIndex, endIndex);
-      console.log("NEW EPISODES", startIndex, endIndex, newEpisodes)
       let newIndex = newEpisodes.findIndex((ep) => ep.objectId === episodes[index].objectId);
       if (newIndex < 0) newIndex = 0;
       player.setIsAutoPlay(true);
@@ -131,9 +126,7 @@ const BookPage:React.FC = () => {
 
 
   const fetchMoreEpisodes = async (e) => {
-    console.log("CALL FETCH 1")
     e.preventDefault();
-    console.log("CALL FETCH 2")
     let bookIds = (book) ? [book?.objectId] : undefined;
     await getEpisodes(undefined,{limit: 24, bookIds, sort: "-publishedAt", exclude: ["text"], skip: (skip||0)+1}, true);
     e.target.complete()

@@ -94,7 +94,6 @@ const useEpisodes = () => {
     const appendEpisodeStrings = (episode: IEpisode): IEpisode => {
         const _lang = (user?.language) ? user?.language : userDefaultLanguage;
         const _bookImageUrl = episode?.book?.thumbUrl || episode?.book?.imageUrl;
-        console.log("BOOK IMAGE", episode?.book?.thumbUrl, _bookImageUrl)
         const _authorImageUrl = episode?.book?.authorImageUrl;
         const _bookPath = (episode?.book?.slug) ? "/book/" + episode?.book?.slug : undefined;
         const metaData = resolveLangString(episode?.metaData, _lang);
@@ -129,10 +128,8 @@ const useEpisodes = () => {
         //Text
         const textInLanguage = resolveLangString(episode?.text, _lang); 
         const _textBlocks:string[] = (textInLanguage) ? textInLanguage.split("\\n") : [];
-        // console.log("EPISODE BLOCKS ", textInLanguage, textInLanguage.split("\\n"), "TEST\nTEST".split(/\r?\n/))
         const _quote = resolveLangString(episode?.quote, _lang); 
         const _audioPath = resolveLangString(episode?.audioPath, _lang);
-        //console.log('getEpisodes', getEpisodes())
 
         
 
@@ -157,24 +154,26 @@ const useEpisodes = () => {
     }
     
     //When the user changes their language, if episodes exists, redo the episode setrings
+    const [reappends, setReappends] = useState(0)
     useEffect(() => {
-        if (!user.language) return;
-        if (episodes) {
+        if (!user?.language) return;
+
+        if (episodes && reappends < 2) {
             setEpisodes((prevEpisodes) => {
                 return prevEpisodes?.map((episode: any) => {
-                    return appendEpisodeStrings(episode);
+                    return appendEpisodeStrings(episode); 
                 })
             });
         }
         //Update the list already loaded in the player
         if (!player.list) return
-        // player.setList((prevList) => {
-        //     let newEpisodes = prevList!.episodes.map((episode: any) => {
-        //         return appendEpisodeStrings(episode);
-        //     })
-        //     return {...prevList, episodes: newEpisodes}
-        // });
-      }, [user.language]);
+        player.setList((prevList) => {
+            let newEpisodes = prevList!.episodes.map((episode: any) => {
+                return appendEpisodeStrings(episode);
+            })
+            return {...prevList, episodes: newEpisodes}
+        });
+      }, [user?.language, reappends]);
 
 
     
@@ -190,6 +189,8 @@ const useEpisodes = () => {
         setEpisodes,
         skip: episodeOptions?.skip,
         getAdjacentEpisodes,
+        setReappends,
+        reappends,
     }
 }
 

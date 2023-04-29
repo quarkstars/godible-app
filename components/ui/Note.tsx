@@ -139,7 +139,9 @@ const Note = (props: INoteProps) => {
                             present({
                                 event: e,
                                 onDidDismiss: (e: CustomEvent) => {},
+                                alignment: "start",
                                 side: "left",
+                                reference: "event",
                             })
                             }
                         >

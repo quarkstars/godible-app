@@ -130,7 +130,6 @@ const useUser = () => {
         if (currentUser) {
             await currentUser.fetch();
             const currentUserJSON = currentUser.toJSON();
-            console.log("GOT CURRENT USER NEW", currentUserJSON)
             setUser(currentUserJSON);
             setIsLoading(false);
             return currentUserJSON;
@@ -233,6 +232,7 @@ const useUser = () => {
             currentUser.set('username', googleUser.email);
             currentUser.set('email', googleUser.email);
             currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+            currentUser.set('sendHour', 5);
             currentUser.set('nextSendTime', nextSendTime(5));
             if (googleUser.givenName) currentUser.set('firstName', googleUser.givenName);
             if (googleUser.familyName) currentUser.set('lastName', googleUser.familyName);
@@ -240,11 +240,9 @@ const useUser = () => {
             
 
 
-            // ;;.;8'urrently if a user exists already with the same email, it will not allow a new user
-            //
+            //  if a user exists already with the same email, it will not allow a new user
             let idToken = googleUser.authentication.idToken;
             // if (idToken.split(".").length > 1) idToken = idToken.split(".")[0];
-            // console.log('idToken', idToken, googleUser.authentication.idToken.split("."))
 
             try {
                 setIsLoading(true);
@@ -292,9 +290,7 @@ const useUser = () => {
         GoogleAuth.signOut().catch();
 
         try {
-            console.log('start log out)')
             await Parse.User.logOut();
-            console.log('end log out)')
             // To verify that current user is now empty, currentAsync can be used
             const currentUser: Parse.User<Parse.Attributes>|undefined|null = await Parse.User.current();
             if (!currentUser) {
@@ -351,6 +347,7 @@ const useUser = () => {
                     lastName: last,
                     language,
                     timeZone:  Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    sendHour: 5,
                     nextSendTime: nextSendTime(5),
                 },
             )
@@ -428,16 +425,13 @@ const useUser = () => {
     // const [highlightedDates, setHighlightedDates] = useState<any[]>([]);
     const [dateMap, setDateMap] = useState<IDateMap>({});
     const getMonth = async (month: string, clearMonths=false) => {
-        console.log("LOCATION GET MONTH", month, clearMonths, user?.objectId, fetchedMonths.current.includes(month) && !clearMonths)
         if (!user?.objectId) return;
         if (clearMonths) fetchedMonths.current = []
         if (fetchedMonths.current.includes(month) && !clearMonths) return;
         try {
-            console.log("LOCATION", clearMonths)
             //Listenings
             let listenings = await Parse.Cloud.run("getListenings", {options: {month, hasValidSession: true}}) as IListening[];     
             // let newHighlightedDates:any[] = [];
-            console.log("LOCATION listenings", listenings)
             let newDateMap:IDateMap = {};
             listenings.map((listening) => {
                 if (!listening.date) return;

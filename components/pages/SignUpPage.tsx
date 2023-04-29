@@ -52,7 +52,6 @@ const SignUpPage: React.FC = () => {
   useEffect(() => {
     if (!user?.objectId) return;
     // if (isOnboarding) presentSettings();
-    console.log("REDIRECT ONBOARDINH", isOnboarding)
     if(isOnboarding) presentSettings()
     if (reroutePath) {
       let _reroutePath = reroutePath;

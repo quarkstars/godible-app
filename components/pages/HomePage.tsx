@@ -36,7 +36,6 @@ const HomePage:React.FC = () => {
   const [topicWidth, setTopicWidth] = useState<number>(148);
   const [bookWidth, setBookWidth] = useState<number>(376);
   
-  //TODO: Attempting to prevent reordering by the list reorderer
   const player = useContext(Player);
   const {
     appendEpisodeStrings, 
@@ -45,13 +44,22 @@ const HomePage:React.FC = () => {
     error: episodesError,
     episodes,
     setEpisodes,
+    setReappends,
+    reappends
   } = useEpisodes();
   const {getBooks, books, setBooks} = useBooks();
   const {getTopics, topics, setTopics} = useTopics();
   //Get episodes
   useIonViewWillEnter(() => {
     getEpisodes(undefined, {limit: 12, sort:"-publishedAt", exclude: ["text"]});
+    setReappends(0)
+
   });
+  //
+  useEffect(() => {
+    if (reappends < 1) setReappends(prev => prev + 1)
+  }, [user, user?.language, episodes])
+  
 
   //Get topics
   useIonViewWillEnter(() => {
@@ -80,12 +88,10 @@ const HomePage:React.FC = () => {
       })
       const reversedEpisodes = [...newEpisodes].reverse(); 
       const reversedIndex = Math.abs(newEpisodes.length - 1 - newIndex);
-      console.log("PROBLEM EPISODE", reversedEpisodes.length , reversedIndex, newIndex, newEpisodes, startIndex, endIndex)
       player.setList(undefined);
       player.setList({episodes: reversedEpisodes});
       player.setIndex(reversedIndex);
       player.setIsAutoPlay(true);
-      console.log("")
       router.push(reversedEpisodes[reversedIndex]?._path!);
   }
 

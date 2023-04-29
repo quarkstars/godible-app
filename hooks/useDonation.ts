@@ -188,7 +188,6 @@ const useDonation = () => {
       // Call the createStripeCustomer cloud function
       const response = await Parse.Cloud.run("getPaymentEvents", {type});
       if (!response) throw "Failed to get events"
-      console.log("EVENTS", response)
       setEvents(response);
       setError(undefined);
     } catch (error) {

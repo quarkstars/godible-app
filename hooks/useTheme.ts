@@ -15,7 +15,6 @@ const useTheme = () => {
     const [isDark, _setIsDark] = useState(false);
 
     const setIsDark = (input: boolean): void => {
-      console.log('IS DARK', input)
       if(input) {
         document.body.classList.add("dark");
       }

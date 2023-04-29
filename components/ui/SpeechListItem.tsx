@@ -20,7 +20,6 @@ interface ISpeechListItemProps {
 
 const SpeechListItem = (props: ISpeechListItemProps) => {
   const list = props.list;
-  console.log("LIST", list)
 
   const router = useIonRouter();
   const {
@@ -56,7 +55,6 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
   return (
     <IonItem
       onClick={(e: any) => {
-        console.log('clicked')
         e.preventDefault();
         if (props.onPlay) props.onPlay(e)
       }}

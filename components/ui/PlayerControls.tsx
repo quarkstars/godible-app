@@ -27,7 +27,6 @@ export const PlayerControls = () => {
     //Pass user state to the usePlayer context because useUser cannot
     const userState = useContext(UserState);
     useEffect(() => {
-        console.log("userState update", userState)
         if (!player.userState) return;
         player.userState.current = userState;
     }, [userState]);

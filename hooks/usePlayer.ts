@@ -81,13 +81,14 @@ const usePlayer = ():IPlayer => {
     
     const invalidPositionEpisodeIds= useRef<string[]>([]);
 
-    //Time to doublecheck
+    //Check if the audio is actually synced correctly
     const doubleCheckCurrentTime= useRef<number|undefined>();
     const doubleCheckTime = (pastTime: number) => {
-        console.log("DOUBLE CHECK", doubleCheckCurrentTime.current, pastTime, isPlaying)
-        if (typeof doubleCheckCurrentTime.current !== "number") return;
-        if (isPlaying && pastTime === doubleCheckCurrentTime.current) {setIsPlaying(false);}
-        else if (!isPlaying && pastTime < doubleCheckCurrentTime.current) {setIsPlaying(true);}
+        // if (typeof doubleCheckCurrentTime.current !== "number") return;
+        // if (isPlaying && pastTime === doubleCheckCurrentTime.current) {setIsPlaying(false);}
+        // else if (!isPlaying && pastTime < doubleCheckCurrentTime.current) {setIsPlaying(true);}
+        if (_audio.current && _audio.current.paused && isPlaying) setIsPlaying(false);
+        if (_audio.current && !_audio.current.paused && !isPlaying) setIsPlaying(true);
     }
 
     // boolean to protect from episode page fighting against new list update
@@ -137,25 +138,16 @@ const usePlayer = ():IPlayer => {
         doubleCheckCurrentTime.current = audio.currentTime;
         checkTimer = setTimeout(() => {
             doubleCheckTime(audio.currentTime);
-        }, 1500);
+        }, 4000);
 
         
 
         // return () => {if (timer) clearTimeout(timer);}
     }
     useEffect(() => {
-        // console.log("INITIALIZING AUDIO")
         initializeAudio();
     }, [_audio.current, list?.episodes, index]);
-    // useEffect(() => {
-    //     console.log("INITIALIZING AUDIO CURRENT", _audio.current)
-    // }, [_audio.current]);
-    // useEffect(() => {
-    //     console.log("INITIALIZING AUDIO LIST", list?.episodes)
-    // }, [list?.episodes]);
-    // useEffect(() => {
-    //     console.log("INITIALIZING AUDIO INDEX", index)
-    // }, [index]);
+
 
 
     //Start Audio when audio loads if autoplay is on
@@ -163,7 +155,6 @@ const usePlayer = ():IPlayer => {
     const [timeTilNext, setTimeTilNext] = useState<number|undefined>();
     const [currentSeconds, setCurrentSeconds] = useState(0);
     
-// console.log("DOUBLE CHECK IS PLAYING", isPlaying)
     //Keep duration updated when available
     const [duration, setDuration] = useState<number|undefined>();
     useEffect(() => {
@@ -219,7 +210,6 @@ const usePlayer = ():IPlayer => {
     const postListening = async (params) => {
         try {
              const listening = await  Parse.Cloud.run("postListening", params);
-             console.log("LISTEINING", listening)
             } catch (err) {
                 console.error(err)
             }
@@ -310,6 +300,10 @@ const usePlayer = ():IPlayer => {
                 next();
             }
         }
+
+        //Fix any unsynchronized state to actual audio
+        if (_audio.current && _audio.current.paused && isPlaying === true) setIsPlaying(false);
+        if (_audio.current && !_audio.current.paused && isPlaying === false) setIsPlaying(true);
 
         //Loop every 1 second
         const timer = setTimeout(() => {
