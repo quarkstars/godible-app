@@ -271,6 +271,7 @@ const ListModal = (props: IPlayerListModalProps) => {
                   let isPrepending = (_index) ? false : true;
                   if (!addEpisodeId) return;
                   let updatedList = await addEpisodeToList(_index, addEpisodeId, isPrepending);
+                  console.log("UPDATED LIST", updatedList)
                   setInternalList(updatedList);
                   setIsAddingEpisode(false);
                   setListReloads(prev => prev + 1);
