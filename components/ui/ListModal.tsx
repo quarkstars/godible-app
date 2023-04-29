@@ -33,7 +33,6 @@ const ListModal = (props: IPlayerListModalProps) => {
     <IonPage>
 
     <IonContent>
-  )
       </IonContent>
     </IonPage>
   )
