@@ -238,10 +238,10 @@ const HomePage:React.FC = () => {
             {user?.objectId ? 
               <img src='/logo/godible-logo.png' className='w-24'/>
             :
-              <span>Welcome</span>
+              <span></span>
             }
           </div>
-          <div className="hidden md:inline">Welcome</div>
+          <div className="hidden md:inline"></div>
         </IonTitle>
         }
       </Toolbar>

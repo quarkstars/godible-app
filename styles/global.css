@@ -318,6 +318,12 @@ body.dark ::-webkit-scrollbar-thumb {
   text-align:center;
 }
 
+/* Toolbar */
+
+ion-title.md.title-default {
+  font-size: 1em;
+}
+
 /* Menu.tsx */
 ion-split-pane {
   --side-max-width: 325px;
