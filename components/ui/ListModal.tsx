@@ -88,13 +88,13 @@ const ListModal = (props: IPlayerListModalProps) => {
       }
   }
   
-    let newEpisodeOrder = event.detail.complete(_list.episodes);
+    let newEpisodeOrder = event.detail.complete(_list?.episodes);
 
     const newList = {..._list, episodes: newEpisodeOrder};
     if (setList) setList(newList);
 
     // if the list has an id, update the server
-    if (user?.objectId && _list.objectId) {
+    if (user?.objectId && _list?.objectId) {
       postList(newList);
     }
 
@@ -108,8 +108,8 @@ const ListModal = (props: IPlayerListModalProps) => {
 
     //Find episode to decide if you want to move index
     let removedIndex:number|undefined = undefined;
-    for (let i = 0; i < _list.episodes.length; i++) {
-      if (_list.episodes[i].objectId === episodeId) {
+    for (let i = 0; i < _list?.episodes.length; i++) {
+      if (_list?.episodes[i]?.objectId === episodeId) {
         removedIndex = i;
         break;
       }
@@ -136,8 +136,8 @@ const ListModal = (props: IPlayerListModalProps) => {
   const [listName, setListName] = useState<string|undefined>();
   useEffect(() => {
     if (!_list) return;
-    if (!_list.name) return;
-    setListName(_list.name);
+    if (!_list?.name) return;
+    setListName(_list?.name);
   }, [_list?.name])
 
 
@@ -145,7 +145,7 @@ const ListModal = (props: IPlayerListModalProps) => {
   async function handlePlay(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, episodeIndex: number, isDismissing = true) {
     
     if (!_list) return;
-    const episodes = _list.episodes;
+    const episodes = _list?.episodes;
     if (!episodes) return;
     if (episodes.length < 1) return;
     //Reverse episodes because playlist should be incremental
@@ -170,7 +170,7 @@ const ListModal = (props: IPlayerListModalProps) => {
     let name = (_name === "Bookmarks") ? "More Bookmarks" : _name;
     let userLists;
     let index = 1
-    if (typeof _list.index !== "number") {
+    if (typeof _list?.index !== "number") {
         userLists = await getLists(undefined, { limit:30, userId: user?.objectId, exclude:["episodes"] });
         if (userLists && userLists.length >= 30) {
           setSaveListText("Failed! 30 List Max")
@@ -181,7 +181,7 @@ const ListModal = (props: IPlayerListModalProps) => {
           await postList({name: "Bookmarks", index: 0});
         }
     } else {
-      index = _list.index;
+      index = _list?.index;
     }
     if (isBookmarks) index = 0; 
     const updatedList = await postList({..._list, name, index});
@@ -224,7 +224,7 @@ const ListModal = (props: IPlayerListModalProps) => {
 
   let isPlayerList = false;
   if (!_list?.objectId) isPlayerList = true
-  else if (_list.objectId === player.list?.objectId) isPlayerList = true;
+  else if (_list?.objectId === player.list?.objectId) isPlayerList = true;
   if (_isAddingEpisode) {
     return (
     <IonPage>
@@ -264,7 +264,7 @@ const ListModal = (props: IPlayerListModalProps) => {
             return (
               <ListListItem
                 list={list}
-                key={"userlists-"+list.objectId}
+                key={"userlists-"+list?.objectId}
                 isAddingEpisode
                 disabled={listsIsLoading}
                 onClick={async (e) => {
@@ -293,7 +293,7 @@ const ListModal = (props: IPlayerListModalProps) => {
                 <div className="w-full">
               <IonItem>
                 <IonInput 
-                  placeholder="Name your list..." 
+                  placeholder="Name your list?..." 
                   ref={nameListInput}
                   onIonChange={(e) => {
                     if (typeof e.detail.value !== "string") return;
@@ -406,7 +406,7 @@ const ListModal = (props: IPlayerListModalProps) => {
             <div className="w-full">
           <IonItem>
             <IonInput 
-              placeholder="Name your list..." 
+              placeholder="Name your list?..." 
               ref={nameListInput}
               onIonChange={(e) => {
                 if (typeof e.detail.value !== "string") return;
@@ -453,7 +453,7 @@ const ListModal = (props: IPlayerListModalProps) => {
         <IonList>
         {/* The reorder gesture is disabled by default, enable it to drag and drop items */}
         <IonReorderGroup disabled={!isReordering} onIonItemReorder={(e) => handleReorder(e)}>
-        {_list?.episodes && _list.episodes.map((episode, _index) => {
+        {_list?.episodes && _list?.episodes.map((episode, _index) => {
           //Will it be highlighted?
           let weight:string|undefined;
           let highlight:string|undefined;
