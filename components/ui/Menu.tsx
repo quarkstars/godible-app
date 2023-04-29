@@ -38,10 +38,10 @@ const Menu: React.FC = () => {
     const router = useIonRouter();
 
     let hideClass:string|undefined;
-    if (location.pathname === "/signup" || location.pathname === "/signin") {
-      hideClass = "hide"
-    }
-    console.log(location.pathname, hideClass)
+    // Removing this because it causes bugs
+    // if (location.pathname === "/signup" || location.pathname === "/signin") {
+    //   hideClass = "hide"
+    // }
 
   const player = useContext(Player);
     
@@ -171,7 +171,7 @@ const Menu: React.FC = () => {
                     routerDirection="none"  
                     button 
                     onClick={()=>{
-                      if (player) player.togglePlayPause(false);
+                       player.togglePlayPause(false);
                       router.push("/signin?message=Log in to save bookmarks");
                     }}
                   >

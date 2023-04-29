@@ -95,7 +95,7 @@ const {
                     </p>
                     }
                   </div>
-                  <div className="flex items-center justify-center w-full cursor-pointer" onClick={(e) => {if (onClickMain) onClickMain(e)}}>
+                  <div className="flex flex-wrap items-center justify-center w-full cursor-pointer xs:flex-nowrap" onClick={(e) => {if (onClickMain) onClickMain(e)}}>
                     {postImageUrl &&
                       <div className="w-4 h-4 overflow-hidden rounded-sm">
                         <img src={postImageUrl} className="w-full h-full"/>
@@ -103,7 +103,7 @@ const {
                     }
                     {postText && <span className="pl-2 text-xs italic text-center text-white dark:text-white">{postText}</span>}
                   </div>
-                  <div className="mt-4 -ml-5 sm:ml-0">
+                  <div className="flex mt-4 -ml-5 sm:ml-0">
                     {mainButtonText &&
                     <IonButton fill={mainButtonIcon ? "clear" : "outline"} color="fullwhite" onClick={(e) => {if (onClickMain) onClickMain(e)}}>
                       {mainButtonIcon && <IonIcon icon={mainButtonIcon} color="fullwhite" size="large" />}

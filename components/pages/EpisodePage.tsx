@@ -226,8 +226,8 @@ const EpisodePage:React.FC = () => {
   const metaControls = useAnimationControls();
   const [showMeta, setShowMeta] = useState(true);  
   useEffect(() => {
-    if (!episode?._metaDataBlocks) return;
       let width = episode?._metaDataBlocks && episode._metaDataBlocks.length > 1 ? 120 : 60;
+      if (!episode?._metaDataBlocks)
       if (showMeta) {
         metaControls.start({ width });
 
@@ -442,7 +442,7 @@ const EpisodePage:React.FC = () => {
                 }
             </div>     
             <div className="flex flex-wrap justify-center w-full pb-8">
-              <div className={`rounded-md p-2 flex justify-center sm:items-center ${!episode ? "py-6": ""} ${showMeta ? "bg-gray-100 dark:bg-gray-800": ""} ${!episode?._metaDataBlocks ? "w-full" : ""} ${episode?._metaDataBlocks && episode?._metaDataBlocks.length > 1 ? "w-full" : ""}`}>
+              <div className={`rounded-md p-2 flex justify-center sm:items-center ${!episode ? "py-6": ""} ${showMeta ? "bg-gray-100 dark:bg-gray-800": ""} ${episode?._metaDataBlocks && episode?._metaDataBlocks.length > 1 ? "w-full" : ""}`}>
                 <motion.div className="overflow-hidden rounded-md pointer-cursor" onClick={()=>setShowMeta(prev => !prev)} animate={metaControls}>
                   
                   {episode ? 
