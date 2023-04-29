@@ -68,6 +68,7 @@ const ListModal = (props: IPlayerListModalProps) => {
   const [internalList, setInternalList] = useState<IList|undefined>();
   useEffect(() => {
     if (!_isAddingEpisode) return;
+    console.log("GET LIST", user)
     getLists(undefined, { sort: "+index", limit: 30, userId: user?.objectId });
   }, [_isAddingEpisode]);
   
@@ -141,7 +142,7 @@ const ListModal = (props: IPlayerListModalProps) => {
     setTimeout(() => player.setIsMutatingList(false), 500);
   }
 
-  console.log(144)
+  console.log(144, _list?.name)
   const [listName, setListName] = useState<string|undefined>();
   useEffect(() => {
     console.log(147)
