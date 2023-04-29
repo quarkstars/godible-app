@@ -140,7 +140,7 @@ const useLists = () => {
                     return {
                     __type: 'Pointer',
                     className: 'Episode',
-                    objectId: episode.objectId,
+                    objectId: episode?.objectId,
                     };
                 });
             }
@@ -239,7 +239,8 @@ const useLists = () => {
       };
 
     //Will delete a list
-    const deleteList = async (listId: string) => {    
+    const deleteList = async (listId: string) => {   
+        console.log("delete 243") 
         //Cannot delete 0 Bookmarks    
         if (!user?.objectId) return;
         if (!lists) return;
@@ -261,7 +262,7 @@ const useLists = () => {
         setIsLoading(true);
         try {
             //TODO: Notify user on specific list information that has been deleted
-            deletedList = await Parse.Cloud.run("deleteObject", {className: "List", objectId: listToDelete.objectId});       
+            deletedList = await Parse.Cloud.run("deleteObject", {className: "List", objectId: listToDelete?.objectId});       
              // Update the index of the remaining lists
             for (let i = deleteIndex; i < updatedLists.length; i++) {
                 const index = i;

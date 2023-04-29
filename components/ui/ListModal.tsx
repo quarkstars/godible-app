@@ -424,6 +424,7 @@ const ListModal = (props: IPlayerListModalProps) => {
               placeholder="Name your list?..." 
               ref={nameListInput}
               onIonChange={(e) => {
+                console.log(427)
                 if (typeof e.detail.value !== "string") return;
                 setListName(e.detail.value);
               }}
@@ -469,13 +470,14 @@ const ListModal = (props: IPlayerListModalProps) => {
         {/* The reorder gesture is disabled by default, enable it to drag and drop items */}
         <IonReorderGroup disabled={!isReordering} onIonItemReorder={(e) => handleReorder(e)}>
         {_list?.episodes && _list?.episodes.map((episode, _index) => {
+          console.log(473, episode)
           //Will it be highlighted?
           let weight:string|undefined;
           let highlight:string|undefined;
           let isCurrent:boolean|undefined;
           let isPlaying:boolean|undefined;
           //Check if current episode matches the current one in the player
-          if (typeof index === "number" && typeof index === "number" && episode.objectId === player.list?.episodes?.[player.index]?.objectId ) {
+          if (typeof index === "number" && typeof index === "number" && episode?.objectId === player.list?.episodes?.[player.index]?.objectId ) {
             weight = (player.index === _index) ? "font-bold" : "font-medium";
             highlight = (typeof index === "number" && player.index === _index) ? "light" : undefined;
             isCurrent = (typeof index === "number" && player.index === _index);
