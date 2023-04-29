@@ -468,7 +468,7 @@ const ListModal = (props: IPlayerListModalProps) => {
           }
 
           return(
-            <IonReorder key={"list-"+episode.objectId} >
+            <IonReorder key={"list-"+episode?.objectId} >
               <IonItem 
                 // key={"list-"+episode.objectId} 
                 color={highlight}
