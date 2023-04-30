@@ -408,12 +408,12 @@ const useUser = () => {
             const updatedParseUser = addParseObjectProperties(currentParseUser, updates);
             await updatedParseUser.save()
             // setIsLoading(false);
-            console.log("USER SAVED", user?.language)
+            console.log("USER SAVED", updatedParseUser)
             setUpdateError(undefined);
             return newUser;
         } catch (error: any) {
             // setIsLoading(false);
-            console.log("USER REVERSED", user?.language)
+            console.log("USER REVERSED", prevUser)
             setUpdateError(error);
             setUser(prevUser);
             return prevUser;
