@@ -222,8 +222,11 @@ const ListModal = (props: IPlayerListModalProps) => {
 
 
   let isPlayerList = false;
-  if (_list && !_list?.objectId) isPlayerList = true
-  else if (_list && player && _list?.objectId === player?.list?.objectId) isPlayerList = true;
+  if (_list && !_list?.objectId) {
+    isPlayerList = true;
+  } else if (_list && _list?.objectId && player.list && player.list?.objectId === _list?.objectId) {
+    isPlayerList = true;
+  }
 
   if (_isAddingEpisode) {
     return (
