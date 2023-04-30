@@ -44,14 +44,12 @@ const ListModal = (props: IPlayerListModalProps) => {
     isViewOnly,
   } = props;
 
-  console.log(47)
   const player = useContext(Player);
   const {
     user,
     setListReloads,
   } = useContext(UserState);
 
-  console.log(52)
   //User Lists
   const {
     postList,
@@ -62,18 +60,15 @@ const ListModal = (props: IPlayerListModalProps) => {
     addEpisodeToList,
   } = useLists();
 
-  console.log(65)
   //When adding an episode, show the fetch the user's lists and show the lists
   const [_isAddingEpisode, setIsAddingEpisode] = useState(isAddingEpisode||false);
   const [internalList, setInternalList] = useState<IList|undefined>();
   useEffect(() => {
     if (!_isAddingEpisode) return;
-    console.log("GET LIST", user)
     getLists(undefined, { sort: "+index", limit: 30, userId: user?.objectId });
   }, [_isAddingEpisode]);
   
 
-  console.log(75)
   const _list = (internalList) ? internalList :  list;
   
   const [isReordering, setIsReordering] = useState(false);
@@ -92,7 +87,6 @@ const ListModal = (props: IPlayerListModalProps) => {
       }
   }
   
-  console.log(93)
     let newEpisodeOrder = event.detail.complete(_list?.episodes);
 
     const newList = {..._list, episodes: newEpisodeOrder};
@@ -105,14 +99,12 @@ const ListModal = (props: IPlayerListModalProps) => {
 
   }
 
-  console.log(107)
   async function handleRemoveEpisode(event: CustomEvent<ItemReorderEventDetail>, episodeId: string) {
     if (!_list) return;
     //Remove from list (possibly on the server too)
     player.setIsMutatingList(true);
     const newList = await removeEpisodeFromList(_list, episodeId);
 
-    console.log(114)
     //Find episode to decide if you want to move index
     let removedIndex:number|undefined = undefined;
     for (let i = 0; i < _list?.episodes.length; i++) {
@@ -125,14 +117,12 @@ const ListModal = (props: IPlayerListModalProps) => {
     if (!newList || !setList || !setIndex) return player.setIsMutatingList(false);
     setList(newList);
 
-    console.log(127)
     if (newList.episodes?.length === 0) {
       player.setIsMutatingList(false);
       onDismiss(undefined, "emptied list");
       return;
     }
 
-    console.log(134)
     //Adjust the index if necessary
     let indexAdjust = (typeof index === "number" && removedIndex && removedIndex <= index) ? -1 : 0;
     let newIndex:number|undefined;
@@ -142,10 +132,8 @@ const ListModal = (props: IPlayerListModalProps) => {
     setTimeout(() => player.setIsMutatingList(false), 500);
   }
 
-  console.log(144, _list?.name)
   const [listName, setListName] = useState<string|undefined>();
   useEffect(() => {
-    console.log(147)
     if (!_list) return;
     if (!_list?.name) return;
     setListName(_list?.name);
@@ -153,7 +141,6 @@ const ListModal = (props: IPlayerListModalProps) => {
 
 
 
-  console.log(154)
   async function handlePlay(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, episodeIndex: number, isDismissing = true) {
     
     if (!_list) return;
@@ -178,7 +165,6 @@ const ListModal = (props: IPlayerListModalProps) => {
   const [saveListText, setSaveListText] = useState<string>("Save as List");
   async function handleSaveList(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, _name?: string) {
     
-  console.log(180)
     if (!_list) return;
     let name = (_name === "Bookmarks") ? "More Bookmarks" : _name;
     let userLists;
@@ -205,17 +191,15 @@ const ListModal = (props: IPlayerListModalProps) => {
   }
 
   
-  console.log(207)
   //List saving
   async function handleSaveListToAdd(event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, _name?: string) {
-    console.log(210)
     let saveList;
     let name = (_name === "Bookmarks") ? "More Bookmarks" : _name;
     if (lists && lists.length >= 1) saveList = {name, index: lists.length};
     else return setListReloads(prev => prev + 1);
     const updatedList = await postList(saveList);
     setListReloads(prev => prev + 1);
-    // getLists(undefined, { sort: "+index", limit: 30, userId: user?.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
+    getLists(undefined, { sort: "+index", limit: 30, userId: user?.objectId, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] });
   }
 
   //Focus name input
@@ -236,11 +220,10 @@ const ListModal = (props: IPlayerListModalProps) => {
     });
   const reorderable = (setList || (_list?.userId && _list?.userId === user?.objectId))
 
-  console.log(238, user, internalList, lists, _list)
 
   let isPlayerList = false;
-  // if (!_list?.objectId) isPlayerList = true
-  // else if (_list?.objectId === player.list?.objectId) isPlayerList = true;
+  if (_list && !_list?.objectId) isPlayerList = true
+  else if (_list && _list?.objectId === player.list?.objectId) isPlayerList = true;
   if (_isAddingEpisode) {
     return (
     <IonPage>
@@ -287,7 +270,6 @@ const ListModal = (props: IPlayerListModalProps) => {
                   let isPrepending = (_index) ? false : true;
                   if (!addEpisodeId) return;
                   let updatedList = await addEpisodeToList(_index, addEpisodeId, isPrepending);
-                  console.log("UPDATED LIST", updatedList)
                   setInternalList(updatedList);
                   setIsAddingEpisode(false);
                   setListReloads(prev => prev + 1);
@@ -425,7 +407,6 @@ const ListModal = (props: IPlayerListModalProps) => {
               placeholder="Name your list?..." 
               ref={nameListInput}
               onIonChange={(e) => {
-                console.log(427)
                 if (typeof e.detail.value !== "string") return;
                 setListName(e.detail.value);
               }}
@@ -471,7 +452,6 @@ const ListModal = (props: IPlayerListModalProps) => {
         {/* The reorder gesture is disabled by default, enable it to drag and drop items */}
         <IonReorderGroup disabled={!isReordering} onIonItemReorder={(e) => handleReorder(e)}>
         {_list?.episodes && _list?.episodes.map((episode, _index) => {
-          console.log(473, episode)
           //Will it be highlighted?
           let weight:string|undefined;
           let highlight:string|undefined;
