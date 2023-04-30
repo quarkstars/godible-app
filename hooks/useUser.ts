@@ -405,7 +405,7 @@ const useUser = () => {
             const currentParseUser: Parse.User|undefined|null = await Parse.User.current();
             if (!currentParseUser) throw "No User"
             const updatedParseUser = addParseObjectProperties(currentParseUser, updates)
-            updatedParseUser.save()
+            await updatedParseUser.save()
             // setIsLoading(false);
             setUpdateError(undefined);
             return newUser;

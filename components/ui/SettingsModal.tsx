@@ -493,7 +493,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 color={(language === "english" || typeof language === "undefined") ? "dark" : "medium"} 
                 onClick={async () => {
                   if (language !== "english") await updateUser({language: "english"})
-                  if (user?.objectId) getCurrentUser();
+                  
                 }}
               >
                 <IonIcon icon={(language === "english" || typeof language === "undefined") ? checkmarkCircle : ellipseOutline} slot="start"/>
@@ -504,7 +504,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 color={language === "japanese" ? "dark" : "medium"} 
                 onClick={async () => {
                   if (language !== "japanese") await updateUser({language: "japanese"})
-                  if (user?.objectId) getCurrentUser();
+                  
                 }}
               >                
                 <IonIcon icon={language === "japanese" ? checkmarkCircle : ellipseOutline} slot="start"/>
@@ -685,7 +685,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 color={(fontStyle === "serif") ? "dark" : "medium"} 
                 onClick={async () => {
                   if (fontStyle !== "serif") await updateUser({fontStyle: "serif"})
-                  if (user?.objectId) getCurrentUser();
+                  
                 }}
               >     
               <IonIcon icon={(fontStyle === "serif")  ? checkmarkCircle : ellipseOutline} slot="start"/>
@@ -696,7 +696,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 color={(fontStyle === "sanserif" || typeof fontStyle === "undefined") ? "dark" : "medium"} 
                 onClick={async () => {
                   if (fontStyle !== "sanserif" || typeof fontStyle === "undefined") await updateUser({fontStyle: "sanserif"})
-                  if (user?.objectId) getCurrentUser();
+                  
                 }}
               >     
               <IonIcon icon={(fontStyle === "sanserif" || typeof fontStyle === "undefined") ? checkmarkCircle : ellipseOutline} slot="start"/>
@@ -712,7 +712,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 color={fontSize === "small" ? "dark" : "medium"} 
                 onClick={async () => {
                   if (fontSize !== "small") await updateUser({fontSize: "small"})
-                  if (user?.objectId) getCurrentUser();
+                  
                 }}
               >     
               <IonIcon icon={fontSize === "small" ? checkmarkCircle : ellipseOutline} slot="start"/>
@@ -723,7 +723,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 color={(fontSize === "regular" || typeof fontSize === "undefined") ? "dark" : "medium"} 
                 onClick={async () => {
                   if (fontSize !== "regular") await updateUser({fontSize: "regular"})
-                  if (user?.objectId) getCurrentUser();
+                  
                 }}
               >     
               <IonIcon icon={(fontSize === "regular" || typeof fontSize === "undefined") ? checkmarkCircle : ellipseOutline} slot="start"/>
@@ -734,7 +734,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 color={fontSize === "large" ? "dark" : "medium"} 
                 onClick={async () => {
                   if (fontSize !== "large") await updateUser({fontSize: "large"})
-                  if (user?.objectId) getCurrentUser();
+                  
                 }}
               >     
               <IonIcon icon={fontSize === "large" ? checkmarkCircle : ellipseOutline} slot="start"/>
@@ -752,7 +752,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 size="small" 
                 onClick={async () => {
                   if (fontContrast !== "low") await updateUser({fontContrast: "low"})
-                  if (user?.objectId) getCurrentUser();
+                  
                 }}
               >     
               <IonIcon icon={fontContrast === "low" ? checkmarkCircle : ellipseOutline} slot="start"color="fullblack" />
@@ -762,7 +762,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 size="small" 
                 onClick={async () => {
                   if (fontContrast !== "normal") await updateUser({fontContrast: "normal"})
-                  if (user?.objectId) getCurrentUser();
+                  
                 }}
               >     
               <IonIcon icon={(!fontContrast || fontContrast === "normal") ? checkmarkCircle : ellipseOutline} slot="start" color="fullblack" />
@@ -772,7 +772,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 size="small" 
                 onClick={async () => {
                   if (fontContrast !== "high") await updateUser({fontContrast: "high"});
-                  if (user?.objectId) getCurrentUser();
+                  
                   
                 }}
               >     

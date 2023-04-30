@@ -276,7 +276,7 @@ const EpisodePage:React.FC = () => {
             return(
               <h1
                 className="w-full text-left"
-                key={line}
+                key={episode?.objectId+index}
               >
                 {line.replace(/#/g,'')}
               </h1>
@@ -286,7 +286,7 @@ const EpisodePage:React.FC = () => {
             return(
               <h2
                 className="w-full text-left"
-                key={line}
+                key={episode?.objectId+index}
               >
                 {line.replace(/#/g,'')}
               </h2>
@@ -296,7 +296,7 @@ const EpisodePage:React.FC = () => {
             return(
               <h3
                 className="w-full text-left"
-                key={line}
+                key={episode?.objectId+index}
               >
                 {line.replace(/#/g,'')}
               </h3>
@@ -306,7 +306,7 @@ const EpisodePage:React.FC = () => {
             return(
               <h4
                 className="w-full text-left"
-                key={line}
+                key={episode?.objectId+index}
               >
                 {line.replace(/#/g,'')}
               </h4>
@@ -316,7 +316,7 @@ const EpisodePage:React.FC = () => {
             return(
               <p
                 className={`leading-relaxed ${paddingSize} ${fontStyle} ${fontSize} ${fontContrast}`}
-                key={line}
+                key={episode?.objectId+index}
               >
                 {line.replace(/#/g,'')}
               </p>
