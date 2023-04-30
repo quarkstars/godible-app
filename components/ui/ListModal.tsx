@@ -221,6 +221,7 @@ const ListModal = (props: IPlayerListModalProps) => {
   const reorderable = (setList || (_list?.userId && _list?.userId === user?.objectId))
 
 
+  //Special logic if the list is from the player
   let isPlayerList = false;
   if (_list && !_list?.objectId) {
     isPlayerList = true;
@@ -462,7 +463,12 @@ const ListModal = (props: IPlayerListModalProps) => {
           let isCurrent:boolean|undefined;
           let isPlaying:boolean|undefined;
           //Check if current episode matches the current one in the player
-          if (typeof index === "number" && typeof index === "number" && episode?.objectId === player.list?.episodes?.[player.index]?.objectId ) {
+          if (
+            typeof index === "number" &&
+            episode?.objectId &&
+            player.list?.episodes?.[player.index]?.objectId &&
+            episode?.objectId === player.list?.episodes?.[player.index]?.objectId
+          ) {
             weight = (player.index === _index) ? "font-bold" : "font-medium";
             highlight = (typeof index === "number" && player.index === _index) ? "light" : undefined;
             isCurrent = (typeof index === "number" && player.index === _index);
