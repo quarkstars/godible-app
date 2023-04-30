@@ -191,7 +191,7 @@ const EpisodePage:React.FC = () => {
   const saveNextEpisode = async(expectedSlug: string) => {
     if (!user?.objectId || !adjacentEpisodes[1]) return; 
     if (expectedSlug === episode?.slug) {
-      updateUser({nextEpisode: adjacentEpisodes[1]});
+      // updateUser({nextEpisode: adjacentEpisodes[1]});
     }
   }
   
