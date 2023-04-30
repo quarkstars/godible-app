@@ -6,7 +6,7 @@ import { text, userDefaultLanguage } from 'data/translations'
 import { IEpisode, IList } from 'data/types'
 import useEpisodes from 'hooks/useEpisodes'
 import { add, bookOutline, bookmark,  documentTextOutline, chevronDown, chevronUp, language, pauseCircle,  playCircle, settings, settingsOutline, documentText, megaphone, send, checkmarkCircle, calendar, close, addCircleOutline, list, bookmarkOutline, arrowBack, arrowForward, time, timeOutline } from 'ionicons/icons'
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState, useRef } from 'react'
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import Thumbnail from 'components/ui/Thumbnail'
 import SettingsModal from 'components/ui/SettingsModal'
@@ -148,53 +148,79 @@ const EpisodePage:React.FC = () => {
   }, [episodes]);
 
   
-  useEffect(() => {
-    if (!episode) return;
-    setupAdjacentEpisodes();
-  }, [episode]);
+
   const [adjacentEpisodes, setAdjacentEpisodes] = useState<Array<IEpisode|null>>([null, null]);
   const [isAdjacentEpisodeFromList, setIsAdjacentEpisodesFromList] = useState<Array<boolean>>([false, false]);
-  const setupAdjacentEpisodes = async () => {
-    if (!player.list || typeof player.index !== "number") return;
-    let _isAdjacentEpisodeFromList = [false, false];
-    let previousPlayerEpisode = player.list.episodes[player.index-1];
-    if (previousPlayerEpisode) {
-      _isAdjacentEpisodeFromList[0] = true;
-      setAdjacentEpisodes(adjacentEps => {
-        adjacentEps[0] = previousPlayerEpisode;
-        return adjacentEps;
-      });
-    }
-    let nextPlayerEpisode = player.list.episodes[player.index+1];
-    if (nextPlayerEpisode) {
-      _isAdjacentEpisodeFromList[1] = true;
-      setAdjacentEpisodes(adjacentEps => {
-        adjacentEps[1] = nextPlayerEpisode;
-        return adjacentEps;
-      });
-    }
-    setIsAdjacentEpisodesFromList(_isAdjacentEpisodeFromList);
-    if (!_isAdjacentEpisodeFromList[0] || !_isAdjacentEpisodeFromList[1]) {
-      const [previousEpisode, nextEpisode] = await getAdjacentEpisodes(episode!, !_isAdjacentEpisodeFromList[0], !_isAdjacentEpisodeFromList[1]);
-      setAdjacentEpisodes(adjacentEps => {
-        if (previousEpisode) adjacentEps[0] = previousEpisode;
-        if (nextEpisode) adjacentEps[1] = nextEpisode;
-        return adjacentEps;
-      })
-    }
-
-    // If the user remains on the same episode for 2 minutes, assign the next episode to the user
-    if (user?.objectId) setTimeout(() => saveNextEpisode(episode!.slug), 120000)
-
-  }
-
-  const saveNextEpisode = async(expectedSlug: string) => {
-    if (!user?.objectId || !adjacentEpisodes[1]) return; 
-    if (expectedSlug === episode?.slug) {
-      // updateUser({nextEpisode: adjacentEpisodes[1]});
-    }
-  }
   
+  useEffect(() => {
+  
+    const setupAdjacentEpisodes = async () => {
+      if (!player.list || typeof player.index !== "number") return;
+      let _isAdjacentEpisodeFromList = [false, false];
+      let previousPlayerEpisode = player.list.episodes[player.index-1];
+      if (previousPlayerEpisode) {
+        _isAdjacentEpisodeFromList[0] = true;
+        setAdjacentEpisodes(adjacentEps => {
+          adjacentEps[0] = previousPlayerEpisode;
+          return adjacentEps;
+        });
+      }
+      let nextPlayerEpisode = player.list.episodes[player.index+1];
+      if (nextPlayerEpisode) {
+        _isAdjacentEpisodeFromList[1] = true;
+        setAdjacentEpisodes(adjacentEps => {
+          adjacentEps[1] = nextPlayerEpisode;
+          return adjacentEps;
+        });
+      }
+      setIsAdjacentEpisodesFromList(_isAdjacentEpisodeFromList);
+      if (!_isAdjacentEpisodeFromList[0] || !_isAdjacentEpisodeFromList[1]) {
+        const [previousEpisode, nextEpisode] = await getAdjacentEpisodes(episode!, !_isAdjacentEpisodeFromList[0], !_isAdjacentEpisodeFromList[1]);
+        setAdjacentEpisodes(adjacentEps => {
+          if (previousEpisode) adjacentEps[0] = previousEpisode;
+          if (nextEpisode) adjacentEps[1] = nextEpisode;
+          return adjacentEps;
+        })
+      }
+      // If the user remains on the same episode for 2 minutes, assign the next episode to the user
+    }
+  
+    if (episode) {
+      setupAdjacentEpisodes();
+    }
+
+  }, [episode]);
+  const userRef = useRef(user);
+  const updateUserRef = useRef(updateUser);
+    
+  useEffect(() => {
+    userRef.current = user; // Update userRef whenever user changes
+    updateUserRef.current = updateUser; // Update updateUserRef whenever updateUser changes
+  }, [user, updateUser]);
+  
+  useEffect(() => {
+    let timer: NodeJS.Timeout;  // Declare the timer variable here.
+    
+    const saveNextEpisode = async(expectedSlug: string) => {
+      if (!userRef.current?.objectId || !adjacentEpisodes[1]) return; 
+      if (expectedSlug === episode?.slug) {
+        console.log("SWITCHED THE EPISODE!!", userRef.current)
+        if (updateUserRef.current) {
+          updateUserRef.current({nextEpisode: adjacentEpisodes[1]});
+        }
+      }
+    };
+  
+    if (userRef.current?.objectId && adjacentEpisodes[1]) {
+      timer = setTimeout(() => saveNextEpisode(episode!.slug), 120000); // Assign the timeout to timer variable.
+    }
+  
+    return () => {
+      if (timer) {
+        clearTimeout(timer); // Clear the timer when the episode or adjacentEpisodes[1] changes.
+      }
+    }
+  }, [episode, adjacentEpisodes[1]]);
 
   const [showQuote, setShowQuote] = useState(false);  
   useEffect(() => {
