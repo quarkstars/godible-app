@@ -147,9 +147,10 @@ const player = useContext(Player);
 
   let playerIndex = (typeof player.index === "number" &&  player.list?.episodes?.[player.index] &&  lists?.[inspectedListIndex||0]?.episodes?.[player.index]?.objectId === player.list?.episodes?.[player.index]?.objectId) ? player.index : undefined
   //List modal trigger
+  console.log("LIST AVAILABLE", lists?.[inspectedListIndex||0])
   const [presentList, dimissList] = useIonModal(ListModal, {
     onDismiss: (data: string, role: string) => dimissList(data, role),
-      // list: lists?.[inspectedListIndex||0],
+      list: lists?.[inspectedListIndex||0],
       setList: setList,
       index: playerIndex,
       setIndex: player.setIndex,

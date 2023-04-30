@@ -69,7 +69,7 @@ const ListModal = (props: IPlayerListModalProps) => {
   useEffect(() => {
     if (!_isAddingEpisode) return;
     console.log("GET LIST", user)
-    // getLists(undefined, { sort: "+index", limit: 30, userId: user?.objectId });
+    getLists(undefined, { sort: "+index", limit: 30, userId: user?.objectId });
   }, [_isAddingEpisode]);
   
 
@@ -100,7 +100,7 @@ const ListModal = (props: IPlayerListModalProps) => {
 
     // if the list has an id, update the server
     if (user?.objectId && _list?.objectId) {
-      // postList(newList);
+      postList(newList);
     }
 
   }
@@ -184,7 +184,7 @@ const ListModal = (props: IPlayerListModalProps) => {
     let userLists;
     let index = 1
     if (typeof _list?.index !== "number") {
-        // userLists = await getLists(undefined, { limit:30, userId: user?.objectId, exclude:["episodes"] });
+        userLists = await getLists(undefined, { limit:30, userId: user?.objectId, exclude:["episodes"] });
         if (userLists && userLists.length >= 30) {
           setSaveListText("Failed! 30 List Max")
           throw "30 list max"
@@ -239,8 +239,8 @@ const ListModal = (props: IPlayerListModalProps) => {
   console.log(238, user, internalList, lists, _list)
 
   let isPlayerList = false;
-  if (!_list?.objectId) isPlayerList = true
-  else if (_list?.objectId === player.list?.objectId) isPlayerList = true;
+  // if (!_list?.objectId) isPlayerList = true
+  // else if (_list?.objectId === player.list?.objectId) isPlayerList = true;
   if (_isAddingEpisode) {
     return (
     <IonPage>
@@ -280,7 +280,7 @@ const ListModal = (props: IPlayerListModalProps) => {
             return (
               <ListListItem
                 list={list}
-                key={"userlists-"+list?.objectId}
+                key={"userlists-"+index}
                 isAddingEpisode
                 disabled={listsIsLoading}
                 onClick={async (e) => {
