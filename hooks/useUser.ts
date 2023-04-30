@@ -163,7 +163,6 @@ const useUser = () => {
     useEffect(() => {
         if (!user?.objectId) return;
         const createdAt = user.createdAt;
-        //TODO: Test again
         const createdTime = Math.floor(new Date(createdAt!).getTime());
         if (!createdTime) return;
         if (Date.now()-60000 < createdTime) {
@@ -319,13 +318,13 @@ const useUser = () => {
         }
       };
     
-    //TODO: Get resetSettings
+    //Get resetSettings
     const getResetUser = (currentUser: IUser): IUser => {
         return {
             language: currentUser.language || "english",
             fontSize: currentUser.fontSize || "normal",
             fontContrast: currentUser.fontContrast || "normal",
-            fontStyle: currentUser.language || "serif",
+            fontStyle: currentUser.language || "sanserif",
         }
     }
 
@@ -333,7 +332,7 @@ const useUser = () => {
     const [signUpError, setSignUpError] = useState<any>();
     // Email Sign up Function - Returns User or Error
     const signUp = async function (email: string, password: string, first: string, last: string): Promise<IUser | Error | undefined> {
-        //TODO: Do not do this is user is already defined...
+
         // Note that these values come from state variables that we've declared before
         try {
             setIsLoading(true);
