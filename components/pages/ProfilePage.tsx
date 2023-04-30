@@ -149,7 +149,7 @@ const player = useContext(Player);
   //List modal trigger
   const [presentList, dimissList] = useIonModal(ListModal, {
     onDismiss: (data: string, role: string) => dimissList(data, role),
-      list: lists?.[inspectedListIndex||0],
+      // list: lists?.[inspectedListIndex||0],
       setList: setList,
       index: playerIndex,
       setIndex: player.setIndex,
