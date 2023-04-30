@@ -398,6 +398,7 @@ const useUser = () => {
             ...updates,
         }
         setUser(newUser);
+        console.log("USER UPDATED TO", newUser)
         //If user is logged in, save updates to the server or reverse them if failed.
         if (!user?.objectId) return newUser;
         try {
@@ -405,19 +406,20 @@ const useUser = () => {
             const currentParseUser: Parse.User|undefined|null = await Parse.User.current();
             if (!currentParseUser) throw "No User"
             const updatedParseUser = addParseObjectProperties(currentParseUser, updates);
-            if (updatedParseUser) setUser(updatedParseUser.toJSON);
             await updatedParseUser.save()
             // setIsLoading(false);
+            console.log("USER SAVED", user?.language)
             setUpdateError(undefined);
             return newUser;
         } catch (error: any) {
             // setIsLoading(false);
+            console.log("USER REVERSED", user?.language)
             setUpdateError(error);
             setUser(prevUser);
             return prevUser;
         }
     };
-
+    console.log("USER", user, user?.language)
 
 
     //Calendar, get month
