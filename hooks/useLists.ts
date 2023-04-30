@@ -32,7 +32,6 @@ const useLists = () => {
     const getLists = async (listIds?: string[], _options?: IGetListOptions, isAppending=false) => {
         setIsLoading(true);
         let updatedLists;
-        console.log("gl",35)
         try {
             let options = _options || getListsOptions.current;
             const limit = options?.limit || 24;
@@ -43,13 +42,10 @@ const useLists = () => {
               limit,
               skip,
             }
-            console.log("gl",46)
             const results:IList[] = await Parse.Cloud.run("getLists", params);
 
-            console.log("gl",49)
             //Process all episodes on the list to append episode strings
             updatedLists = results.map((list) => {
-                console.log("gl",52)
                 const updatedEpisodes = list?.episodes && list?.episodes.map((episode) => {
                     return appendEpisodeStrings(episode);
                 });
@@ -58,11 +54,9 @@ const useLists = () => {
             });
               
             if (isAppending && lists) {
-                console.log("gl",61)
                 setLists((prev) =>{ return [...prev!, ...updatedLists]});
                 setListOptions(prev => {return { ...(prev || {}), ...(options||{})}});
             } else {
-                console.log("gl",65)
                 setLists(updatedLists);
                 setListOptions(options);
             }
@@ -74,7 +68,6 @@ const useLists = () => {
         finally {
             setIsLoading(false);
         }
-        console.log("gl",77, updatedLists)
         return updatedLists;
     };
 
@@ -204,7 +197,6 @@ const useLists = () => {
             // Set loading state
             setIsLoading(false);
         }
-        console.log("UPDATED LIST", updatedList)
         return updatedList;
     }
 
@@ -247,7 +239,6 @@ const useLists = () => {
 
     //Will delete a list
     const deleteList = async (listId: string) => {   
-        console.log("delete 243") 
         //Cannot delete 0 Bookmarks    
         if (!user?.objectId) return;
         if (!lists) return;
