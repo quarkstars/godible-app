@@ -306,14 +306,14 @@ const EpisodePage:React.FC = () => {
         line = line.replace(/^(\d+)\s/, '$1\u00A0\u00A0');
       }
   
-      // Split line into segments based on <em> tags
+       // Split line into segments based on <em> tags
       let segments = line.split(/(<em>.*?<\/em>)/g).map((segment, i) => {
         // If segment is an <em> tag, replace it with JSX <span> tag
         if (/^<em>.*<\/em>$/.test(segment)) {
           return <span key={i} className="italic">{segment.replace(/<\/?em>/g, '')}</span>;
         }
         // Else return the segment as is
-        return segment;
+        return segment.replace(/#/g,'');
       });
   
       switch (hCount) {
@@ -323,7 +323,6 @@ const EpisodePage:React.FC = () => {
               className="w-full text-left"
               key={episode?.objectId+index}
             >
-              {segments}
             </h1>
           );
         case 2:
