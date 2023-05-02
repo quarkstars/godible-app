@@ -608,7 +608,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 icon={user.lastEmailResponse.includes("success") ? checkmarkCircle : closeCircle} 
                 onClick={(e:any) => {
                   setResponse(user.lastEmailResponse!)
-                  presentResponse({event: e, side:"left"})
+                  presentResponse({})
                 }}
               />
             }
@@ -645,7 +645,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 icon={user.lastTextResponse.includes("success") ? checkmarkCircle : closeCircle} 
                 onClick={(e:any) => {
                   setResponse(user.lastTextResponse!)
-                  presentResponse({event: e, side:"left"})
+                  presentResponse({})
                 }}
               />
             }

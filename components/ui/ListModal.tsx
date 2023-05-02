@@ -517,11 +517,8 @@ const ListModal = (props: IPlayerListModalProps) => {
                       e.stopPropagation();
                       setInspectedEpisode(episode);
                       presentDetails({
-                      event: e,
                       onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
-                      alignment: "start",
-                      side: "left",
-                      reference: "trigger",
+
                     })
                   }}
                 >
@@ -556,7 +553,6 @@ const ListModal = (props: IPlayerListModalProps) => {
                         e.stopPropagation();
                         setInspectedEpisode(episode);
                         presentMenu({
-                        event: e,
                         onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
                         alignment: "start",
                         side: "left",

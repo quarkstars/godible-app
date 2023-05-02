@@ -137,11 +137,8 @@ const Note = (props: INoteProps) => {
                         <IonButton
                             onClick={(e: any) =>
                             present({
-                                event: e,
                                 onDidDismiss: (e: CustomEvent) => {},
-                                alignment: "start",
-                                side: "left",
-                                reference: "trigger",
+
                             })
                             }
                         >

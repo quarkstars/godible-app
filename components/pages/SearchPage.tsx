@@ -506,7 +506,6 @@ const SearchPage = (props: ISearchPageProps) => {
           fill="clear" 
           color="dark"
           onClick={(e: any) => presentMode({
-            event: e,
             onDidDismiss: (e: CustomEvent) => setMode(e.detail.role),
           })}
         >
@@ -660,7 +659,6 @@ const SearchPage = (props: ISearchPageProps) => {
                 fill="clear" 
                 color="dark" 
                 onClick={(e: any) => presentDisplay({
-                  event: e,
                   onDidDismiss: (e: CustomEvent) => setDisplay(e.detail.role),
                 })}
               >

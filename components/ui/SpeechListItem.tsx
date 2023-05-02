@@ -69,7 +69,6 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
       onClick={(e: any) => {
           e.stopPropagation();
           presentDetails({
-          event: e,
           onDidDismiss: (e: CustomEvent) => {},
         })}
       }

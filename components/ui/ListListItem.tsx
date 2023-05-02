@@ -54,7 +54,6 @@ const ListListItem = (props: IListListItemProps) => {
       className='flex items-center py-1 cursor-pointer'
       onClick={(e: any) => {
           presentDetails({
-          event: e,
           onDidDismiss: (e: CustomEvent) => {},
         })}
       }
@@ -109,7 +108,6 @@ const ListListItem = (props: IListListItemProps) => {
               onClick={(e: any) => {
                   e.stopPropagation();
                   presentMenu({
-                  event: e,
                   onDidDismiss: (e: CustomEvent) => {},
                   alignment: "start",
                   side: "left",

@@ -409,11 +409,8 @@ const player = useContext(Player);
                   <IonButton 
                     size="small"
                     onClick={(e: any) => {presentLogoutMenu({
-                      event: e,
                       onDidDismiss: (e: CustomEvent) => {},
-                      alignment: "start",
-                      side: "left",
-                      reference: "trigger",
+
                       
                     })}}
                     color="medium"
@@ -496,11 +493,8 @@ const player = useContext(Player);
                     onClick={(e: any) => {
                         if (user?.objectId) {
                             presentStreak({
-                              event: e,
                               onDidDismiss: (e: CustomEvent) => {},
-                              alignment: "start",
-                              side: "left",
-                              reference: "trigger",
+    
                           })
                         }
                         else router.push("/signin")
@@ -536,11 +530,8 @@ const player = useContext(Player);
                     onClick={(e: any) =>{
                       if (user?.objectId) {
                           presentStreak({
-                            event: e,
                             onDidDismiss: (e: CustomEvent) => {},
-                            alignment: "start",
-                            side: "left",
-                            reference: "trigger",
+
                         })
                       }
                       else router.push("/signin")

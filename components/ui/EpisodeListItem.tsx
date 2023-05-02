@@ -58,7 +58,6 @@ const EpisodeListItem = (props: IEpisodeListItemProps) => {
       onClick={(e: any) => {
           e.stopPropagation();
           presentDetails({
-          event: e,
           onDidDismiss: (e: CustomEvent) => {},
         })
       }}
