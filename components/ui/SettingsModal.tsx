@@ -129,7 +129,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
   useEffect(() => {
     if (!sendHour.current) return;
     if (!user?.objectId) return sendHour.current.value = undefined;
-    sendHour.current.value = user?.sendHour||"5";
+    sendHour.current.value = user?.sendHour||"8";
   }, [user?.objectId, sendHour.current]);
 
   const sendType = useRef<HTMLIonSelectElement>(null);

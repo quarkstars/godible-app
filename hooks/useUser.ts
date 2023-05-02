@@ -237,8 +237,8 @@ const useUser = () => {
             currentUser.set('username', googleUser.email);
             currentUser.set('email', googleUser.email);
             currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
-            currentUser.set('sendHour', "5");
-            currentUser.set('nextSendTime', nextSendTime(5));
+            currentUser.set('sendHour', "8");
+            currentUser.set('nextSendTime', nextSendTime(8));
             if (googleUser.givenName) currentUser.set('firstName', googleUser.givenName);
             if (googleUser.familyName) currentUser.set('lastName', googleUser.familyName);
             if (googleUser.imageUrl) currentUser.set('imageUrl', googleUser.imageUrl);
@@ -352,8 +352,8 @@ const useUser = () => {
                     lastName: last,
                     language,
                     timeZone:  Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    sendHour: "5",
-                    nextSendTime: nextSendTime(5),
+                    sendHour: "8",
+                    nextSendTime: nextSendTime(8),
                 },
             )
             if (!newUser) {

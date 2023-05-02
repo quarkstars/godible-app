@@ -643,7 +643,7 @@ const player = useContext(Player);
                   >
                     <IonRippleEffect></IonRippleEffect>
                     {(user?.isPushOn || user?.isTextOn || user?.isEmailOn) ?
-                      <span className='text-lg text-center'>{`${reminderText} daily reminder at `}<span className="font-bold">{`${(user.sendHour||5) > 13 ? (user.sendHour! - 12) + "PM" : user?.sendHour == 0 ? "12AM" : user.sendHour+"AM"}`}</span></span>
+                      <span className='text-lg text-center'>{`${reminderText} daily reminder at `}<span className="font-bold">{`${(user.sendHour||8) > 13 ? (user.sendHour! - 12) + "PM" : user?.sendHour == 0 ? "12AM" : user.sendHour+"AM"}`}</span></span>
                       :
                       <span className='text-lg text-center'>{user?.objectId ? "Daily Reminders OFF" : "Get Daily Text, Email, Push Reminders"}</span>
                     }
