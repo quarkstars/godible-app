@@ -284,7 +284,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton color="medium" onClick={() => props.onDismiss(null, 'close')}>
+            <IonButton color="medium" onClick={() => {props.onDismiss(null, 'close')}}>
               <IonIcon icon={close} slot="icon-only"/>
               {/* Default */}
             </IonButton>

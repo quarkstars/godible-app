@@ -105,20 +105,23 @@ const Menu: React.FC = () => {
   });
     
     //Settings Modal
-  const onLogout = (user?.objectId) ? logOut : undefined
+  const onLogout = (user?.objectId) ? logOut : undefined;
+  
+    //Settings Modal
     const [presentSettings, dimissSettings] = useIonModal(SettingsModal, {
-      dimissSettings: (data: string, role: string) => {
-        dimissList(data, role); 
-        if (isModalOpen) isModalOpen.current = false;
-      },
-      router,
-      onLogout,
-    });
-    function openSettingsModal() {
-        presentSettings({
-            initialBreakpoint:0.85,
-        })
-    }
+      onDismiss: (data: string, role: string) => {
+          // if (userState.isModalOpen) userState.isModalOpen.current = false;
+          dimissSettings(data, role); 
+        },
+        router,
+        onLogout,
+  });
+
+  function openSettingsModal() {
+      presentSettings({
+          initialBreakpoint:0.85,
+      })
+  }
   
     return (
         <IonMenu contentId="main" type="overlay" className={hideClass}>
