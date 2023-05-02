@@ -198,7 +198,7 @@ const SearchPage = (props: ISearchPageProps) => {
   //Update episode list everytime parameters change
 
 
-  const initializeResults = () => {
+  const initializeEpisodes = () => {
 
     if (mode !== "speeches") {
       let sort = (!search) ? "-publishedAt" : undefined;
@@ -209,6 +209,10 @@ const SearchPage = (props: ISearchPageProps) => {
         setEpisodes(undefined);
         getEpisodes(undefined, {search, bookIds, topicIds, limit: 24, sort,  exclude: ["text"] });
       }
+      
+  }
+
+  const initializeSpeeches = () => {
       if (mode !== "episodes") {
         let sort = (!search) ? "-createdTime" : undefined;
         const bookId = bookFilter ? bookFilter.objectId: undefined;
@@ -220,17 +224,26 @@ const SearchPage = (props: ISearchPageProps) => {
       }
   }
 
-
   useEffect(() => {
-    //Only load episodes if defined search
-    if (!search && !bookFilter && !topicFilter && mode !== "speeches" && mode !== "episodes") return;
-    initializeResults()
+    //Only load episodes if defined search or if episodes and speeches have been loaded before
+    let searchUndefined = !search && !bookFilter && !topicFilter && mode !== "speeches" && mode !== "episodes" ? true : false;
+    if (searchUndefined && episodes) {
+      initializeEpisodes();
+    }
+    if (searchUndefined && speeches) {
+      initializeSpeeches();
+    }
+    
+    if (!searchUndefined) {
+      initializeEpisodes();
+      initializeSpeeches();
+    }
     
   }, [search, bookFilter, topicFilter, mode]);
 
   useIonViewDidEnter(() => {
     if (!search && !bookFilter && !topicFilter && mode !== "speeches" && mode !== "episodes") return;
-    if (typeof episodes === "undefined" || typeof speeches === "undefined") initializeResults();
+    if (typeof episodes === "undefined" || typeof speeches === "undefined") initializeEpisodes();
     if (searchBar.current) searchBar.current.value = undefined
     
   }, []);
@@ -278,13 +291,12 @@ const SearchPage = (props: ISearchPageProps) => {
   const fetchMoreEpisodes = async (e) => {
     e.preventDefault();
     // if (!max) return setReachedMax(true);
-    
     const displayCount = 24 + ((skip||0)*24);
     if (max && displayCount >= max) return setReachedMax(true);
     let sort = (!search) ? "-publishedAt" : undefined;
     const bookIds = bookFilter ? [bookFilter.objectId] : undefined;
     const topicIds = topicFilter ? [topicFilter.objectId!] : undefined;
-    await getEpisodes(undefined,{limit: 24, search, bookIds, topicIds, sort, skip: (skip||-1)+1, exclude: ["text"]}, true);
+    await getEpisodes(undefined,{limit: 24, search, bookIds, topicIds, sort, skip: (skip||0)+1, exclude: ["text"]}, true);
     setIsLoadingMore(false);
   }
   //Fetch more Lists
@@ -296,7 +308,7 @@ const SearchPage = (props: ISearchPageProps) => {
     let sort = (!search) ? "-createdTime" : undefined;
     const bookId = bookFilter ? bookFilter.objectId: undefined;
     const topicId = topicFilter ? topicFilter.objectId! : undefined;
-    await getLists(undefined, {search, bookId, topicId, limit: 24, sort, isSpeech: true, skip: (listSkip||-1)+1, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] }, true);
+    await getLists(undefined, {search, bookId, topicId, limit: 24, sort, isSpeech: true, skip: (listSkip||0)+1, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] }, true);
     setListIsLoadingMore(false);
   }
   // Handle Episode Listen
@@ -688,7 +700,8 @@ const SearchPage = (props: ISearchPageProps) => {
                 <IonButton
                   onClick={(ev) => {
                     setIsLoadingMore(true);
-                    fetchMoreEpisodes(ev);
+                    if (episodes) fetchMoreEpisodes(ev);
+                    else initializeEpisodes();
                   }}
                   disabled={isLoadingMore}
                   color="medium"
@@ -725,7 +738,8 @@ const SearchPage = (props: ISearchPageProps) => {
                 <IonButton
                   onClick={(ev) => {
                     setListIsLoadingMore(true);
-                    fetchMoreLists(ev);
+                    if (speeches) fetchMoreLists(ev);
+                    else initializeSpeeches;
                   }}
                   disabled={listIsLoadingMore}
                   color="medium"

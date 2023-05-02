@@ -37,7 +37,6 @@ const Toolbar = ({children}) => {
         };
     }, []);
     
-    console.log("MODAL CONTROL", isModalOpen?.current)
 
     return (
         
