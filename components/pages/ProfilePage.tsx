@@ -49,8 +49,12 @@ const ProfilePage:React.FC = () => {
     listReloads,
     getStreak,
     setDateMap,
+    getCurrentUser,
   } = useContext(UserState);
   const lang = (user?.language) ? user.language : userDefaultLanguage;
+  useIonViewDidEnter(() => {
+    if (user?.objectId) getCurrentUser();
+  }, [user?.objectId]);
 
   //Modal
   const [presentStreak, dismissStreak] = useIonPopover(StreakDetails, {
@@ -111,17 +115,17 @@ const player = useContext(Player);
     reorderLists
   } = useLists();
 
-  //Get any updated streak when visiting the profile
-  useEffect(() => {
-    if (!user?.objectId) return;
-    getStreak();
-    //If reminder param is 1, then open settings
-    if (reminders == "1" && user?.objectId) {
-      setIsScrollToReminders(true);
-      presentSettings({
-      })
-    }
-  }, [user?.objectId])
+  // //Get any updated streak when visiting the profile
+  // useEffect(() => {
+  //   if (!user?.objectId) return;
+  //   getStreak();
+  //   //If reminder param is 1, then open settings
+  //   if (reminders == "1" && user?.objectId) {
+  //     setIsScrollToReminders(true);
+  //     presentSettings({
+  //     })
+  //   }
+  // }, [user?.objectId])
 
     //List modal trigger
     const [presentTrailer, dismissTrailer] = useIonModal(TrailerModal, {
@@ -147,7 +151,6 @@ const player = useContext(Player);
 
   let playerIndex = (typeof player.index === "number" &&  player.list?.episodes?.[player.index] &&  lists?.[inspectedListIndex||0]?.episodes?.[player.index]?.objectId === player.list?.episodes?.[player.index]?.objectId) ? player.index : undefined
   //List modal trigger
-  console.log("LIST AVAILABLE", lists?.[inspectedListIndex||0])
   const [presentList, dimissList] = useIonModal(ListModal, {
     onDismiss: (data: string, role: string) => dimissList(data, role),
       list: lists?.[inspectedListIndex||0],
@@ -195,10 +198,11 @@ const player = useContext(Player);
 
   //Handle reordering
   const [isReordering, setIsReordering] = useState(false);
-  function handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
+  async function handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
     let newListOrder = event.detail.complete();
     // setList(newListOrder);
-    reorderLists(event.detail.from, event.detail.to)
+    await reorderLists(event.detail.from, event.detail.to)
+    setListReloads(prev => prev + 1);
   }
 
 
@@ -445,7 +449,7 @@ const player = useContext(Player);
                   overlayColor={"linear-gradient(90deg, rgba(97,219,146,.2) 0%, rgba(0,255,239,.2) 100%)"}
                   bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
                   preImageUrl={"/logo/godible-logo-white.png"}
-                  postText={"Now available as an Android and iOS Phone App"}
+                  // postText={"Now available as an Android and iOS Phone App"}
                   isRounded
                 /> 
               </div>
@@ -801,15 +805,17 @@ const player = useContext(Player);
                   </div>
                   <h5 className="w-full text-left"><span className="font-bold">Let God&apos;s Word Be Heard!</span> Godible is only made possible by listeners like you.</h5>
                   <div className="flex justify-start w-full">
-                    <IonButton 
-                    color="primary" 
-                    onClick={() => {player.togglePlayPause(false);
-                      setReroutePath(undefined);
-                      router.push("/donation")}
+                  {!user?.subscriptionId &&
+                      <IonButton 
+                      color="primary" 
+                      onClick={() => {player.togglePlayPause(false);
+                        setReroutePath(undefined);
+                        router.push("/donation")}
+                      }
+                      >
+                        Donate Now
+                      </IonButton>
                     }
-                    >
-                      {`${user?.subscriptionId ? "Manage Donation" : "Donate Now"}`}
-                    </IonButton>
                   </div>
                   <h2 className="w-full pt-12 text-2xl font-bold dark:text-dark">{user?.subscriptionId ? "Thank you for your donation" : "And Upgrade to Unlimited Access"}</h2>
                   <Pricing 

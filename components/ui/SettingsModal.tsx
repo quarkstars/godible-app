@@ -23,6 +23,18 @@ interface ISettingsModalProps {
 
 const SettingsModal = (props: ISettingsModalProps) => {
 
+  const content = useRef<HTMLIonContentElement | null>(null);
+  const reminders = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!reminders.current || !content.current) return
+    if (!props.isScrollToReminders) {
+      content.current.scrollToTop();
+      return;
+    }
+    reminders.current.scrollIntoView();
+  }, [reminders.current, content.current, props.isScrollToReminders]);
+  
+
   //TODO: Get translations
 
   const player = useContext(Player);
@@ -196,22 +208,10 @@ const SettingsModal = (props: ISettingsModalProps) => {
   if (userName.length === 0) userName = "M E"
 
   let volumeIcon = volumeHigh;
-  if (player.volume < .66) volumeIcon =volumeMedium;
-  if (player.volume < .33) volumeIcon = volumeLow;
-  if (player.volume < .05) volumeIcon = volumeOff;
+  if (player?.volume < .66) volumeIcon =volumeMedium;
+  if (player?.volume < .33) volumeIcon = volumeLow;
+  if (player?.volume < .05) volumeIcon = volumeOff;
 
-
-  const content = useRef<HTMLIonContentElement | null>(null);
-  const reminders = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (!reminders.current || !content.current) return
-    if (!props.isScrollToReminders) {
-      content.current.scrollToTop();
-      return;
-    }
-    reminders.current.scrollIntoView();
-  }, [reminders.current, content.current, props.isScrollToReminders]);
-  
 
   if (onboardingUpgrade) return (
     
@@ -598,9 +598,9 @@ const SettingsModal = (props: ISettingsModalProps) => {
             />
         </IonItem>
         
-        <IonItem> 
+        {/* <IonItem> 
             <IonIcon icon={notifications} slot="start" />
-            <IonLabel>{`Push notification ${user?.isPushOn ? "on": "off"}`}</IonLabel>
+            <IonLabel>{`Push notifications ${user?.isPushOn ? "on": "off"}`}</IonLabel>
             <IonToggle
               name="push"
               ref={isPushOn}
@@ -609,7 +609,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 if (user?.objectId) updateUser({isPushOn: e.detail.checked, pushErrorCount: 0, lastPushResponse: null})
               }}
             />
-        </IonItem>
+        </IonItem> */}
         <IonItem> 
             <IonIcon icon={chatbox} slot="start" />
             

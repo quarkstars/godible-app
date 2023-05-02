@@ -155,6 +155,7 @@ const EpisodePage:React.FC = () => {
   useEffect(() => {
   
     const setupAdjacentEpisodes = async () => {
+      
       if (!player.list || typeof player.index !== "number") return;
       let _isAdjacentEpisodeFromList = [false, false];
       let previousPlayerEpisode = player.list.episodes[player.index-1];
@@ -182,7 +183,6 @@ const EpisodePage:React.FC = () => {
           return adjacentEps;
         })
       }
-      // If the user remains on the same episode for 2 minutes, assign the next episode to the user
     }
   
     if (episode) {
@@ -202,15 +202,16 @@ const EpisodePage:React.FC = () => {
     let timer: NodeJS.Timeout;  // Declare the timer variable here.
     
     const saveNextEpisode = async(expectedSlug: string) => {
+      
       if (!userRef.current?.objectId || !adjacentEpisodes[1]) return; 
       if (expectedSlug === episode?.slug) {
-        console.log("SWITCHED THE EPISODE!!", userRef.current)
         if (updateUserRef.current) {
           updateUserRef.current({nextEpisode: adjacentEpisodes[1]});
         }
       }
     };
-  
+    // If the user remains on the same episode for 2 minutes, assign the next episode to the user
+
     if (userRef.current?.objectId && adjacentEpisodes[1]) {
       timer = setTimeout(() => saveNextEpisode(episode!.slug), 120000); // Assign the timeout to timer variable.
     }
@@ -408,9 +409,9 @@ const EpisodePage:React.FC = () => {
           }}
           >
           <div className="flex flex-col items-center justify-center w-full bg-black bg-opacity-50">
-            <div className="flex flex-col items-start w-full px-4 py-8" style={{color: "white !important", maxWidth: "800px"}}>           
+            <div className="flex flex-col items-center w-full px-4 py-8" style={{color: "white !important", maxWidth: "800px"}}>           
               {quote && 
-                <div className="flex flex-col w-full">
+                <div className="flex flex-col items-center w-full">
                   <div 
                     className="flex justify-center w-full cursor-pointer"
                     onClick={()=>setShowQuote(prev => !prev)}

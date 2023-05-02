@@ -74,9 +74,11 @@ const Pricing = ({onClick}) => {
             {user?.subscriptionId ? `Your Donor Account` : "Donor Account"}
             </p>
 
-            <p className="mt-4 text-3xl font-medium text-gray-700 dark:text-gray-100">
-            $Any <span className="text-base font-normal">/month</span>
-            </p>
+            {!user?.subscriptionId && 
+                <p className="mt-4 text-3xl font-medium text-gray-700 dark:text-gray-100">
+                    $Any <span className="text-base font-normal">/month</span>
+                </p>
+            }
 
             <p className={`mt-4 ${user?.subscriptionId ? "text-primary font-bold":"text-gray-700 dark:text-gray-100 font-medium"}`} >
             {user?.subscriptionId ? `You are contributing $${user?.donationAmount}/month` : "Support Godible and you get"}
