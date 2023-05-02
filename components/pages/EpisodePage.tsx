@@ -296,71 +296,76 @@ const EpisodePage:React.FC = () => {
   
   const episodeText = useMemo(() => {
     return episode?._textBlocks && episode._textBlocks.map((_line, index) => {
-        // if (index === 0) return;
-        let line = _line;
-        const fontWeight = line[0] === '#' ? 'bold' : 'normal';
-        let hCount = 0;
-        if (line[0] === "#") hCount=1;
-        if (line[1] === "#") hCount=2;
-        if (line[2] === "#") hCount=3;
-        if (line[3] === "#") hCount=4;
-        if (/^\d+\s/.test(line)) {
-          line = line.replace(/^(\d+)\s/, '$1\u00A0\u00A0');
+      let line = _line;
+      let hCount = 0;
+      if (line[0] === "#") hCount=1;
+      if (line[1] === "#") hCount=2;
+      if (line[2] === "#") hCount=3;
+      if (line[3] === "#") hCount=4;
+      if (/^\d+\s/.test(line)) {
+        line = line.replace(/^(\d+)\s/, '$1\u00A0\u00A0');
+      }
+  
+      // Split line into segments based on <em> tags
+      let segments = line.split(/(<em>.*?<\/em>)/g).map((segment, i) => {
+        // If segment is an <em> tag, replace it with JSX <span> tag
+        if (/^<em>.*<\/em>$/.test(segment)) {
+          return <span key={i} className="italic">{segment.replace(/<\/?em>/g, '')}</span>;
         }
-        switch (hCount) {
-          case 1:
-            return(
-              <h1
-                className="w-full text-left"
-                key={episode?.objectId+index}
-              >
-                {line.replace(/#/g,'')}
-              </h1>
-            )
-            break;
-          case 2:
-            return(
-              <h2
-                className="w-full text-left"
-                key={episode?.objectId+index}
-              >
-                {line.replace(/#/g,'')}
-              </h2>
-            )
-            break;
-          case 3:
-            return(
-              <h3
-                className="w-full text-left"
-                key={episode?.objectId+index}
-              >
-                {line.replace(/#/g,'')}
-              </h3>
-            )
-            break;
-          case 4:
-            return(
-              <h4
-                className="w-full text-left"
-                key={episode?.objectId+index}
-              >
-                {line.replace(/#/g,'')}
-              </h4>
-            )
-            break;
-          default:
-            return(
-              <p
-                className={`leading-relaxed ${paddingSize} ${fontStyle} ${fontSize} ${fontContrast}`}
-                key={episode?.objectId+index}
-              >
-                {line.replace(/#/g,'')}
-              </p>
-          )
-        }
-      })
+        // Else return the segment as is
+        return segment;
+      });
+  
+      switch (hCount) {
+        case 1:
+          return(
+            <h1
+              className="w-full text-left"
+              key={episode?.objectId+index}
+            >
+              {segments}
+            </h1>
+          );
+        case 2:
+          return(
+            <h2
+              className="w-full text-left"
+              key={episode?.objectId+index}
+            >
+              {segments}
+            </h2>
+          );
+        case 3:
+          return(
+            <h3
+              className="w-full text-left"
+              key={episode?.objectId+index}
+            >
+              {segments}
+            </h3>
+          );
+        case 4:
+          return(
+            <h4
+              className="w-full text-left"
+              key={episode?.objectId+index}
+            >
+              {segments}
+            </h4>
+          );
+        default:
+          return(
+            <p
+              className={`leading-relaxed ${paddingSize} ${fontStyle} ${fontSize} ${fontContrast}`}
+              key={episode?.objectId+index}
+            >
+              {segments}
+            </p>
+          );
+      }
+    })
   }, [episode,fontStyle, fontSize, fontContrast])
-
+  
 
   //Clear data when leaving unless it's another episode
   useIonViewDidEnter(() => {
