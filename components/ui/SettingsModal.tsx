@@ -779,7 +779,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                   
                 }}
               >     
-              <IonIcon icon={fontContrast === "low" ? checkmarkCircle : ellipseOutline} slot="start"color="fullblack" />
+              <IonIcon icon={fontContrast === "low" ? checkmarkCircle : ellipseOutline} slot="start" />
               <span className="font-bold text-gray-500 dark:text-gray-500">Low</span>
             </IonButton>
               <IonButton 
@@ -789,7 +789,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                   
                 }}
               >     
-              <IonIcon icon={(!fontContrast || fontContrast === "normal") ? checkmarkCircle : ellipseOutline} slot="start" color="fullblack" />
+              <IonIcon icon={(!fontContrast || fontContrast === "normal") ? checkmarkCircle : ellipseOutline} slot="start" />
               <span className="font-bold text-gray-700 dark:text-gray-300">Normal</span>
             </IonButton>
               <IonButton 
@@ -800,7 +800,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                   
                 }}
               >     
-              <IonIcon icon={fontContrast === "high" ? checkmarkCircle : ellipseOutline} slot="start" color="fullblack" />
+              <IonIcon icon={fontContrast === "high" ? checkmarkCircle : ellipseOutline} slot="start" />
               <span className="font-bold text-black dark:text-white">High</span>
             </IonButton>
           </IonButtons>
