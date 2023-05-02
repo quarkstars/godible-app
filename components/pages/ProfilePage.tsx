@@ -50,6 +50,7 @@ const ProfilePage:React.FC = () => {
     getStreak,
     setDateMap,
     getCurrentUser,
+    isModalOpen,
   } = useContext(UserState);
   const lang = (user?.language) ? user.language : userDefaultLanguage;
   useIonViewDidEnter(() => {
@@ -67,7 +68,10 @@ const ProfilePage:React.FC = () => {
   const [isScrollToReminders, setIsScrollToReminders] = useState(false);
   const onLogout = (user?.objectId) ? logOut : undefined
   const [presentSettings, dismissSettings] = useIonModal(SettingsModal, {
-    onDismiss: (data: string, role: string) => dismissSettings(data, role),
+    onDismiss: (data: string, role: string) => {
+      dismissSettings(data, role); 
+      if (isModalOpen) isModalOpen.current = false;
+    },
     isProfile: true,
     isScrollToReminders,
     onLogout,
@@ -129,7 +133,10 @@ const player = useContext(Player);
 
     //List modal trigger
     const [presentTrailer, dismissTrailer] = useIonModal(TrailerModal, {
-      onDismiss: (data: string, role: string) => dismissTrailer(data, role),
+      onDismiss: (data: string, role: string) => {
+        dismissTrailer(data, role); 
+        if (isModalOpen) isModalOpen.current = false;
+      },
 
     })
 
@@ -152,7 +159,10 @@ const player = useContext(Player);
   let playerIndex = (typeof player.index === "number" &&  player.list?.episodes?.[player.index] &&  lists?.[inspectedListIndex||0]?.episodes?.[player.index]?.objectId === player.list?.episodes?.[player.index]?.objectId) ? player.index : undefined
   //List modal trigger
   const [presentList, dimissList] = useIonModal(ListModal, {
-    onDismiss: (data: string, role: string) => dimissList(data, role),
+    onDismiss: (data: string, role: string) => {
+      dimissList(data, role); 
+      if (isModalOpen) isModalOpen.current = false;
+    },
       list: lists?.[inspectedListIndex||0],
       setList: setList,
       index: playerIndex,
@@ -385,13 +395,14 @@ const player = useContext(Player);
     <IonHeader>
     <IonToolbar>
           <IonButtons slot="start">
+            
+        
             <IonMenuButton />
-                <div className="hidden px-2 sm:block">
-                    <IonBackButton />
-                </div>
+            <IonBackButton />
+
             </IonButtons>
             <IonTitle>
-              <div className={'flex justify-center items-center text-lg'}>
+              <div className={'flex items-center text-lg'}>
               {user?.objectId ? "My Profile" : "Welcome to Godible"}
               {user?.objectId &&
                 <IonButtons>
@@ -402,7 +413,7 @@ const player = useContext(Player);
                       onDidDismiss: (e: CustomEvent) => {},
                       alignment: "start",
                       side: "left",
-                      reference: "event",
+                      reference: "trigger",
                       
                     })}}
                     color="medium"
@@ -489,7 +500,7 @@ const player = useContext(Player);
                               onDidDismiss: (e: CustomEvent) => {},
                               alignment: "start",
                               side: "left",
-                              reference: "event",
+                              reference: "trigger",
                           })
                         }
                         else router.push("/signin")
@@ -529,7 +540,7 @@ const player = useContext(Player);
                             onDidDismiss: (e: CustomEvent) => {},
                             alignment: "start",
                             side: "left",
-                            reference: "event",
+                            reference: "trigger",
                         })
                       }
                       else router.push("/signin")

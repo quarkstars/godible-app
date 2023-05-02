@@ -11,6 +11,7 @@ import usePhoto from 'hooks/usePhoto';
 import { nextSendTime } from 'utils/nextSendTime';
 import { countryCodes } from 'data/countryCodes';
 import Pricing from './Pricing';
+import { App } from '@capacitor/app';
 
 interface ISettingsModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
@@ -25,6 +26,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
 
   const content = useRef<HTMLIonContentElement | null>(null);
   const reminders = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     if (!reminders.current || !content.current) return
     if (!props.isScrollToReminders) {
@@ -34,8 +36,8 @@ const SettingsModal = (props: ISettingsModalProps) => {
     reminders.current.scrollIntoView();
   }, [reminders.current, content.current, props.isScrollToReminders]);
   
-
-  //TODO: Get translations
+  
+  
 
   const player = useContext(Player);
 
@@ -46,7 +48,29 @@ const SettingsModal = (props: ISettingsModalProps) => {
     reroutePath,
     setReroutePath,
     getCurrentUser,
+    isModalOpen
   } = useContext(UserState);
+
+  useEffect(() => {
+    let backButtonListener;
+    if (isModalOpen) isModalOpen.current = true;
+
+    const addListenerAsync = async () => {
+        backButtonListener = await App.addListener('backButton', (data) => {
+            props.onDismiss();
+        });
+    };
+
+    addListenerAsync();
+
+    return () => {
+        // Clean up listener
+        if (backButtonListener) {
+            backButtonListener.remove();
+        }
+        if (isModalOpen) isModalOpen.current = false;
+    };
+  }, []);
 
   const reader = new FileReader();
   const {

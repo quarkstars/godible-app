@@ -44,6 +44,8 @@ export const UserStateDefault = {
 
   listReloads: 0,
   setListReloads: () => null,
+
+  isModalOpen: null,
 }
 export const UserState = createContext<IUserState>(UserStateDefault);
 

@@ -25,12 +25,18 @@ import { resolveLangString } from 'utils/resolveLangString'
 
 const EpisodePage:React.FC = () => {
 
+  
+  const {user, listReloads, setListReloads, updateUser, setReroutePath,isModalOpen} = useContext(UserState);
+  const lang = (user?.language) ? user.language : userDefaultLanguage;
   const player = useContext(Player);
 	const router = useIonRouter();
   
   //Modal
   const [presentSettings, dimissSettings] = useIonModal(SettingsModal, {
-      onDismiss: (data: string, role: string) => dimissSettings(data, role),
+      onDismiss: (data: string, role: string) => {
+        dimissSettings(data, role); 
+        if (isModalOpen) isModalOpen.current = false;
+      },
   });
   function openSettingsModal() {
       if (!player.list?.episodes || typeof player.index !== "number" ) return;
@@ -45,9 +51,6 @@ const EpisodePage:React.FC = () => {
     getAdjacentEpisodes,
     setEpisodes,
   } = useEpisodes();
-  
-  const {user, listReloads, setListReloads, updateUser, setReroutePath} = useContext(UserState);
-  const lang = (user?.language) ? user.language : userDefaultLanguage;
 
 
   //User Bookmarks
@@ -263,7 +266,10 @@ const EpisodePage:React.FC = () => {
   }, [showMeta, episode?._metaDataBlocks]);
 
   const [presentNotes, dismissNotes] = useIonModal(EpisodeNotes, {
-    onDismiss: (data: string, role: string) => dismissNotes(data, role),
+    onDismiss: (data: string, role: string) => {
+      dismissNotes(data, role); 
+      if (isModalOpen) isModalOpen.current = false;
+    },
     episode,
   });
   useEffect(() => {  
@@ -279,7 +285,10 @@ const EpisodePage:React.FC = () => {
 
   //List modal trigger
   const [presentList, dimissList] = useIonModal(ListModal, {
-    onDismiss: (data: string, role: string) => dimissList(data, role),
+    onDismiss: (data: string, role: string) => {
+      dimissList(data, role); 
+      if (isModalOpen) isModalOpen.current = false;
+    },
       router,
       isAddingEpisode: true,
       addEpisodeId: episode?.objectId,

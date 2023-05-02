@@ -2,26 +2,51 @@ import { IonAvatar, IonBackButton, IonButton, IonButtons, IonIcon, IonLabel, Ion
 import { Player } from 'components/AppShell';
 import { UserState } from 'components/UserStateProvider';
 import { arrowForward } from 'ionicons/icons';
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import InitialsAvatar from 'react-initials-avatar';
 import 'react-initials-avatar/lib/ReactInitialsAvatar.css';
+import { App } from '@capacitor/app';
+
+
 
 const Toolbar = ({children}) => {
-
     const player = useContext(Player);
     const {
-        user
+        user,
+        isModalOpen,
       } = useContext(UserState);
 
 	const router = useIonRouter();
+    useEffect(() => {
+        let backButtonListener;
+    
+        const addListenerAsync = async () => {
+            backButtonListener = await App.addListener('backButton', (data) => {
+                if (isModalOpen && isModalOpen.current) return;
+                if (router.canGoBack()) router.goBack();
+            });
+        };
+    
+        addListenerAsync();
+    
+        return () => {
+            // Clean up listener
+            if (backButtonListener) {
+                backButtonListener.remove();
+            }
+        };
+    }, []);
+    
+    console.log("MODAL CONTROL", isModalOpen?.current)
+
     return (
         
         <IonToolbar>
             <IonButtons slot="start">
             <IonMenuButton />
-                <div className="hidden px-2 md:block">
-                    <IonBackButton />
-                </div>
+            {/* <div className="hidden px-2 md:block"> */}
+            <IonBackButton />
+            {/* </div> */}
             </IonButtons>
             {children}
             <IonButtons slot="end">

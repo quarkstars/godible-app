@@ -13,6 +13,7 @@ import { countryCodes } from 'data/countryCodes';
 import Pricing from './Pricing';
 import { SwiperSlide } from 'swiper/react';
 import SlideList from './SlideList';
+import { App } from '@capacitor/app';
 
 interface ISettingsModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
@@ -21,7 +22,31 @@ interface ISettingsModalProps {
 
 const TrailerModal = (props: ISettingsModalProps) => {
 
-  //TODO: Get translations
+  
+  const {
+    isModalOpen,
+  } = useContext(UserState);
+  useEffect(() => {
+    let backButtonListener;
+    if (isModalOpen) isModalOpen.current = true;
+
+    const addListenerAsync = async () => {
+        backButtonListener = await App.addListener('backButton', (data) => {
+            props.onDismiss();
+        });
+    };
+
+    addListenerAsync();
+
+    return () => {
+        // Clean up listener
+        if (backButtonListener) {
+            backButtonListener.remove();
+        }
+        if (isModalOpen) isModalOpen.current = false;
+    };
+  }, []);
+
  return (
     <IonPage>
       <IonHeader>

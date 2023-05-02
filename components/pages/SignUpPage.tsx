@@ -32,6 +32,7 @@ const SignUpPage: React.FC = () => {
     setReroutePath,
     logInWithGoogle,
     isOnboarding,
+    isModalOpen,
   } = useContext(UserState);
 
   //Loading When Logging
@@ -44,7 +45,10 @@ const SignUpPage: React.FC = () => {
   //TODO: Programmatically check what platform and then show floating only on android
   
   const [presentSettings, dismissSettings] = useIonModal(SettingsModal, {
-      onDismiss: (data: string, role: string) => dismissSettings(data, role),
+      onDismiss: (data: string, role: string) => {
+        dismissSettings(data, role); 
+        if (isModalOpen) isModalOpen.current = false;
+      },
       router,
       isOnboarding: true,
   });
@@ -76,8 +80,8 @@ const SignUpPage: React.FC = () => {
                 fill="clear" 
                 size="small" 
                 color="medium"
-                    onClick={()=>{router.push("/signin")}}
-                  >
+                onClick={()=>{router.push("/signin")}}
+              >
                 Or Log In
               </IonButton>
             </IonButtons>

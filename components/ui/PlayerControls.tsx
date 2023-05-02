@@ -37,7 +37,10 @@ export const PlayerControls = () => {
 
     //List Modal
     const [presentList, dimissList] = useIonModal(ListModal, {
-        onDismiss: (data: string, role: string) => dimissList(data, role),
+        onDismiss: (data: string, role: string) => {
+            dimissList(data, role); 
+            if (userState.isModalOpen) userState.isModalOpen.current = false;
+          },
         list: player.list,
         setList: player.setList,
         index: player.index,
@@ -50,7 +53,10 @@ export const PlayerControls = () => {
     }
     //Settings Modal
     const [presentSettings, dimissSettings] = useIonModal(SettingsModal, {
-        onDismiss: (data: string, role: string) => dimissSettings(data, role),
+        onDismiss: (data: string, role: string) => {
+            if (userState.isModalOpen) userState.isModalOpen.current = false;
+            dimissSettings(data, role); 
+          },
     });
     function openSettingsModal() {
         if (!player.list?.episodes || typeof player.index !== "number" ) return;
@@ -114,14 +120,10 @@ export const PlayerControls = () => {
 
     const modal = useRef<HTMLIonModalElement>(null);
   
+    let nextDisabled = (!player.isReady) ? true : false;
+    if (player && player.duration && player.index+2 > (player.list?.episodes?.length||0) && player.currentSeconds >= player.duration -1) nextDisabled = true; 
 
-  
-
-    function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
-      if (ev.detail.role === 'confirm') {
-        // setMessage(`Hello, ${ev.detail.data}!`);
-      }
-    }
+    
     return (
         <>
         <AnimatePresence>
@@ -265,7 +267,7 @@ export const PlayerControls = () => {
 
                                 <IonButtons>
                                     <IonButton
-                                        disabled={!player.isReady && !player.isPlaying && player.index+2 > (player.list?.episodes?.length||0)}
+                                        disabled={nextDisabled}
                                         onClick={()=> {
                                             player.next()
                                         }}

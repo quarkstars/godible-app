@@ -60,6 +60,7 @@ const Menu: React.FC = () => {
     listReloads,
     setListReloads,
     logOut,
+    isModalOpen,
   } = useContext(UserState);
 
 
@@ -91,7 +92,10 @@ const Menu: React.FC = () => {
   let playerIndex = (typeof player.index === "number" &&  player.list?.episodes?.[player.index] &&  lists?.[inspectedListIndex||0]?.episodes?.[player.index]?.objectId === player.list?.episodes?.[player.index]?.objectId) ? player.index : undefined
   //List modal trigger
   const [presentList, dimissList] = useIonModal(ListModal, {
-    onDismiss: (data: string, role: string) => dimissList(data, role),
+    onDismiss: (data: string, role: string) => {
+        dimissList(data, role); 
+        if (isModalOpen) isModalOpen.current = false;
+      },
       list: lists?.[inspectedListIndex||0],
       setList: setList,
       index: playerIndex,
@@ -103,7 +107,10 @@ const Menu: React.FC = () => {
     //Settings Modal
   const onLogout = (user?.objectId) ? logOut : undefined
     const [presentSettings, dimissSettings] = useIonModal(SettingsModal, {
-      onDismiss: (data: string, role: string) => dimissSettings(data, role),
+      dimissSettings: (data: string, role: string) => {
+        dimissList(data, role); 
+        if (isModalOpen) isModalOpen.current = false;
+      },
       router,
       onLogout,
     });
@@ -130,7 +137,7 @@ const Menu: React.FC = () => {
                           className={location.pathname === page.path ? 'selected' : ''} 
                           //Search Query is empty to start
                           routerLink={page.path} 
-                          routerDirection="none" 
+                          routerDirection="forward" 
                           lines="none" 
                           detail={false}
                           ion-padding={false}
@@ -158,7 +165,7 @@ const Menu: React.FC = () => {
 
                         })
                       }}
-                      routerDirection="none"  
+                      routerDirection="forward"  
                       button 
                     >
                       <IonIcon slot="start" icon={myList.name==="Bookmarks" ? bookmark : list} />
@@ -168,7 +175,7 @@ const Menu: React.FC = () => {
                 :
                   <IonItem 
                     lines="none" 
-                    routerDirection="none"  
+                    routerDirection="forward"  
                     button 
                     onClick={()=>{
                        player.togglePlayPause(false);
@@ -183,7 +190,7 @@ const Menu: React.FC = () => {
                   <IonItem 
                     lines="none" 
                     routerLink={"/profile?tab=lists"}
-                    routerDirection="none"  
+                    routerDirection="forward"  
                     button 
                   >
                     <IonIcon slot="start" icon={arrowForward} color="medium" />
@@ -207,7 +214,7 @@ const Menu: React.FC = () => {
                   <div className="h-full border-r dark:border-gray-800" />
                 <IonButton 
                     routerLink={"/profile?tab=donation"}
-                    routerDirection="none" 
+                    routerDirection="forward" 
                     fill="clear"
                     size="small" 
                   >
@@ -216,7 +223,7 @@ const Menu: React.FC = () => {
                   <div className="h-full border-r dark:border-gray-800" />
                 <IonButton 
                     routerLink={"/faq"}
-                    routerDirection="none" 
+                    routerDirection="forward" 
                     fill="clear"
                     size="small" 
                   >
@@ -225,7 +232,7 @@ const Menu: React.FC = () => {
                   <div className="h-full border-r dark:border-gray-800" />
                 <IonButton 
                     routerLink={"/terms"}
-                    routerDirection="none" 
+                    routerDirection='forward'
                     fill="clear"
                     size="small" 
                   >

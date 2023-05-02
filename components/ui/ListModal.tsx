@@ -10,6 +10,7 @@ import { UserState } from 'components/UserStateProvider';
 import useLists from 'hooks/useLists';
 import { list } from 'postcss';
 import ListListItem from './ListListItem';
+import { App } from '@capacitor/app';
 
 interface IPlayerListModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
@@ -48,8 +49,31 @@ const ListModal = (props: IPlayerListModalProps) => {
   const {
     user,
     setListReloads,
+    isModalOpen,
   } = useContext(UserState);
 
+  useEffect(() => {
+    let backButtonListener;
+    if (isModalOpen) isModalOpen.current = true;
+
+    const addListenerAsync = async () => {
+        backButtonListener = await App.addListener('backButton', (data) => {
+            props.onDismiss();
+        });
+    };
+
+    addListenerAsync();
+
+    return () => {
+        // Clean up listener
+        if (backButtonListener) {
+            backButtonListener.remove();
+        }
+        if (isModalOpen) isModalOpen.current = false;
+    };
+  }, []);
+
+  
   //User Lists
   const {
     postList,
@@ -497,7 +521,7 @@ const ListModal = (props: IPlayerListModalProps) => {
                       onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
                       alignment: "start",
                       side: "left",
-                      reference: "event",
+                      reference: "trigger",
                     })
                   }}
                 >
@@ -536,7 +560,7 @@ const ListModal = (props: IPlayerListModalProps) => {
                         onDidDismiss: (e: CustomEvent) => {setInspectedEpisode(undefined)},
                         alignment: "start",
                         side: "left",
-                        reference: "event",
+                        reference: "trigger",
                         
                       })
                     }}

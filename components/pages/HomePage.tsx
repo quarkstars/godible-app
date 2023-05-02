@@ -29,7 +29,7 @@ const HomePage:React.FC = () => {
 
 	const router = useIonRouter();
 
-  const {user} = useContext(UserState);
+  const {user, isModalOpen} = useContext(UserState);
   
   const lang = (user?.language) ? user.language : userDefaultLanguage;
   const [episodeWidth, setEpisodeWidth] = useState<number>(148);
@@ -99,7 +99,10 @@ const HomePage:React.FC = () => {
     //List modal trigger
   const [inspectedEpisode, setInspectedEpisode] = useState<IEpisode|undefined>();
   const [presentList, dimissList] = useIonModal(ListModal, {
-      onDismiss: (data: string, role: string) => dimissList(data, role),
+      onDismiss: (data: string, role: string) => {
+        dimissList(data, role); 
+        if (isModalOpen) isModalOpen.current = false;
+      },
         router,
         isAddingEpisode: true,
         addEpisodeId: inspectedEpisode?.objectId,
@@ -219,14 +222,15 @@ const HomePage:React.FC = () => {
     <IonPage>
     <IonHeader>
       <Toolbar>
+        
         {user.nextEpisode ?
-          <div className="flex justify-center w-full pl-8">
+          <div className="flex justify-center w-full">
           <IonButton 
             fill="clear"
             disabled={(user.nextEpisode?.publishedAt && user.nextEpisode?.publishedAt > Date.now())? true: false}
             onClick={(e) => {if (user.nextEpisode?._path) router.push(user.nextEpisode._path)}}
           >
-          <div className="flex flex-col justify-start w-full -ml-2 text-sm tracking-tight normal-case">
+          <div className="flex flex-col justify-start w-full text-sm tracking-tight normal-case">
             <div className="flex items-center gap-x-1 text-medium">
               My Next Episode
             </div>

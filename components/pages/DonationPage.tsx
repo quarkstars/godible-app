@@ -9,12 +9,13 @@ import TextDivider from 'components/ui/TextDivider';
 import { countryCodes } from 'data/countryCodes';
 import AlertInline from 'components/ui/AlertInline';
 import BillingHistoryModal from 'components/ui/BillingHistoryModal';
+import { App } from '@capacitor/app';
 
 
 const DonationPage: React.FC = () => {
 	const router = useIonRouter();
 
-  const {user, isLoading: userIsLoading, setReroutePath, logOut, updateUser, getCurrentUser} = useContext(UserState);
+  const {user, isLoading: userIsLoading, setReroutePath, logOut, updateUser, isModalOpen} = useContext(UserState);
   const {
     error,
     isLoading,
@@ -125,11 +126,17 @@ const DonationPage: React.FC = () => {
   } 
   
   const [presentHistory, dismissHistory] = useIonModal(BillingHistoryModal, {
-    onDismiss: (data: string, role: string) => dismissHistory(data, role),
+    onDismiss: (data: string, role: string) => {
+      dismissHistory(data, role); 
+      if (isModalOpen) isModalOpen.current = false;
+    },
   });
 
   const [presentSuccess, dismissSuccess] = useIonModal(SuccessModal, {
-    onDismiss: (data: string, role: string) => dismissSuccess(data, role),
+    onDismiss: (data: string, role: string) => {
+      dismissSuccess(data, role); 
+      if (isModalOpen) isModalOpen.current = false;
+    },
     router,
   });
 
@@ -642,6 +649,28 @@ const cancelMenu = ({onDismiss, cancelSubscription, router, isLoading, setMessag
 }
 
 const SuccessModal = ({onDismiss, router, reroutePath}) => {
+  const {isModalOpen} = useContext(UserState);
+  useEffect(() => {
+    let backButtonListener;
+    if (isModalOpen) isModalOpen.current = true;
+
+    const addListenerAsync = async () => {
+        backButtonListener = await App.addListener('backButton', (data) => {
+            onDismiss();
+        });
+    };
+
+    addListenerAsync();
+
+    return () => {
+        // Clean up listener
+        if (backButtonListener) {
+            backButtonListener.remove();
+        }
+        if (isModalOpen) isModalOpen.current = false;
+    };
+  }, []);
+
   return (
     
     <IonPage>

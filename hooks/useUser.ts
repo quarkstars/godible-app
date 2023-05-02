@@ -68,6 +68,8 @@ export interface IUserState {
     
     listReloads: number,
     setListReloads: Function,
+
+    isModalOpen: React.MutableRefObject<boolean>|null;
 }
 
 
@@ -108,6 +110,10 @@ const useUser = () => {
     
     //Loading State, waiting for server response
     const [isOnboarding, setIsOnboarding] = useState<any>();
+
+    
+    //is Modal open, lets the back button
+    const isModalOpen = useRef(false)
 
     useEffect(() => {
         if (isPlatform('capacitor')) return;
@@ -527,6 +533,10 @@ const useUser = () => {
         dateMap,
         getStreak,
         setDateMap,
+
+        //MODAL CONTROL BACK BUTTON
+        isModalOpen,
+
     }
 }
 

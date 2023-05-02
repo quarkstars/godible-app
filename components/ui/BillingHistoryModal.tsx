@@ -11,6 +11,7 @@ import usePhoto from 'hooks/usePhoto';
 import { nextSendTime } from 'utils/nextSendTime';
 import { countryCodes } from 'data/countryCodes';
 import useDonation from 'hooks/useDonation';
+import { App } from '@capacitor/app';
 
 interface IBillingHistory {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
@@ -23,8 +24,30 @@ const BillingHistoryModal = (props: IBillingHistory) => {
 
   const {
     user,
+    isModalOpen,
   } = useContext(UserState);
 
+  useEffect(() => {
+    let backButtonListener;
+    if (isModalOpen) isModalOpen.current = true;
+
+    const addListenerAsync = async () => {
+        backButtonListener = await App.addListener('backButton', (data) => {
+            props.onDismiss();
+        });
+    };
+
+    addListenerAsync();
+
+    return () => {
+        // Clean up listener
+        if (backButtonListener) {
+            backButtonListener.remove();
+        }
+        if (isModalOpen) isModalOpen.current = false;
+    };
+  }, []);
+  
   const {
     getPaymentEvents,
     events,

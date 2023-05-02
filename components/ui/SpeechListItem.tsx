@@ -23,7 +23,8 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
 
   const router = useIonRouter();
   const {
-    user
+    user,
+    isModalOpen,
   } = useContext(UserState);
   const lang = (user?.language) ? user.language : userDefaultLanguage;
   const episode = list.episodes[0] as IEpisode|undefined;
@@ -42,7 +43,10 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
 
     //List Modal
   const [presentList, dimissList] = useIonModal(ListModal, {
-    onDismiss: (data: string, role: string) => dimissList(data, role),
+    onDismiss: (data: string, role: string) => {
+      dimissList(data, role); 
+      if (isModalOpen) isModalOpen.current = false;
+    },
       list: {
         name: resolveLangString(list?.title, lang),
         episodes: list.episodes,

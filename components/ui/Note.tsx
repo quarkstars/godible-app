@@ -141,7 +141,7 @@ const Note = (props: INoteProps) => {
                                 onDidDismiss: (e: CustomEvent) => {},
                                 alignment: "start",
                                 side: "left",
-                                reference: "event",
+                                reference: "trigger",
                             })
                             }
                         >

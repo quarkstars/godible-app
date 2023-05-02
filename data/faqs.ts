@@ -1,13 +1,13 @@
 export const faqs = [
     {
-        question: "question",
-        answer: "answer"
+        question: "FAQ Coming Soon. Contact mediasupport@unification.org for tech questions or to report a bug.",
+        answer: ""
     },
-    {
+    // {
 
-    },
-    {
-        question: "question",
-        answer: "answer"
-    },
+    // },
+    // {
+    //     question: "question",
+    //     answer: "answer"
+    // },
 ]

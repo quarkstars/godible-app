@@ -1,4 +1,4 @@
-import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover, IonFooter, useIonRouter, IonSelect, IonSelectOption, IonSpinner, useIonModal, IonSkeletonText, useIonViewWillEnter, useIonViewDidLeave } from '@ionic/react'
+import { IonContent, IonHeader, IonPage, IonToolbar, IonTitle, IonSearchbar, IonButton, useIonViewDidEnter, IonIcon, IonChip, IonLabel, useIonPopover, IonFooter, useIonRouter, IonSelect, IonSelectOption, IonSpinner, useIonModal, IonSkeletonText, useIonViewWillEnter, useIonViewDidLeave, IonBackButton } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import { BookCard } from 'components/ui/BookCard'
@@ -45,7 +45,8 @@ const SearchPage = (props: ISearchPageProps) => {
   const player = useContext(Player);
 
   const {
-    user
+    user,
+    isModalOpen,
   } = useContext(UserState);
   const lang = (user.language) ? user.language : userDefaultLanguage;
 
@@ -318,8 +319,10 @@ const SearchPage = (props: ISearchPageProps) => {
   //List modal trigger
   const [inspectedEpisode, setInspectedEpisode] = useState<IEpisode|undefined>();
   const [presentList, dimissList] = useIonModal(ListModal, {
-      onDismiss: (data: string, role: string) => dimissList(data, role),
-        router,
+      onDismiss: (data: string, role: string) => {
+        dimissList(data, role); 
+        if (isModalOpen) isModalOpen.current = false;
+      },
         isAddingEpisode: true,
         addEpisodeId: inspectedEpisode?.objectId,
     });
@@ -527,6 +530,7 @@ const SearchPage = (props: ISearchPageProps) => {
       </IonHeader>
       <IonContent>
         <div className="flex flex-col p-4 pt-4 sm:p-10 sm:pt-6">
+        
         
           <div className='flex justify-center w-full'>
               <div className="flex flex-col w-full" style={{maxWidth:"768px"}}>

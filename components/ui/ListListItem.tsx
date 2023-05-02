@@ -113,7 +113,7 @@ const ListListItem = (props: IListListItemProps) => {
                   onDidDismiss: (e: CustomEvent) => {},
                   alignment: "start",
                   side: "left",
-                  reference: "event",
+                  reference: "trigger",
                 })
               }}
             
