@@ -282,8 +282,8 @@ const HomePage:React.FC = () => {
 
         </SlideList>
         <div className="flex flex-col p-4 sm:p-10">
-          <div className="flex flex-row items-center w-full space-x-5">
-            <h2 className="mt-0 text-lg xs:text-2xl">
+          <div className="flex flex-row items-center w-full py-2 space-x-5">
+            <h2 className="py-0 my-0 text-lg xs:text-2xl">
               Latest Episodes
             </h2>
             <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=episodes&init=0")}>
@@ -307,7 +307,7 @@ const HomePage:React.FC = () => {
         </div>
         <div className="flex flex-col p-4 sm:p-10">
           <div className="flex flex-row items-center w-full space-x-5">
-            <h2 className="mt-0 text-lg xs:text-2xl">
+            <h2 className="py-0 my-0 mt-0 text-lg xs:text-2xl">
               Topics
             </h2>
             <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=topics&init=0")}>
@@ -322,7 +322,7 @@ const HomePage:React.FC = () => {
         </div>
         <div className="flex flex-col p-4 sm:p-10">
           <div className="flex flex-row items-center w-full space-x-5">
-            <h2 className="mt-0 text-lg xs:text-2xl">
+            <h2 className="py-0 my-0 text-lg xs:text-2xl">
               Books
             </h2>
             <IonButton fill="clear" color="medium" onClick={() => router.push("/books")}>

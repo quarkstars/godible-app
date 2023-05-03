@@ -21,7 +21,7 @@ import { IonIcon, IonProgressBar } from '@ionic/react';
 
 
 const Thumbnail = (props: IThumbnailProps) => {
-    const size = (props.size) ? props.size : "100%";
+    const size = (typeof props.size === "number") ? props.size : "100%";
     const imageUrl = (props.imageUrl) ? `url(${props.imageUrl}) no-repeat center center`: undefined;
     const backgroundSize = (props.backgroundSize) ? props.backgroundSize : "cover";
 

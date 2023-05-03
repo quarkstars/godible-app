@@ -293,7 +293,11 @@ const SearchPage = (props: ISearchPageProps) => {
     e.preventDefault();
     // if (!max) return setReachedMax(true);
     const displayCount = 24 + ((skip||0)*24);
-    if (max && displayCount >= max) return setReachedMax(true);
+    if (max && displayCount >= max)  {
+      setReachedMax(true);
+      setListIsLoadingMore(false);
+      return;
+    }
     let sort = (!search) ? "-publishedAt" : undefined;
     const bookIds = bookFilter ? [bookFilter.objectId] : undefined;
     const topicIds = topicFilter ? [topicFilter.objectId!] : undefined;
@@ -305,7 +309,11 @@ const SearchPage = (props: ISearchPageProps) => {
   const fetchMoreLists = async (e) => {
     e.preventDefault();
     const displayCount = 24 + ((listSkip||0)*24);
-    if (max && displayCount >= max) return setReachedListMax(true);
+    if (max && displayCount >= max)  {
+      setReachedListMax(true);
+      setListIsLoadingMore(false);
+      return;
+    }
     let sort = (!search) ? "-createdTime" : undefined;
     const bookId = bookFilter ? bookFilter.objectId: undefined;
     const topicId = topicFilter ? topicFilter.objectId! : undefined;
@@ -706,15 +714,14 @@ const SearchPage = (props: ISearchPageProps) => {
                 {(!reachedMax) &&
                 <IonButton
                   onClick={(ev) => {
-                    setIsLoadingMore(true);
                     if (episodes) fetchMoreEpisodes(ev);
                     else initializeEpisodes();
                   }}
-                  disabled={isLoadingMore}
+                  disabled={isLoadingMore || episodesIsLoading}
                   color="medium"
                   fill="clear"
                 >
-                  {isLoadingMore ?
+                  {(isLoadingMore|| episodesIsLoading) ?
                     "Loading..."
                   :
                     (max && episodes) ?
@@ -744,15 +751,14 @@ const SearchPage = (props: ISearchPageProps) => {
                 {(!reachedListMax) &&
                 <IonButton
                   onClick={(ev) => {
-                    setListIsLoadingMore(true);
                     if (speeches) fetchMoreLists(ev);
-                    else initializeSpeeches;
+                    else initializeSpeeches();
                   }}
-                  disabled={listIsLoadingMore}
+                  disabled={listIsLoadingMore || listsIsLoading}
                   color="medium"
                   fill="clear"
                 >
-                  {listIsLoadingMore ?
+                  {(listIsLoadingMore || listsIsLoading) ?
                     "Loading..."
                   :
                     
