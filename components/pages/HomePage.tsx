@@ -29,7 +29,7 @@ const HomePage:React.FC = () => {
 
 	const router = useIonRouter();
 
-  const {user, isModalOpen} = useContext(UserState);
+  const {user, isModalOpen, isLoading} = useContext(UserState);
   
   const lang = (user?.language) ? user.language : userDefaultLanguage;
   const [episodeWidth, setEpisodeWidth] = useState<number>(148);
@@ -259,7 +259,7 @@ const HomePage:React.FC = () => {
       <IonContent>
       <div className="flex flex-col justify-start w-full min-h-full">
         <SlideList >
-          {!user?.objectId && 
+          {(!user?.objectId && !isLoading) && 
           <SwiperSlide>
             <Hero 
               title={"Let God's Word Be Heard"}
@@ -269,7 +269,7 @@ const HomePage:React.FC = () => {
               subButtonText={"Log in"}
               subButtonIcon={arrowForwardOutline}
               onClickSub={() => {player.togglePlayPause(false);router.push("/signin")}}
-              overlayColor={"linear-gradient(90deg, rgba(97,219,146,.2) 0%, rgba(0,255,239,.2) 100%)"}
+              overlayColor={"linear-gradient(90deg, rgba(97,219,146,.4) 0%, rgba(0,165,196,.2) 100%)"}
               bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
               preImageUrl={"/logo/godible-logo-white.png"}
               postText={"Now available on Android, iOS, or on the web"}
@@ -278,7 +278,7 @@ const HomePage:React.FC = () => {
           }
           {episodesHero}
 
-          {(!episodes && episodesIsLoading && user?.objectId) && <IonSkeletonText  style={{width:"100%", height:"450px"}} />}
+          {(!episodes && episodesIsLoading && user?.objectId || isLoading && !user?.objectId) && <IonSkeletonText  style={{width:"100%", height:"450px"}} />}
 
         </SlideList>
         <div className="flex flex-col p-4 sm:p-10">

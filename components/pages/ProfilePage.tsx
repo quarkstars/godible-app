@@ -444,7 +444,7 @@ const player = useContext(Player);
         
         <div className='flex justify-center w-full'>
           <div className="flex flex-col items-center w-full" style={{maxWidth:"768px"}}>
-            {!user?.objectId && 
+            {(!user?.objectId && !isLoading) && 
               <div className="flex flex-col w-full pb-2">
                 <Hero 
                   title={"Let God's Word Be Heard"}
@@ -454,7 +454,7 @@ const player = useContext(Player);
                   subButtonText={"Trailers"}
                   subButtonIcon={playCircle}
                   onClickSub={() => {presentTrailer({})}}
-                  overlayColor={"linear-gradient(90deg, rgba(97,219,146,.2) 0%, rgba(0,255,239,.2) 100%)"}
+                  overlayColor={"linear-gradient(90deg, rgba(97,219,146,.4) 0%, rgba(0,165,196,.2) 100%)"}
                   bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
                   preImageUrl={"/logo/godible-logo-white.png"}
                   // postText={"Now available as an Android and iOS Phone App"}
