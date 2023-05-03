@@ -468,7 +468,10 @@ const player = useContext(Player);
                     onClick={()=>{
                       setIsScrollToReminders(false);
                       if (user?.objectId) presentSettings()
-                      else router.push("/signin")
+                      else {
+                        player.togglePlayPause(false);
+                        router.push("/signin")
+                      }
                     }}
                 >
                   {user.imageUrl ?
@@ -497,7 +500,11 @@ const player = useContext(Player);
     
                           })
                         }
-                        else router.push("/signin")
+                        
+                        else {
+                          player.togglePlayPause(false);
+                          router.push("/signin")
+                        }
                         }
                       }
                     >
@@ -534,7 +541,12 @@ const player = useContext(Player);
 
                         })
                       }
-                      else router.push("/signin")
+                      
+                      else {
+                        
+                        player.togglePlayPause(false);
+                        router.push("/signin")
+                      }
                       }
                     }
                     >
@@ -623,6 +635,8 @@ const player = useContext(Player);
                   <button 
                     onClick={()=>{
                       if (!user?.objectId)  {
+                        
+                        player.togglePlayPause(false);
                         router.push("/signin")
                         return;
                       }
@@ -758,6 +772,8 @@ const player = useContext(Player);
                         disabled={listsIsLoading}
                         onClick={(e) => {
                           if (!user?.objectId) {
+                            
+                            player.togglePlayPause(false);
                             router.push("/signin")
                             return;
                           }

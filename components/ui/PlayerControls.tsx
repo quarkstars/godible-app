@@ -187,6 +187,7 @@ export const PlayerControls = () => {
                                     <IonButton
                                         onClick={() => {
                                             if (!userState.user?.objectId) {
+                                                userState?.setReroutePath(router.routeInfo.pathname)
                                                 player.togglePlayPause(false);
                                                 router.push("/signin?message=Log in to bookmark.");
                                             }

@@ -14,6 +14,7 @@ const Toolbar = ({children}) => {
     const {
         user,
         isModalOpen,
+        setReroutePath,
       } = useContext(UserState);
 
 	const router = useIonRouter();
@@ -73,11 +74,12 @@ const Toolbar = ({children}) => {
                     <IonButton 
                         fill="clear" 
                         onClick={()=>{
+                            setReroutePath(router.routeInfo.pathname)
                             player.togglePlayPause(false);
                             router.push("/signin");
                         }}
                     >
-                        <IonIcon icon={arrowForward} />
+                        <div className="items-center hidden xs:flex"><IonIcon icon={arrowForward} /></div>
                         <span className="px-2">Log in</span>
                     </IonButton>
                 }

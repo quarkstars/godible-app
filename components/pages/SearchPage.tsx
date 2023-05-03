@@ -47,6 +47,7 @@ const SearchPage = (props: ISearchPageProps) => {
   const {
     user,
     isModalOpen,
+    setReroutePath,
   } = useContext(UserState);
   const lang = (user.language) ? user.language : userDefaultLanguage;
 
@@ -415,8 +416,12 @@ const SearchPage = (props: ISearchPageProps) => {
           episode={episode}
           onPlay={(e) => handleListenClick(e, index)}
           onAdd={(e: any) => {
-            if (!user?.objectId)
+            if (!user?.objectId){
+
+              setReroutePath(router.routeInfo.pathname)
+              player.togglePlayPause(false);
               return router.push("/signin?message=Log in to save lists");
+            }
             setInspectedEpisode(episode);
             presentList({
               onDidDismiss: (e: CustomEvent) => {
@@ -447,8 +452,10 @@ const SearchPage = (props: ISearchPageProps) => {
             subButtonText={"List"}
             subButtonIcon={addCircleOutline}
             onClickSub={(e: any) => {
-              if (!user?.objectId)
-                return router.push("/signin?message=Log+in+to+save+lists");
+              if (!user?.objectId){
+                  router.push("/signin?message=Log+in+to+save+lists");
+                  return;
+                }
               setInspectedEpisode(episode);
               presentList({
                 onDidDismiss: (e: CustomEvent) => {

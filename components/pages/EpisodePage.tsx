@@ -387,9 +387,8 @@ const EpisodePage:React.FC = () => {
     <IonPage>
       <IonHeader>
         <Toolbar>
-          {/* <IonTitle> */}
             <div className='flex flex-row items-center justify-center w-full space-x-2'>
-              <div className="flex items-center h-full text-lg font-medium">
+              <div className="flex items-center h-full font-medium text-md xs:text-lg">
                 {episode ? 
                   episode._title
                   :
@@ -398,17 +397,22 @@ const EpisodePage:React.FC = () => {
               </div>
                 <IonButton size="small"
                   onClick={((e:any) => {
+                    if (!user?.objectId){
+                      
+                      setReroutePath(router.routeInfo.pathname);
+                      player.togglePlayPause(false);
+                      return router.push("/signin?message=Log in to save notes")
+                    }
                     presentNotes({
                       initialBreakpoint:0.85,
                   })
                   })}
                   color="primary"
                 >
-                  <IonIcon icon={documentTextOutline} slot="start" size="small"/>
-                  Notes
+                  <div className="hidden pr-1 xs:flex flex-center"><IonIcon icon={documentTextOutline} size="small"/></div>
+                  <span className="text-xs xs:text-sm">Notes</span>
                 </IonButton>
             </div>
-          {/* </IonTitle> */}
         </Toolbar>
         </IonHeader>
         <IonContent>
@@ -542,6 +546,7 @@ const EpisodePage:React.FC = () => {
                     onClick={()=>{
                       if (!user?.objectId)  {
                         setReroutePath(router.routeInfo.pathname)
+                        player.togglePlayPause(false);
                         router.push("/signin?message=Log in to save bookmarks")
                         return;
                       }
@@ -553,7 +558,12 @@ const EpisodePage:React.FC = () => {
                 </IonButtons>
                 <IonButtons>
                   <IonButton fill="clear" size="small"  onClick={(e)=>{
-                      if (!user?.objectId) return router.push("/signin?message=Log in to save lists")
+                      if (!user?.objectId)  {
+                        player.togglePlayPause(false);
+                        setReroutePath(router.routeInfo.pathname);
+                        router.push("/signin?message=Log in to save lists")
+                        return
+                      }
                       presentList({
 
                       })

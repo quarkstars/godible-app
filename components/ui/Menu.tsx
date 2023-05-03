@@ -61,6 +61,7 @@ const Menu: React.FC = () => {
     setListReloads,
     logOut,
     isModalOpen,
+    setReroutePath,
   } = useContext(UserState);
 
 
@@ -182,6 +183,7 @@ const Menu: React.FC = () => {
                     button 
                     onClick={()=>{
                        player.togglePlayPause(false);
+                       setReroutePath(router.routeInfo.pathname)
                       router.push("/signin?message=Log in to save bookmarks");
                     }}
                   >
