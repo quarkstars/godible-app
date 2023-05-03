@@ -323,7 +323,7 @@ export const PlayerControls = () => {
 
                                 }
                                 </>}
-                                <div className="flex items-center h-16 text-xs text-gray-500 sm:text-md">
+                                <div className="flex items-center h-16 text-xs text-gray-500 sm:text-md xs:pr-24 sm:pr-0">
                                     <AnimatePresence>
                                     {!player.message ? <>
                                         {(player.isReady || player.isPlaying || player.currentSeconds > 0) && 
