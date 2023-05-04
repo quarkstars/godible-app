@@ -577,7 +577,19 @@ const EpisodePage:React.FC = () => {
                   </IonButton>
                 </IonButtons>
             </div>    
-
+            
+            {episode?.isFirstSpeechEpisode && episode?._speechTitle && 
+                <h1 className="w-full pb-2 text-left text-light dark:text-dark">{episode?._speechTitle}</h1>
+             } 
+            {episode?.isFirstSpeechEpisode && episode?._speechMetaDataBlocks && 
+            <div className="pb-6">
+              {episode?._speechMetaDataBlocks.map((metaData, index) => {
+                return(
+                  <p className="text-lg italic text-" key={index}>{metaData}</p>
+                )
+              })}
+            </div>
+            }
             {(episode && episode.text) ? 
                 episodeText
               :

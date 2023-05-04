@@ -112,6 +112,9 @@ export interface IEpisode extends ParseObjectToJson {
     position?: IListeningPosition,
     textHighlighted?: string,
     hitCount?: number,
+    speechMetaData?: ILangString,
+    isFirstSpeechEpisode?: boolean,
+    speechTitle?: ILangString,
     // duration?: number,
 
     isForbidden?: boolean, 
@@ -129,6 +132,8 @@ export interface IEpisode extends ParseObjectToJson {
     _textBlocks?: string[],
     _authorImageUrl?: string,
     _metaDataBlocks?: string[],
+    _speechMetaDataBlocks?: string[],
+    _speechTitle?: string,
     _quote?: string,
     _audioPath?: string,
 

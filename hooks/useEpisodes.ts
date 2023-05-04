@@ -98,6 +98,9 @@ const useEpisodes = () => {
         const _bookPath = (episode?.book?.slug) ? "/book/" + episode?.book?.slug : undefined;
         const metaData = resolveLangString(episode?.metaData, _lang);
         const _metaDataBlocks:string[]|undefined = (metaData) ? metaData.split("\\n") : undefined;
+        const speechMetaData = resolveLangString(episode?.speechMetaData, _lang);
+        const _speechTitle = resolveLangString(episode?.speechTitle, _lang);
+        const _speechMetaDataBlocks:string[]|undefined = (speechMetaData) ? speechMetaData.split("\\n") : undefined;
         // const episodePath = "/episode/" + episode?.slug;
         const number =  episode?.number;
         let _bookTitle = resolveLangString(episode?.book?.title, _lang)
@@ -132,7 +135,7 @@ const useEpisodes = () => {
         const _audioPath = resolveLangString(episode?.audioPath, _lang);
 
         
-
+        console.log("SPEECH", _speechTitle, _speechMetaDataBlocks)
         return {
             ...episode,
             _lang,
@@ -150,6 +153,8 @@ const useEpisodes = () => {
             _metaDataBlocks,
             _quote,
             _audioPath,
+            _speechTitle,
+            _speechMetaDataBlocks,
         };
     }
     
