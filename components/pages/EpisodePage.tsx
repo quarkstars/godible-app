@@ -336,6 +336,7 @@ useEffect(() => {
               className="w-full text-left"
               key={episode?.objectId+index}
             >
+              {segments}
             </h1>
           );
         case 2:
