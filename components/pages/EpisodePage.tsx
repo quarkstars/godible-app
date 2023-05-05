@@ -593,7 +593,7 @@ useEffect(() => {
             </div>    
             
             {episode?.isFirstSpeechEpisode && episode?._speechTitle && 
-                <h1 className="w-full pb-2 text-left text-light dark:text-dark">{episode?._speechTitle}</h1>
+                <h1 className="w-full pb-2 text-left text-light dark:text-dark">{episode._speechTitle.toUpperCase()}</h1>
              } 
             {episode?.isFirstSpeechEpisode && episode?._speechMetaDataBlocks && 
             <div className="pb-6">
