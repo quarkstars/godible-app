@@ -26,7 +26,7 @@ import { resolveLangString } from 'utils/resolveLangString'
 const EpisodePage:React.FC = () => {
 
   
-  const {user, listReloads, setListReloads, updateUser, setReroutePath,isModalOpen} = useContext(UserState);
+  const {user, listReloads, setListReloads, updateUser, setReroutePath,isModalOpen, isLoading: userIsLoading} = useContext(UserState);
   const lang = (user?.language) ? user.language : userDefaultLanguage;
   const player = useContext(Player);
 	const router = useIonRouter();
@@ -121,12 +121,25 @@ const EpisodePage:React.FC = () => {
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     //If current episode matches location, get the episode from the server
-    if (!router.routeInfo || !user || loaded) return;
+    if (!router.routeInfo || !user || !user.language || loaded) return;
+    if (user?.objectId) return;
     setLoaded(true);
     const urlParams = new URLSearchParams(router.routeInfo.search)
     const languageParam = urlParams.get("l");
     if (languageParam === "j") updateUser({language:"japanese"})
-}, [router.routeInfo, user])
+}, [router.routeInfo, user]);
+//Set default if the user has no settings
+useEffect(() => {
+  if (user && !user?.language && !user?.objectId && !userIsLoading) {
+      updateUser ({
+        language: "english",
+        fontSize: "normal",
+        fontContrast: "normal",
+        fontStyle: "sanserif",
+    })
+  }
+}, [user, userIsLoading])
+
 
   useEffect(() => {
         //If current episode matches location, get the episode from the server

@@ -135,7 +135,6 @@ const useEpisodes = () => {
         const _audioPath = resolveLangString(episode?.audioPath, _lang);
 
         
-        console.log("SPEECH", _speechTitle, _speechMetaDataBlocks)
         return {
             ...episode,
             _lang,

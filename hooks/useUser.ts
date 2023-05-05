@@ -474,14 +474,7 @@ const useUser = () => {
         } 
     }
 
-    //update streak if logging in
 
-
-    //TODO: Get next episode based on criteria
-    //lastEpisode?: IEpisode, //For link and episode number
-    //lastListId?: string, //Check what's next on the list and load the whole list or just check the next on in the book exists if not, just start that one over.
-    //lastEpisodePercent?: number, //If episode is 92% complete
-    //lastEpisodeSeconds?: number, 
 
 
     return {
