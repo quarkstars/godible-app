@@ -290,9 +290,9 @@ const useUser = () => {
 
       }; 
     
-      // Function to log into Apple
-      let options: SignInWithAppleOptions = {
-        clientId: 'com.godible',
+      // Function to log into Apple sign in
+      let options: SignInWithAppleOptions = { 
+        clientId: 'com.godible', 
         redirectURI: 'https//app.godible.org/signin', 
         scopes: 'email name',
         state: '12345',
