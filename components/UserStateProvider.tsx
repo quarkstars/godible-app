@@ -14,7 +14,7 @@ export const UserStateDefault = {
   isOnboarding: false,
   setIsOnboarding: () => null,
 
-  //SIGN UP
+  //SIGN UP 
   signUpError: undefined,
   setSignUpError: () => null,
   signUp: async () => null,

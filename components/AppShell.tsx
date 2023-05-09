@@ -3,7 +3,7 @@ import React, { createContext } from "react";
 import { IonApp, IonLabel, IonRouterOutlet, setupIonicReact, IonTabs, IonTabBar, IonTabButton, IonIcon, IonSplitPane, IonFooter, IonToolbar  } from '@ionic/react';
 import { StatusBar, Style } from '@capacitor/status-bar';
 
-import { IonReactRouter } from '@ionic/react-router';
+import { IonReactRouter } from '@ionic/react-router' ;
 import { Redirect, Route } from 'react-router-dom';
 
 import NotFoundPage from './pages/NotFoundPage';

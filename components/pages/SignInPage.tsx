@@ -109,7 +109,7 @@ const SignInPage: React.FC = () => {
               <img src="/img/g-logo.webp" alt="G" className="w-4 h-4 rounded-full" />
               <span className="px-2">Continue with Google</span>
             </IonButton>
-            {!isPlatform('android') &&
+            {!isPlatform('android') && 
 
               <IonButton 
                 color="medium" 
