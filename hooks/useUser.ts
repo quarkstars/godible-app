@@ -333,12 +333,13 @@ const useUser = () => {
 
         try {
             setIsLoading(true);
-            currentUser = await currentUser.linkWith('apple', {
-            authData: {
-                id: appleUser.id,
-                id_token: idToken,
-            }
-            });
+            console.log("APPLE LOGIN WITH", appleUser)
+            currentUser = await currentUser.linkWith('apple',
+                {authData: {
+                    id: appleUser.id,
+                    id_token: idToken,
+                }}
+            );
         }
         catch (error) {
             setLogInError(error); 
