@@ -302,6 +302,7 @@ const useUser = () => {
         let appleUser:any;
         try {
             appleUser = await SignInWithApple.authorize(options);
+            appleUser = appleUser.response;
             console.log("GOT APPLE", appleUser)
         }
         catch (error) {
