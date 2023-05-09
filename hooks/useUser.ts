@@ -302,15 +302,15 @@ const useUser = () => {
         let appleUser:any;
         try {
             appleUser = await SignInWithApple.authorize(options);
-            appleUser = appleUser.response;
             console.log("GOT APPLE", appleUser)
+            appleUser = appleUser.response;
         }
         catch (error) {
             setLogInError(error);    
             return error;
         }
         if (!appleUser) {
-            setLogInError({message:"Failed to log in with Google"});      
+            setLogInError({message:"Failed to log in with Apple"});      
             return;
         }
 
@@ -375,7 +375,9 @@ const useUser = () => {
         
         setIsLoading(true);
         //Try to sign out gooogle user if exists
-        GoogleAuth.signOut().catch();
+        if (GoogleAuth.signOut) GoogleAuth.signOut().catch();
+
+        // if (SignInWithApple.authorize) GoogleAuth.signOut().catch();
 
         try {
             await Parse.User.logOut();
