@@ -336,7 +336,7 @@ const useUser = () => {
             console.log("APPLE LOGIN WITH", appleUser)
             currentUser = await currentUser.linkWith('apple',
                 {authData: {
-                    id: appleUser.id,
+                    id: appleUser.userId,
                     id_token: idToken,
                 }}
             );
