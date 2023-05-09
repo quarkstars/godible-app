@@ -303,7 +303,6 @@ const useUser = () => {
         try {
             appleUser = await SignInWithApple.authorize(options);
             console.log("GOT APPLE", appleUser)
-            appleUser = appleUser.response;
         }
         catch (error) {
             setLogInError(error);    
@@ -351,11 +350,10 @@ const useUser = () => {
 
         if (!currentUser) {
             setLogOutError({message: "Failed to Log In"});
-            GoogleAuth.signOut().catch();
             return;
         }
         setNotice({
-            message: "Logged in with Google",
+            message: "Logged in with Apple",
             icon: checkmarkCircle,
             color: "green",
         });
