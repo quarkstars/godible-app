@@ -327,12 +327,12 @@ const useUser = () => {
 
 
         //  if a user exists already with the same email, it will not allow a new user
-        let idToken = appleUser.authentication.idToken;
+        let idToken = appleUser.identityToken;
         // if (idToken.split(".").length > 1) idToken = idToken.split(".")[0];
 
         try {
             setIsLoading(true);
-            currentUser = await currentUser.linkWith('google', {
+            currentUser = await currentUser.linkWith('apple', {
             authData: {
                 id: appleUser.id,
                 id_token: idToken,
