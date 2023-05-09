@@ -6,6 +6,7 @@ import LoggedInAlready from 'components/ui/LoggedInAlready';
 import SettingsModal from 'components/ui/SettingsModal';
 import TextDivider from 'components/ui/TextDivider';
 import { isValidEmail } from 'hooks/useUser';
+import {isPlatform} from '@ionic/react'
 // import styles from './Signup.module.scss';
 
 import { arrowBack, eye, eyeOff, logoApple, logoGoogle, personCircleOutline, shapesOutline } from "ionicons/icons";
@@ -31,6 +32,7 @@ const SignUpPage: React.FC = () => {
     reroutePath,
     setReroutePath,
     logInWithGoogle,
+    logInWithApple,
     isOnboarding,
     isModalOpen,
   } = useContext(UserState);
@@ -105,15 +107,19 @@ const SignUpPage: React.FC = () => {
               <img src="/img/g-logo.webp" alt="G" className="w-4 h-4 rounded-full" />
               <span className="px-2">Continue with Google</span>
             </IonButton>
-            {/* <IonButton 
-              color="medium" 
-              fill="outline"  
-              expand="block"
-              disabled={isLoading}
-            >
-              <IonIcon icon={logoApple} slot="start" />
-              Continue with Apple
-            </IonButton> */}
+            {!isPlatform('android') &&
+
+              <IonButton 
+                color="medium" 
+                fill="outline"  
+                expand="block"
+                disabled={isLoading}
+                onClick={()=>{logInWithApple()}}
+              >
+                <IonIcon icon={logoApple} slot="start" />
+                Continue with Apple
+              </IonButton>
+            }
             <TextDivider>or email</TextDivider>
             
               {signUpError &&

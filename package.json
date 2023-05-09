@@ -15,6 +15,7 @@
     "ionic:serve": "npm run start"
   },
   "dependencies": {
+    "@capacitor-community/apple-sign-in": "^4.0.0",
     "@capacitor/android": "4.3.0",
     "@capacitor/app": "^4.1.1",
     "@capacitor/camera": "^4.1.4",

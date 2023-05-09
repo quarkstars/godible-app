@@ -23,6 +23,7 @@ export const UserStateDefault = {
   setLogInError: () => null,
   logIn: async () => null,
   logInWithGoogle: async () => null,
+  logInWithApple: async () => null,
 
   logOutError: undefined,
   setLogOutError: () => null,

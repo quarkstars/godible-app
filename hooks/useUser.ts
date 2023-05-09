@@ -12,6 +12,12 @@ import useParse from './useParse';
 import useLists from './useLists';
 import { nextSendTime } from 'utils/nextSendTime';
 
+import {
+    SignInWithApple,
+    SignInWithAppleResponse,
+    SignInWithAppleOptions,
+  } from '@capacitor-community/apple-sign-in';
+
 // This is also where a non logged in user will store Language Preference, Volume and logically resolve when logging in 
 // where existing user language takes precedemce
 
@@ -48,6 +54,7 @@ export interface IUserState {
     setLogInError: React.Dispatch<any>,
     logIn: Function,
     logInWithGoogle: Function,
+    logInWithApple: Function,
 
     //LOG OUT
     logOutError: any,
@@ -176,6 +183,7 @@ const useUser = () => {
         }
     }, [user?.objectId]);
     
+    
 
     //Login Function
     const [logInError, setLogInError] = useState<any>();
@@ -215,10 +223,6 @@ const useUser = () => {
       };
             
       // Function to log into Google
-      // Gets a Google User and then links with Parse User which is the actual user the app uses
-      // Google User will be signed in but will be unused
-      //https://www.youtube.com/watch?v=GwtpoWZ_78E TODO: Add Reverse Client Id to App 15:00
-      //TODO: When putting on store for auto login you need keyprint or something 17:50
       const logInWithGoogle = async function () {
             let googleUser:any;
             try {
@@ -286,6 +290,83 @@ const useUser = () => {
 
       };
     
+      // Function to log into Apple
+      let options: SignInWithAppleOptions = {
+        clientId: 'com.godible',
+        redirectURI: 'http://localhost:3000/signin',
+        scopes: 'email name',
+        state: '12345',
+        nonce: 'nonce',
+      };
+      const logInWithApple = async function () {
+        let appleUser:any;
+        try {
+            appleUser = await SignInWithApple.authorize(options);
+            console.log("GOT APPLE", appleUser)
+        }
+        catch (error) {
+            setLogInError(error);    
+            return error;
+        }
+        if (!appleUser) {
+            setLogInError({message:"Failed to log in with Google"});      
+            return;
+        }
+
+
+        let currentUser = new Parse.User();
+        currentUser.set('username', appleUser.email);
+        currentUser.set('email', appleUser.email);
+        currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+        currentUser.set('sendHour', "8");
+        currentUser.set('nextSendTime', nextSendTime(8));
+        if (appleUser.givenName) currentUser.set('firstName', appleUser.givenName);
+        if (appleUser.familyName) currentUser.set('lastName', appleUser.familyName);
+        if (appleUser.imageUrl) currentUser.set('imageUrl', appleUser.imageUrl);
+        
+
+
+        //  if a user exists already with the same email, it will not allow a new user
+        let idToken = appleUser.authentication.idToken;
+        // if (idToken.split(".").length > 1) idToken = idToken.split(".")[0];
+
+        try {
+            setIsLoading(true);
+            currentUser = await currentUser.linkWith('google', {
+            authData: {
+                id: appleUser.id,
+                id_token: idToken,
+            }
+            });
+        }
+        catch (error) {
+            setLogInError(error); 
+            setIsLoading(false);   
+            GoogleAuth.signOut().catch();
+            return error;
+
+        }
+
+        if (!currentUser) {
+            setLogOutError({message: "Failed to Log In"});
+            GoogleAuth.signOut().catch();
+            return;
+        }
+        setNotice({
+            message: "Logged in with Google",
+            icon: checkmarkCircle,
+            color: "green",
+        });
+        const currentUserJSON = currentUser.toJSON();
+        setLogInError(undefined);
+        setUser(currentUserJSON);
+        setIsLoading(false);
+
+        return currentUserJSON;
+        
+
+  };
+
       const [logOutError, setLogOutError] = useState<any>();
       //Log out Function
       const logOut = async function (): Promise<IUser | Error > {
@@ -501,6 +582,7 @@ const useUser = () => {
         setLogInError,
         logIn,
         logInWithGoogle,
+        logInWithApple,
 
         //LOG OUT
         logOutError,
