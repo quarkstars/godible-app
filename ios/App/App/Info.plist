@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>godible-app</string>
+	<string>Godible</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -55,7 +55,15 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
-		<string>Photo Library Access Warning</string>
+	<string>Let Godible Access Your Photos</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Let Godible Access Your Camera</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Let Godible Access Your Media Library</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Let Godible Access Your Photos</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 </dict>
