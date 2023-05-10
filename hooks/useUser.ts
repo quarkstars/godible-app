@@ -302,6 +302,7 @@ const useUser = () => {
         let appleUser:any;
         try {
             appleUser = await SignInWithApple.authorize(options);
+            appleUser = appleUser.response;
             console.log("GOT APPLE", appleUser)
         }
         catch (error) {
@@ -314,7 +315,8 @@ const useUser = () => {
         }
 
         console.log("APPLE USER BEFORE JWT", appleUser)
-        let idToken = appleUser.identityToken;
+        let idToken = appleUser.identityToken
+        ;
         let user = appleUser.user;
         try {
             if (!user) appleUser = await Parse.Cloud.run('decodeAppleJWT', { identityToken: idToken })
