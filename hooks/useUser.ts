@@ -320,7 +320,7 @@ const useUser = () => {
         let user = appleUser.user;
         try {
             if (!user) appleUser = await Parse.Cloud.run('decodeAppleJWT', { identityToken: idToken });
-            if (!appleUser.user) appleUser.user = appleUser.sub.split('.')[1];
+            if (!appleUser.user) appleUser.user = appleUser.sub //.split('.')[1];
         } catch (err) {
             console.log("Failed to get response from Apple", err);
             setLogInError({message:"Failed to log in with Apple"});  
