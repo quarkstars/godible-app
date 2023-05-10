@@ -347,7 +347,7 @@ const useUser = () => {
             console.log("APPLE LOGIN WITH", appleUser)
             currentUser = await currentUser.linkWith('apple',
                 {authData: {
-                    // client_id: 'com.hsa.godible',
+                    clientId: 'com.hsa.godible',
                     id: appleUser.user,
                     id_token: idToken,
                 }}
