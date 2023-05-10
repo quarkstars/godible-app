@@ -313,6 +313,16 @@ const useUser = () => {
             return;
         }
 
+        console.log("APPLE USER BEFORE JWT", appleUser)
+        let idToken = appleUser.identityToken;
+        let user = appleUser.user;
+        try {
+            if (!user) appleUser = await Parse.Cloud.run('decodeAppleJWT', { identityToken: idToken })
+        } catch (err) {
+            console.log("Failed to get response from Apple", err);
+            setLogInError({message:"Failed to log in with Apple"});  
+        }
+        console.log("APPLE USER AFTER JWT", appleUser)
 
         let currentUser = new Parse.User();
         currentUser.set('username', appleUser.email);
@@ -322,23 +332,22 @@ const useUser = () => {
         currentUser.set('nextSendTime', nextSendTime(8));
         if (appleUser.givenName) currentUser.set('firstName', appleUser.givenName);
         if (appleUser.familyName) currentUser.set('lastName', appleUser.familyName);
-        if (appleUser.imageUrl) currentUser.set('imageUrl', appleUser.imageUrl);
         
 
 
         //  if a user exists already with the same email, it will not allow a new user
-        let idToken = appleUser.identityToken;
+
         // if (idToken.split(".").length > 1) idToken = idToken.split(".")[0];
 
         try {
             setIsLoading(true);
             console.log("APPLE LOGIN WITH", appleUser)
-            // currentUser = await currentUser.linkWith('apple',
-            //     {authData: {
-            //         id: appleUser.userId,
-            //         id_token: idToken,
-            //     }}
-            // );
+            currentUser = await currentUser.linkWith('apple',
+                {authData: {
+                    id: appleUser.userId,
+                    id_token: idToken,
+                }}
+            );
         }
         catch (error) {
             setLogInError(error); 
