@@ -349,7 +349,7 @@ const useUser = () => {
                 {authData: {
                     clientId: 'com.hsa.godible',
                     id: appleUser.user,
-                    id_token: idToken,
+                    token: idToken,
                 }}
             );
         }
