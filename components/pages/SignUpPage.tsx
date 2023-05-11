@@ -107,7 +107,7 @@ const SignUpPage: React.FC = () => {
               <img src="/img/g-logo.webp" alt="G" className="w-4 h-4 rounded-full" /> 
               <span className="px-2">Continue with Google</span>
             </IonButton>
-            {(!isPlatform('android') && !isPlatform('capacitor')) && 
+            {/* {(!isPlatform('android') && !isPlatform('capacitor')) &&  */}
 
               <IonButton 
                 color="medium" 
@@ -119,7 +119,7 @@ const SignUpPage: React.FC = () => {
                 <IonIcon icon={logoApple} slot="start" />
                 Continue with Apple
               </IonButton>
-            }
+            {/* } */}
             <TextDivider>or email</TextDivider>
             
               {signUpError &&

@@ -73,9 +73,7 @@ const SignInPage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
             <IonButtons slot="start">
-              <div className='flex justify-start sm:w-28'>
                 <IonBackButton defaultHref="/"></IonBackButton>
-              </div>
             </IonButtons>
           <IonTitle>Log in to Continue</IonTitle>
             <IonButtons slot="end">
@@ -109,7 +107,7 @@ const SignInPage: React.FC = () => {
               <img src="/img/g-logo.webp" alt="G" className="w-4 h-4 rounded-full" />
               <span className="px-2">Continue with Google</span>
             </IonButton>
-            {(!isPlatform('android') && !isPlatform('capacitor')) && 
+            {/* {(!isPlatform('android') && !isPlatform('capacitor')) &&  */}
 
               <IonButton 
                 color="medium" 
@@ -121,7 +119,7 @@ const SignInPage: React.FC = () => {
                 <IonIcon icon={logoApple} slot="start" />
                 Continue with Apple
               </IonButton>
-            }
+            {/* } */}
             <TextDivider>or</TextDivider>
               {message &&
               <AlertInline

@@ -38,6 +38,7 @@ const DonationPage: React.FC = () => {
   const [message, setMessage] = useState<string|undefined>(undefined);
   const [showingMinNote, setShowingAmountNote] = useState(false);
   const customAmountInput = useRef<HTMLIonInputElement>(null);
+  const [paymentIsLoading, setPaymentIsLoading] = useState(false);
   
   const line1 = useRef<HTMLIonInputElement>(null);
   const line2 = useRef<HTMLIonInputElement>(null);
@@ -56,18 +57,6 @@ const DonationPage: React.FC = () => {
     if (!user?.objectId) return;
     setHasAddress(user?.hasAddress||false);
   }, [user?.hasAddress]);
-  
-  
-  
-  let selectingAmount = false;
-  let enteringMethod = false;
-  let enteringAddress = false;
-  
-  if(user) {
-    selectingAmount = enteringCustomAmount || changingAmount || !user.donationAmount ? true: false;
-    enteringMethod = changingMethod || (!user.subscriptionId && !user.paymentMethod && user.donationAmount) ? true: false;
-    enteringAddress = changingAddress || (user.hasAddress && !user.address) ? true: false;
-  }
   
   useEffect(() => {
     if (!user?.objectId) return;
@@ -93,6 +82,40 @@ const DonationPage: React.FC = () => {
     if (postal_code.current) postal_code.current.value = user?.address?.postal_code
   }, [user?.address, postal_code, changingAddress]);
   
+   //List modal trigger
+   const [presentCancelMenu, dismissCancelMenu] = useIonPopover(cancelMenu, {
+    onDismiss: (data: string, role: string) => dismissCancelMenu(data, role),
+      cancelSubscription,
+      setMessage,
+  });   
+
+  const [presentHistory, dismissHistory] = useIonModal(BillingHistoryModal, {
+    onDismiss: (data: string, role: string) => {
+      dismissHistory(data, role); 
+      if (isModalOpen) isModalOpen.current = false;
+    },
+  });
+
+  const [presentSuccess, dismissSuccess] = useIonModal(SuccessModal, {
+    onDismiss: (data: string, role: string) => {
+      dismissSuccess(data, role); 
+      if (isModalOpen) isModalOpen.current = false;
+    },
+    router,
+  });
+
+  
+  let selectingAmount = false;
+  let enteringMethod = false;
+  let enteringAddress = false;
+  
+  if(user) {
+    selectingAmount = enteringCustomAmount || changingAmount || !user.donationAmount ? true: false;
+    enteringMethod = changingMethod || (!user.subscriptionId && !user.paymentMethod && user.donationAmount) ? true: false;
+    enteringAddress = changingAddress || (user.hasAddress && !user.address) ? true: false;
+  }
+  
+  
   
   const handleSelectDonation = async (amount: number) => {
     await updateDonationAmount(Math.floor(amount));
@@ -100,13 +123,6 @@ const DonationPage: React.FC = () => {
     setEnteringCustomAmount(false);
   }
 
-
-   //List modal trigger
-   const [presentCancelMenu, dismissCancelMenu] = useIonPopover(cancelMenu, {
-    onDismiss: (data: string, role: string) => dismissCancelMenu(data, role),
-      cancelSubscription,
-      setMessage,
-  });   
 
 
 	const stripeFeePercent = 0.029;
@@ -125,24 +141,9 @@ const DonationPage: React.FC = () => {
     fee = fee.toFixed(2)
   } 
   
-  const [presentHistory, dismissHistory] = useIonModal(BillingHistoryModal, {
-    onDismiss: (data: string, role: string) => {
-      dismissHistory(data, role); 
-      if (isModalOpen) isModalOpen.current = false;
-    },
-  });
-
-  const [presentSuccess, dismissSuccess] = useIonModal(SuccessModal, {
-    onDismiss: (data: string, role: string) => {
-      dismissSuccess(data, role); 
-      if (isModalOpen) isModalOpen.current = false;
-    },
-    router,
-  });
-
   const accessTime = 31 * 24 * 60 * 60 * 1000;
-  const lastAccessTime = (user?.lastPaymentTime||0) + accessTime
-  let hasAccess = (user?.lastPaymentTime && Date.now() < lastAccessTime) ? true : false
+  const lastAccessTime = (user?.lastPaymentTime||0) + accessTime;
+  let hasAccess = (user?.lastPaymentTime && Date.now() < lastAccessTime) ? true : false;
 
 	return (
 		<IonPage>
@@ -534,7 +535,7 @@ const DonationPage: React.FC = () => {
               <IonButton 
                   color="primary" 
                   expand="block"
-                  disabled={isLoading||userIsLoading}
+                  disabled={isLoading||userIsLoading||paymentIsLoading}
                   onClick={async () => {
                     let address:any = {};
                     if (line1.current?.value) address.line1 = line1.current?.value;
@@ -542,6 +543,8 @@ const DonationPage: React.FC = () => {
                     if (city.current?.value) address.city = city.current?.value;
                     if (state.current?.value) address.state = state.current?.value;
                     if (postal_code.current?.value) address.postal_code = postal_code.current?.value;
+                    setPaymentIsLoading(true);
+                    setTimeout(()=> setPaymentIsLoading(false), 10000);
                     let response = await createSubscription(address);
                     if (response) {
                       setMessage("Subscription created")
@@ -611,39 +614,41 @@ const DonationPage: React.FC = () => {
 const cancelMenu = ({onDismiss, cancelSubscription, router, isLoading, setMessage}) => {
   return (    
     <IonContent class="ion-padding">
-      <IonTitle>Are you sure?</IonTitle>
-            <ul className="py-1 text-sm text-gray-700 dark:text-gray-200">
-                <li>
-                <IonButton 
-                  fill="clear" 
-                  expand="block" 
-                  disabled={isLoading}
-                  onClick={async (e) => {
-                    let response = await cancelSubscription();
-                    if (response) setMessage("Subscription canceled");
-                    onDismiss();
-                  }}
-                >
-                    <div className="flex items-center justify-start w-full space-x-2">
-                        <IonIcon icon={checkmarkCircle} color="danger" />
-                        <IonLabel color="danger">Cancel Subscription</IonLabel>
-                    </div>
-                </IonButton>
-                </li>
-                <li>
-                <IonButton fill="clear" expand="block" 
-                  disabled={isLoading}
-                  onClick={(e) => {
-                    onDismiss();
-                  }}
-                >
-                    <div className="flex items-center justify-start w-full space-x-2">
-                        <IonIcon icon={closeCircle} color="medium" />
-                        <IonLabel color="medium">Keep Subscription</IonLabel>
-                    </div>
-                </IonButton>
-                </li>
-            </ul>
+      <div className="flex flex-col">
+      <span className="w-full font-bold text-center">Are you sure?</span>
+          <ul className="py-1 text-sm text-gray-700 dark:text-gray-200">
+              <li>
+              <IonButton 
+                fill="clear" 
+                expand="block" 
+                disabled={isLoading}
+                onClick={async (e) => {
+                  let response = await cancelSubscription();
+                  if (response) setMessage("Subscription canceled");
+                  onDismiss();
+                }}
+              >
+                  <div className="flex items-center justify-start w-full space-x-2">
+                      <IonIcon icon={checkmarkCircle} color="danger" />
+                      <IonLabel color="danger">Cancel Subscription</IonLabel>
+                  </div>
+              </IonButton>
+              </li>
+              <li>
+              <IonButton fill="clear" expand="block" 
+                disabled={isLoading}
+                onClick={(e) => {
+                  onDismiss();
+                }}
+              >
+                  <div className="flex items-center justify-start w-full space-x-2">
+                      <IonIcon icon={closeCircle} color="medium" />
+                      <IonLabel color="medium">Keep Subscription</IonLabel>
+                  </div>
+              </IonButton>
+              </li>
+          </ul>
+      </div>
   </IonContent>  
   )
 }

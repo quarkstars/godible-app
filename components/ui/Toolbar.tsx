@@ -63,7 +63,7 @@ const Toolbar = ({children}) => {
                                 />
                             :
                                 <div
-                                    className='p-2'
+                                    className='overflow'
                                 >
                                     <InitialsAvatar name={`${user.firstName} ${user.lastName}`}  />
                                 </div>

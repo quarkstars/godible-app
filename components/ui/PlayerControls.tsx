@@ -376,7 +376,7 @@ export const PlayerControls = () => {
                             <IonButtons>
                                 <IonButton size="large" onClick={()=>{player.setIsVisible(false)}}>
                                     <IonIcon slot="start" icon={chevronDown} size="small" />
-                                    <span className='text-xs'>hide</span>
+                                    <span className='text-xs'>Hide</span>
                                 </IonButton>
                             </IonButtons>
                         </div>

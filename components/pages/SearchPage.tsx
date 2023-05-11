@@ -129,7 +129,7 @@ const SearchPage = (props: ISearchPageProps) => {
     const urlParams = new URLSearchParams(router.routeInfo.search)
     const topicSlug = urlParams.get("topic");
     let topicParam = (topicSlug) ? `&topic=${topicSlug}` : "";
-    router.push(`${router.routeInfo.pathname}?book="${book.slug}${topicParam}`);
+    router.push(`${router.routeInfo.pathname}?book=${book.slug}${topicParam}`);
     setBookFilter(book);
   }
     //Set book to the url param (keeping book param if it exists)

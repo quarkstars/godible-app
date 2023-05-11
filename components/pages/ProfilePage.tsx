@@ -1,4 +1,4 @@
-import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonText, IonTitle, IonToolbar, ItemReorderEventDetail, useIonModal, useIonPopover, useIonRouter, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react'
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonText, IonTitle, IonToolbar, ItemReorderEventDetail, isPlatform, useIonModal, useIonPopover, useIonRouter, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import Hero from 'components/ui/Hero'
@@ -379,7 +379,8 @@ const player = useContext(Player);
   
   
   let userName = `${user?.firstName ? user?.firstName:""}${user?.lastName ? " "+user?.lastName:""}`
-  if (userName.length === 0) userName = "Your Hoon Dok Hae Profile!"
+  if (userName.length === 0 && !user?.objectId) userName = "Your Hoon Dok Hae Profile!"
+  if (userName.length === 0 && user?.objectId) userName = "Set up your name"
 
 
   //Construct Reminder Button Text
@@ -402,7 +403,7 @@ const player = useContext(Player);
 
             </IonButtons>
             <IonTitle>
-              <div className={'flex items-center text-lg'}>
+              <div className={`flex items-center text-lg ${isPlatform('ios') ? "pl-6" : ""}`}>
               {user?.objectId ? "My Profile" : "Welcome to Godible"}
               {user?.objectId &&
                 <IonButtons>
@@ -410,7 +411,7 @@ const player = useContext(Player);
                     size="small"
                     onClick={(e: any) => {presentLogoutMenu({
                       onDidDismiss: (e: CustomEvent) => {},
-
+                      event: e,
                       
                     })}}
                     color="medium"
@@ -421,7 +422,7 @@ const player = useContext(Player);
               }
               </div>
             </IonTitle>
-            {user?.objectId &&
+            {user?.objectId ?
             <IonButtons slot="end">
                 <IonButton
                     onClick={(e: any) =>{
@@ -436,6 +437,18 @@ const player = useContext(Player);
                   <IonIcon icon={person} slot="start" size="small" />
                   <span className="text-xs mobile:text-md">Settings</span>
                 </IonButton>
+            </IonButtons>
+            :
+            <IonButtons slot="end">
+              <IonButton 
+                slot="end" 
+                fill="clear" 
+                size="small" 
+                color="medium"
+                onClick={()=>{router.push("/signin")}}
+              >
+                Log In
+              </IonButton>
             </IonButtons>
             }
         </IonToolbar>
@@ -478,13 +491,13 @@ const player = useContext(Player);
                       <img 
                           src={user.imageUrl} 
                           alt="My Profile" 
-                          className='p-2'
+                          className='pr-2'
                       />
                   :
                       <div
-                          className='p-2'
+                          className='pr-2'
                       >
-                          <InitialsAvatar name={user?.objectId ? userName : "→"}  />
+                          <InitialsAvatar name={user?.objectId ? userName.length === 0 ? "M E" : userName : "→"}  />
                       </div>
                   }
               </IonAvatar>
@@ -519,7 +532,7 @@ const player = useContext(Player);
                   disabled={(user.nextEpisode?.publishedAt && user.nextEpisode?.publishedAt > Date.now())? true: false}
                   onClick={(e) => {if (user.nextEpisode?._path) router.push(user.nextEpisode._path)}}
                 >
-                  <div className="flex flex-col justify-start w-full -ml-2 text-sm tracking-tight normal-case">
+                  <div className="flex flex-col justify-start w-full -ml-2 text-sm tracking-tight normal-case gap-y-1">
                     <div className="flex items-center gap-x-1">
                       My Next Episode
                       <IonIcon size="small" icon={(user.nextEpisode?.publishedAt && user.nextEpisode?.publishedAt > Date.now())? timeOutline: arrowForward} slot="end" />

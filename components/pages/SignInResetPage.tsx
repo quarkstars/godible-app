@@ -42,9 +42,7 @@ const SignInResetPage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
             <IonButtons slot="start">
-              <div className='flex justify-start sm:w-28'>
                 <IonBackButton defaultHref="/"></IonBackButton>
-              </div>
             </IonButtons>
           <IonTitle>Reset Password</IonTitle>
             <IonButtons slot="end">
