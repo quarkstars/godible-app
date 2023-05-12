@@ -17,6 +17,13 @@
 			"iosClientId": "69348194563-n4lmktl4ca4d1vgl665cnm77sni715kn.apps.googleusercontent.com",
 			"androidClientId": "69348194563-aokpmf9tlu3ac5rv116nn5gsb562p4m0.apps.googleusercontent.com",
 			"forceCodeForRefreshToken": true
+		},
+		"PushNotifications": {
+			"presentationOptions": [
+				"badge",
+				"sound",
+				"alert"
+			]
 		}
 	},
 	"cordova": {}
