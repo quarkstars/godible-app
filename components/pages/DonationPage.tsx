@@ -604,6 +604,7 @@ const DonationPage: React.FC = () => {
                 
             </>}
             </div>
+            <div className='w-full py-5 text-center text-medium'>Donations support Godible, a project of HSA-UWC a 501(c)(3) Non-Profit.</div>
         </div>
       </IonContent>
     </IonPage>
