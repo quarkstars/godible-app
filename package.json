@@ -16,13 +16,12 @@
   },
   "dependencies": {
     "@capacitor-community/apple-sign-in": "^4.0.0",
-    "@capacitor/android": "next",
-    "@capacitor/app": "next",
-    "@capacitor/camera": "next",
-    "@capacitor/core": "next",
-    "@capacitor/ios": "next",
-    "@capacitor/push-notifications": "^5.0.2",
-    "@capacitor/status-bar": "next",
+    "@capacitor/android": "4.3.0",
+    "@capacitor/app": "^4.1.1",
+    "@capacitor/camera": "^4.1.4",
+    "@capacitor/core": "^4.0.0",
+    "@capacitor/ios": "^4.0.0",
+    "@capacitor/status-bar": "^4.0.0",
     "@codetrix-studio/capacitor-google-auth": "^3.2.2",
     "@ionic/pwa-elements": "^3.1.1",
     "@ionic/react": "^6.6.2",
@@ -53,7 +52,7 @@
     "tailwindcss": "^2.2.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "next",
+    "@capacitor/cli": "^4.0.0",
     "@types/parse": "^3.0.2",
     "@types/react": "^18.0.28",
     "eslint": "^7.28.0",
