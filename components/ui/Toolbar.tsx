@@ -1,4 +1,4 @@
-import { IonAvatar, IonBackButton, IonButton, IonButtons, IonIcon, IonLabel, IonMenuButton, IonToolbar, useIonRouter } from '@ionic/react'
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonIcon, IonLabel, IonMenuButton, IonToolbar, isPlatform, useIonRouter } from '@ionic/react'
 import { Player } from 'components/AppShell';
 import { UserState } from 'components/UserStateProvider';
 import { arrowForward } from 'ionicons/icons';
@@ -39,6 +39,8 @@ const Toolbar = ({children}) => {
     }, []);
     
 
+    let userName = `${user?.firstName ? user?.firstName:""}${user?.lastName ? " "+user?.lastName:""}`
+    if (userName.length === 0) userName = "M E"
     return (
         
         <IonToolbar>
@@ -63,9 +65,9 @@ const Toolbar = ({children}) => {
                                 />
                             :
                                 <div
-                                    className='overflow'
+                                    className={!isPlatform("ios") ? "p-2" : ""}
                                 >
-                                    <InitialsAvatar name={`${user.firstName} ${user.lastName}`}  />
+                                    <InitialsAvatar name={userName}  />
                                 </div>
                             }
                         </IonAvatar>

@@ -314,10 +314,12 @@ const useUser = () => {
             return;
         }
 
-        console.log("APPLE USER BEFORE JWT", appleUser)
-        let idToken = appleUser.identityToken
-        ;
+        let idToken = appleUser.identityToken;
         let user = appleUser.user;
+        
+        let currentUser = new Parse.User();
+        if (appleUser.givenName) currentUser.set('firstName', appleUser.givenName);
+        if (appleUser.familyName) currentUser.set('lastName', appleUser.familyName);
         try {
             if (!user) appleUser = await Parse.Cloud.run('decodeAppleJWT', { identityToken: idToken });
             if (!appleUser.user) appleUser.user = appleUser.sub //.split('.')[1];
@@ -325,22 +327,14 @@ const useUser = () => {
             console.log("Failed to get response from Apple", err);
             setLogInError({message:"Failed to log in with Apple"});  
         }
-        console.log("APPLE USER AFTER JWT", appleUser)
 
-        let currentUser = new Parse.User();
         currentUser.set('username', appleUser.email);
         currentUser.set('email', appleUser.email);
+
         currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
         currentUser.set('sendHour', "8");
         currentUser.set('nextSendTime', nextSendTime(8));
-        if (appleUser.givenName) currentUser.set('firstName', appleUser.givenName);
-        if (appleUser.familyName) currentUser.set('lastName', appleUser.familyName);
         
-
-
-        //  if a user exists already with the same email, it will not allow a new user
-
-        // if (idToken.split(".").length > 1) idToken = idToken.split(".")[0];
 
         try {
             setIsLoading(true);
