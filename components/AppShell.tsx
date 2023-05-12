@@ -1,5 +1,5 @@
 
-import React, { createContext } from "react";
+import React, { createContext, useEffect } from "react";
 import { IonApp, IonLabel, IonRouterOutlet, setupIonicReact, IonTabs, IonTabBar, IonTabButton, IonIcon, IonSplitPane, IonFooter, IonToolbar  } from '@ionic/react';
 import { StatusBar, Style } from '@capacitor/status-bar';
 
@@ -21,6 +21,7 @@ import UserStateProvider from "./UserStateProvider";
  
 import {Elements} from "@stripe/react-stripe-js"
 import { loadStripe } from '@stripe/stripe-js';
+
 
 
 const publicKey = (process.env.NEXT_PUBLIC_STRIPE_LIVE_ENABLED==="true") ? 
@@ -79,6 +80,7 @@ initializeParse(
 
 
 const AppShell: React.FC = () => {
+
 
   const theme = useTheme();
   const player = usePlayer();
