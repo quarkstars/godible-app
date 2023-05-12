@@ -12,7 +12,7 @@ import useParse from './useParse';
 import useLists from './useLists';
 import { nextSendTime } from 'utils/nextSendTime';
 
-// import { PushNotifications } from '@capacitor/push-notifications';
+import { PushNotifications } from '@capacitor/push-notifications';
 
 import {
     SignInWithApple,
@@ -568,97 +568,97 @@ const useUser = () => {
 
 
   
-    //PUSH NOTIFICATIONS
-    // const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-    // useEffect(() => {
-    //     if (!user?.objectId || isPlatform("capacitor") === false) return;
-    //     const addListeners = async () => {
-    //       await PushNotifications.addListener('registration', token => {
-    //         console.info('Registration token: ', token.value);
-    //         // Create a new Parse Installation for this device
-    //         const parseInstallation = new Parse.Installation();
-    //         // Use the @capacitor/core to determine the platform
-    //         const deviceType = isPlatform('ios') ? 'ios' : 'android';
+    // PUSH NOTIFICATIONS
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    useEffect(() => {
+        if (!user?.objectId || isPlatform("capacitor") === false) return;
+        const addListeners = async () => {
+          await PushNotifications.addListener('registration', token => {
+            console.info('Registration token: ', token.value);
+            // Create a new Parse Installation for this device
+            const parseInstallation = new Parse.Installation();
+            // Use the @capacitor/core to determine the platform
+            const deviceType = isPlatform('ios') ? 'ios' : 'android';
 
-    //         // JavaScript built-in functions to get the locale and timezone
-    //         const localeIdentifier = window.navigator.language;
-    //         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            // JavaScript built-in functions to get the locale and timezone
+            const localeIdentifier = window.navigator.language;
+            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    //         // Version of Parse SDK
-    //         const parseVersion = Parse.CoreManager.get('VERSION');
+            // Version of Parse SDK
+            const parseVersion = Parse.CoreManager.get('VERSION');
 
-    //         // App version from package.json
-    //         const appVersion = process.env.REACT_APP_VERSION || "1"; // assuming you have your version in your .env
+            // App version from package.json
+            const appVersion = process.env.REACT_APP_VERSION || "1"; // assuming you have your version in your .env
 
-    //         // Set fields
-    //         let parseUser = Parse.User.current();
+            // Set fields
+            let parseUser = Parse.User.current();
 
-    //         const acl = new Parse.ACL(parseUser); // This will set the ACL to be readable and writable by this user only
-    //         parseInstallation.setACL(acl);
-    //         // parseInstallation.set("GCMSenderId", "your_gcm_sender_id"); // replace with your actual GCMSenderId
-    //         parseInstallation.set("deviceToken", token.value);
-    //         parseInstallation.set("localeIdentifier", localeIdentifier);
-    //         // parseInstallation.set("badge", 0); // set this based on your app's logic
-    //         // parseInstallation.set("parseVersion", parseVersion);
-    //         parseInstallation.set("appIdentifier", "com.godible.app");
-    //         parseInstallation.set("appName", "Godible");
-    //         parseInstallation.set("deviceType", deviceType);
-    //         // parseInstallation.set("channels", ["channel1", "channel2"]); // set this based on your app's logic
-    //         parseInstallation.set("pushType", deviceType === 'ios' ? 'apns' : 'gcm'); 
-    //         // parseInstallation.set("installationId", Parse._getInstallationId());
-    //         // parseInstallation.set("appVersion", appVersion);
-    //         parseInstallation.set("timeZone", timeZone);
+            const acl = new Parse.ACL(parseUser); // This will set the ACL to be readable and writable by this user only
+            parseInstallation.setACL(acl);
+            // parseInstallation.set("GCMSenderId", "your_gcm_sender_id"); // replace with your actual GCMSenderId
+            parseInstallation.set("deviceToken", token.value);
+            parseInstallation.set("localeIdentifier", localeIdentifier);
+            // parseInstallation.set("badge", 0); // set this based on your app's logic
+            // parseInstallation.set("parseVersion", parseVersion);
+            parseInstallation.set("appIdentifier", "com.godible.app");
+            parseInstallation.set("appName", "Godible");
+            parseInstallation.set("deviceType", deviceType);
+            // parseInstallation.set("channels", ["channel1", "channel2"]); // set this based on your app's logic
+            parseInstallation.set("pushType", deviceType === 'ios' ? 'apns' : 'gcm'); 
+            // parseInstallation.set("installationId", Parse._getInstallationId());
+            // parseInstallation.set("appVersion", appVersion);
+            parseInstallation.set("timeZone", timeZone);
 
-    //         parseInstallation.save().then(
-    //           (installation) => {
-    //             console.log('Installation saved to Parse');
-    //           },
-    //           (error) => {
-    //             console.log('Error saving installation: ', error);
-    //           }
-    //         );
-    //       });
+            parseInstallation.save().then(
+              (installation) => {
+                console.log('Installation saved to Parse');
+              },
+              (error) => {
+                console.log('Error saving installation: ', error);
+              }
+            );
+          });
     
-    //       await PushNotifications.addListener('registrationError', err => {
-    //         console.error('Registration error: ', err.error);
-    //       });
+          await PushNotifications.addListener('registrationError', err => {
+            console.error('Registration error: ', err.error);
+          });
     
-    //       await PushNotifications.addListener('pushNotificationReceived', notification => {
-    //         console.log('Push notification received: ', notification);
-    //       });
+          await PushNotifications.addListener('pushNotificationReceived', notification => {
+            console.log('Push notification received: ', notification);
+          });
     
-    //       await PushNotifications.addListener('pushNotificationActionPerformed', notification => {
-    //         console.log('Push notification action performed', notification.actionId, notification.inputValue);
-    //       });
-    //     }
+          await PushNotifications.addListener('pushNotificationActionPerformed', notification => {
+            console.log('Push notification action performed', notification.actionId, notification.inputValue);
+          });
+        }
 
-    //     const checkPermissions = async () => {
-    //         let permStatus = await PushNotifications.checkPermissions();
-    //         setNotificationsEnabled(permStatus.receive === 'granted');
-    //       }
+        const checkPermissions = async () => {
+            let permStatus = await PushNotifications.checkPermissions();
+            setNotificationsEnabled(permStatus.receive === 'granted');
+          }
 
     
-    //     const enableNotifications = async () => {
-    //         if (notificationsEnabled) return;
-    //         let permStatus = await PushNotifications.requestPermissions();
+        const enableNotifications = async () => {
+            if (notificationsEnabled) return;
+            let permStatus = await PushNotifications.requestPermissions();
           
-    //         if (permStatus.receive === 'granted') {
-    //           setNotificationsEnabled(true);
-    //           await PushNotifications.register();
-    //         }
-    //     }
-    //     addListeners();
+            if (permStatus.receive === 'granted') {
+              setNotificationsEnabled(true);
+              await PushNotifications.register();
+            }
+        }
+        addListeners();
 
-    //     if (user?.isPushOn) {
-    //         enableNotifications();
-    //     } else {
-    //         checkPermissions();
-    //     }
-    //     return () => {
-    //       // On component unmount, remove all listeners
-    //       PushNotifications.removeAllListeners();
-    //     };
-    // }, [user?.isPushOn]);
+        if (user?.isPushOn) {
+            enableNotifications();
+        } else {
+            checkPermissions();
+        }
+        return () => {
+          // On component unmount, remove all listeners
+          PushNotifications.removeAllListeners();
+        };
+    }, [user?.isPushOn]);
 
     return {
         user,
