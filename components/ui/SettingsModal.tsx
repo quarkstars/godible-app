@@ -1,4 +1,4 @@
-import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonNote, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail, UseIonRouterResult, useIonPopover } from '@ionic/react'
+import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonNote, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail, UseIonRouterResult, useIonPopover, isPlatform } from '@ionic/react'
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
 import { Player, Theme } from 'components/AppShell';
 import { IEpisode, IList, IUser } from 'data/types';
@@ -621,8 +621,8 @@ const SettingsModal = (props: ISettingsModalProps) => {
               }}
             />
         </IonItem>
-        
-        {/* <IonItem> 
+        {isPlatform("capacitor") &&
+        <IonItem> 
             <IonIcon icon={notifications} slot="start" />
             <IonLabel>{`Push notifications ${user?.isPushOn ? "on": "off"}`}</IonLabel>
             <IonToggle
@@ -633,7 +633,8 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 if (user?.objectId) updateUser({isPushOn: e.detail.checked, pushErrorCount: 0, lastPushResponse: null})
               }}
             />
-        </IonItem> */}
+        </IonItem>
+        }
         <IonItem> 
             <IonIcon icon={chatbox} slot="start" />
             
