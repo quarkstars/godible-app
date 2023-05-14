@@ -491,11 +491,11 @@ const player = useContext(Player);
                       <img 
                           src={user.imageUrl} 
                           alt="My Profile" 
-                          className='pr-2'
+
                       />
                   :
                       <div
-                          className='pr-2'
+                          className='flex items-center h-full pr-2'
                       >
                           <InitialsAvatar name={user?.objectId ? userName.length === 0 ? "M E" : userName : "→"}  />
                       </div>

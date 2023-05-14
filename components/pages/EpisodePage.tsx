@@ -229,7 +229,7 @@ useEffect(() => {
     // If the user remains on the same episode for 2 minutes, assign the next episode to the user
 
     if (userRef.current?.objectId && adjacentEpisodes[1]) {
-      timer = setTimeout(() => saveNextEpisode(episode!.slug), 120000); // Assign the timeout to timer variable.
+      timer = setTimeout(() => saveNextEpisode(episode!.slug), 30000); // Assign the timeout to timer variable.
     }
   
     return () => {

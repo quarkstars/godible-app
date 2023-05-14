@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
 import { checkmarkCircle } from 'ionicons/icons';
 import Parse, { Error } from 'parse';
 import React, { SetStateAction, useState } from "react";
-import { isPlatform } from '@ionic/react';
+import { isPlatform, useIonRouter } from '@ionic/react';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import useParse from './useParse';
 import useLists from './useLists';
@@ -119,6 +119,8 @@ const useUser = () => {
     
     //Loading State, waiting for server response
     const [isOnboarding, setIsOnboarding] = useState<any>();
+
+    const router = useIonRouter();
 
     
     //is Modal open, lets the back button
@@ -574,7 +576,6 @@ const useUser = () => {
         if (!user?.objectId || isPlatform("capacitor") === false) return;
         const addListeners = async () => {
           await PushNotifications.addListener('registration', token => {
-            console.info('Registration token: ', token.value);
             // Create a new Parse Installation for this device
             const parseInstallation = new Parse.Installation();
             // Use the @capacitor/core to determine the platform
@@ -584,30 +585,22 @@ const useUser = () => {
             const localeIdentifier = window.navigator.language;
             const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-            // Version of Parse SDK
-            const parseVersion = Parse.CoreManager.get('VERSION');
-
-            // App version from package.json
-            const appVersion = process.env.REACT_APP_VERSION || "1"; // assuming you have your version in your .env
-
             // Set fields
             let parseUser = Parse.User.current();
 
             const acl = new Parse.ACL(parseUser); // This will set the ACL to be readable and writable by this user only
             parseInstallation.setACL(acl);
-            // parseInstallation.set("GCMSenderId", "your_gcm_sender_id"); // replace with your actual GCMSenderId
+            parseInstallation.set("GCMSenderId", "69348194563"); 
             parseInstallation.set("deviceToken", token.value);
             parseInstallation.set("localeIdentifier", localeIdentifier);
-            // parseInstallation.set("badge", 0); // set this based on your app's logic
-            // parseInstallation.set("parseVersion", parseVersion);
             parseInstallation.set("appIdentifier", "com.godible.app");
             parseInstallation.set("appName", "Godible");
             parseInstallation.set("deviceType", deviceType);
-            // parseInstallation.set("channels", ["channel1", "channel2"]); // set this based on your app's logic
             parseInstallation.set("pushType", deviceType === 'ios' ? 'apns' : 'gcm'); 
-            // parseInstallation.set("installationId", Parse._getInstallationId());
-            // parseInstallation.set("appVersion", appVersion);
             parseInstallation.set("timeZone", timeZone);
+            parseInstallation.set("userId", user.objectId);
+            parseInstallation.set("channels", ["Reminder", "Broadcast"]);
+
 
             parseInstallation.save().then(
               (installation) => {
@@ -624,12 +617,17 @@ const useUser = () => {
           });
     
           await PushNotifications.addListener('pushNotificationReceived', notification => {
-            console.log('Push notification received: ', notification);
+            // console.log('Push notification received: ', notification);
           });
     
-          await PushNotifications.addListener('pushNotificationActionPerformed', notification => {
-            console.log('Push notification action performed', notification.actionId, notification.inputValue);
-          });
+          await PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
+            // Check if the notification's data contains a slug
+            if (notification.notification.data && notification.notification.data.slug) {
+                const slug = notification.notification.data.slug;
+                // Navigate to the route using the slug
+                router.push(`/episode/${slug}`);
+            }
+            });
         }
 
         const checkPermissions = async () => {
@@ -644,7 +642,30 @@ const useUser = () => {
           
             if (permStatus.receive === 'granted') {
               setNotificationsEnabled(true);
-              await PushNotifications.register();
+              await PushNotifications.register();// Create Reminder channel
+              await PushNotifications.createChannel({
+                id: 'Reminder',
+                name: 'Reminder Notifications',
+                description: 'Daily Reminder Notifications',
+                importance: 5, // 5 is the highest importance, shows everywhere, makes noise and peeks
+                visibility: 1, // 1 is public (shows everywhere)
+                sound: 'default',
+                lights: true,
+                vibration: true,
+              });
+          
+              // Create Broadcast channel
+              await PushNotifications.createChannel({
+                id: 'Broadcast',
+                name: 'Broadcast Notifications',
+                description: 'Special Broadcast Notifications',
+                importance: 2, // 2 is low importance, shows everywhere but is not intrusive
+                visibility: 1,
+                sound: 'default',
+                lights: true,
+                vibration: false,
+              });
+          
             }
         }
         addListeners();
