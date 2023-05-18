@@ -51,8 +51,12 @@ const ProfilePage:React.FC = () => {
     setDateMap,
     getCurrentUser,
     isModalOpen,
+    router:userRouter
   } = useContext(UserState);
+  
   const lang = (user?.language) ? user.language : userDefaultLanguage;
+  if (userRouter) userRouter.current = router;
+  
   useIonViewDidEnter(() => {
     if (user?.objectId) getCurrentUser();
   }, [user?.objectId]);

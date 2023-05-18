@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
 import { checkmarkCircle } from 'ionicons/icons';
 import Parse, { Error } from 'parse';
 import React, { SetStateAction, useState } from "react";
-import { isPlatform, useIonRouter } from '@ionic/react';
+import { isPlatform, useIonRouter, UseIonRouterResult } from '@ionic/react';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import useParse from './useParse';
 import useLists from './useLists';
@@ -79,6 +79,9 @@ export interface IUserState {
     setListReloads: Function,
 
     isModalOpen: React.MutableRefObject<boolean>|null;
+
+
+    router: React.MutableRefObject<UseIonRouterResult|undefined>|undefined,
 }
 
 
@@ -95,6 +98,8 @@ const useUser = () => {
     const {
         addParseObjectProperties,
     } = useParse();
+
+    
 
     //Logged in user
     const [user, setUser] = useState<IUser>({}); 
@@ -120,7 +125,7 @@ const useUser = () => {
     //Loading State, waiting for server response
     const [isOnboarding, setIsOnboarding] = useState<any>();
 
-    const router = useIonRouter();
+    const router = useRef<UseIonRouterResult|undefined>();
 
     
     //is Modal open, lets the back button
@@ -572,6 +577,8 @@ const useUser = () => {
   
     // PUSH NOTIFICATIONS
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+    const [notificationData, setNotificationData] = useState<any>(null);
     useEffect(() => {
         if (!user?.objectId || isPlatform("capacitor") === false) return;
         const addListeners = async () => {
@@ -625,7 +632,8 @@ const useUser = () => {
             if (notification.notification.data && notification.notification.data.slug) {
                 const slug = notification.notification.data.slug;
                 // Navigate to the route using the slug
-                router.push(`/episode/${slug}`);
+                setNotificationData(notification.notification.data);
+
             }
             });
         }
@@ -681,6 +689,17 @@ const useUser = () => {
         };
     }, [user?.isPushOn]);
 
+        // Handling the navigation
+        useEffect(() => {
+            if (router.current && notificationData && notificationData.slug) {
+                if (!router.current?.push) return;
+                
+                router.current.push(`/episode/${notificationData.slug}`);
+                setNotificationData(null); // Clear the notification data
+            }
+        }, [router.current, notificationData]); // This effect will run whenever either `router` or `notificationData` changes
+    
+
     return {
         user,
         isLoading,
@@ -734,6 +753,8 @@ const useUser = () => {
 
         //MODAL CONTROL BACK BUTTON
         isModalOpen,
+
+        router,
 
     }
 }

@@ -15,9 +15,12 @@ const Toolbar = ({children}) => {
         user,
         isModalOpen,
         setReroutePath,
+        router: userRouter
       } = useContext(UserState);
 
-	const router = useIonRouter();
+      const router = useIonRouter();
+
+      if (userRouter) userRouter.current = router;
     useEffect(() => {
         let backButtonListener;
     
