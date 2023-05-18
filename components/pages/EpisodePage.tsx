@@ -440,7 +440,7 @@ useEffect(() => {
           }}
           >
           <div className="flex flex-col items-center justify-center w-full bg-black bg-opacity-50">
-            <div className="flex flex-col items-center w-full px-4 py-8" style={{color: "white !important", maxWidth: "800px"}}>           
+            <div className="flex flex-col items-center w-full px-1 py-8" style={{color: "white !important", maxWidth: "800px"}}>           
               {quote && 
                 <div className="flex flex-col items-center w-full">
                   <div 
