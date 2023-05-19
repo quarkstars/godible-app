@@ -272,6 +272,7 @@ const HomePage:React.FC = () => {
               overlayColor={"linear-gradient(90deg, rgba(97,219,146,.4) 0%, rgba(0,165,196,.2) 100%)"}
               bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
               preImageUrl={"/logo/godible-logo-white.png"}
+              postText={"Try full Godible Pro access with a free account until June 30!"}
               // postText="Also coming soon to Android and iOs" //{"Now available on Android, iOS, or on the web"}
             />
           </SwiperSlide>

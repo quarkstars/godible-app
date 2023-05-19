@@ -162,7 +162,7 @@ const DonationPage: React.FC = () => {
         <div className="flex flex-col items-center justify-center w-full min-h-full">
             <div className="flex flex-col items-stretch justify-center p-6 py-8 bg-white rounded-lg dark:bg-light" style={{maxWidth:"460px"}}>
             { user?.objectId && <>
-            <TextDivider>{`Donor ${user?.subscriptionId ? "Settings" : "Upgrade"}`}</TextDivider>
+            <TextDivider>{`Godible Pro ${user?.subscriptionId ? "Settings" : "Upgrade"}`}</TextDivider>
             
 
             <div className="flex justify-center w-full">
@@ -199,13 +199,13 @@ const DonationPage: React.FC = () => {
             </div>
             
             {user?.subscriptionId && 
-              <div className="w-full pt-4 italic text-center text-primary">
-                {`Active (next charge ${user?.nextPaymentTime ? new Date(user?.nextPaymentTime).toLocaleDateString() : ""})`}
+              <div className="w-full pt-4 font-bold text-center text-primary">
+                Active<span className="font-normal text-medium">{` (next charge ${user?.nextPaymentTime ? new Date(user?.nextPaymentTime).toLocaleDateString() : ""})`}</span>
               </div>
             }
             {(!user?.subscriptionId && hasAccess)  && 
-              <div className="w-full pt-4 italic text-center text-medium">
-                {`Canceled (access until ${lastAccessTime ? new Date(lastAccessTime).toLocaleDateString() : ""})`}
+              <div className="w-full pt-4 font-medium text-center text-danger">
+                Canceled<span className="font-normal text-medium">{` (access until ${lastAccessTime ? new Date(lastAccessTime).toLocaleDateString() : ""})`}</span>
               </div>
             }
             <div className="flex flex-col items-center w-full">
@@ -218,7 +218,7 @@ const DonationPage: React.FC = () => {
                   </div>
                   }
                   {(!user?.donationAmount || selectingAmount) ?
-                    <span className="px-2 text-2xl font-medium text-center">Select your donation monthly</span>
+                    <span className="px-2 text-2xl font-medium text-center">Select your subscription</span>
                   :
                   <div className="flex items-center"><span className="pb-1 text-2xl font-medium border-b-4 border-primary">monthly</span></div>
                   }
@@ -299,8 +299,8 @@ const DonationPage: React.FC = () => {
                     if (!customAmountInput.current?.value) return;
                     const value = customAmountInput.current?.value;
                     let amount = (typeof value === "string") ? Number(value) : value;
-                    if (amount < 2) {
-                      customAmountInput.current.value = 2;
+                    if (amount < 3) {
+                      customAmountInput.current.value = 3;
                       return setShowingAmountNote(true);
                     }
                     if (amount > 400) {
@@ -314,7 +314,7 @@ const DonationPage: React.FC = () => {
                 >
                   Save
                 </IonButton>              
-                {showingMinNote && <IonNote slot="helper"><span className="text-xs text-primary">Enter between $2 to $400</span></IonNote>}
+                {showingMinNote && <IonNote slot="helper"><span className="text-xs text-primary">Enter between $3 to $400</span></IonNote>}
 
               </IonItem>
             }
@@ -371,7 +371,7 @@ const DonationPage: React.FC = () => {
                   savePaymentMethod();
                 }}
             >
-                Save Payment Method
+                Save Card
             </IonButton>
             {user?.paymentMethod && <IonButton size="small" fill="clear" onClick={(e) => {setChangingMethod(false)}}>Cancel</IonButton>}
 
@@ -392,8 +392,8 @@ const DonationPage: React.FC = () => {
             </div>
             }
             
-            {user?.paymentMethod && !user?.subscriptionId && <span className="w-full py-2 italic text-center">Card added. One last step...</span>}
-          {(user?.paymentMethod && user?.donationAmount) && 
+          {user?.paymentMethod && !user?.subscriptionId && <span className="w-full py-2 italic text-center">Card added. One last step...</span>}
+          {(user?.paymentMethod && user?.donationAmount) &&  
             <div className="flex flex-col w-full mt-6">
             <IonItem>
               <IonCheckbox 
@@ -413,7 +413,7 @@ const DonationPage: React.FC = () => {
                 <IonLabel><span className="text-sm">{`Cover transaction fee ($${fee})?`}</span></IonLabel>
               </div>
             </IonItem>
-            <IonItem>
+            {/* <IonItem>
               <IonCheckbox 
                 slot="start"
                 checked={hasAddress}
@@ -474,11 +474,11 @@ const DonationPage: React.FC = () => {
                       <IonLabel position='stacked'>Zip Code</IonLabel>
                       <IonInput placeholder="Zip" ref={postal_code}></IonInput>
                     </IonItem>
-                </div>
+                </div> */}
                
-              </div>
-              </>}
-              {(enteringAddress && user?.address) && 
+              </div>}
+              {/* </>} */}
+              {/* {(enteringAddress && user?.address) && 
                   <IonButtons>
                     <IonButton 
                       size="small" 
@@ -529,7 +529,7 @@ const DonationPage: React.FC = () => {
               </div>
               }
             </div>
-            }
+            } */}
             {(!user?.subscriptionId && totalAmount && user?.paymentMethod) &&
             <div className="w-full py-4">
               <IonButton 
@@ -555,7 +555,7 @@ const DonationPage: React.FC = () => {
                     }
                   }}
               >
-                  {`Subscribe ($${totalAmount} monthly)`}
+                  {`${paymentIsLoading ? "Processing..." : "Subscribe"} ($${totalAmount} monthly)`}
               </IonButton>
             </div>
             }
@@ -584,7 +584,7 @@ const DonationPage: React.FC = () => {
                   color="primary" 
                   expand="block"
                   onClick={() => {
-                    setReroutePath("/donation");
+                    setReroutePath("/subscription");
                     router.push("/signin");
                   }}
               >
@@ -595,7 +595,7 @@ const DonationPage: React.FC = () => {
                   expand="block"
                   fill="clear"
                   onClick={() => {
-                    setReroutePath("/donation");
+                    setReroutePath("/subscription");
                     router.push("/signup");
                   }}
               >
@@ -604,7 +604,7 @@ const DonationPage: React.FC = () => {
                 
             </>}
             </div>
-            <div className='w-full py-5 text-center text-medium'>Donations support Godible, a project of HSA-UWC a 501(c)(3) Non-Profit.</div>
+            {/* <div className='w-full py-5 text-center text-medium'>Donations support Godible, a project of HSA-UWC a 501(c)(3) Non-Profit.</div> */}
         </div>
       </IonContent>
     </IonPage>

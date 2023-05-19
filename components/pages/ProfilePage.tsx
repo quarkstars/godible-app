@@ -474,6 +474,7 @@ const player = useContext(Player);
                   overlayColor={"linear-gradient(90deg, rgba(97,219,146,.4) 0%, rgba(0,165,196,.2) 100%)"}
                   bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
                   preImageUrl={"/logo/godible-logo-white.png"}
+                  postText={"Try full Godible Pro access with a free account until June 30!"}
                   // postText={"Now available as an Android and iOS Phone App"}
                   isRounded
                 /> 
@@ -595,7 +596,7 @@ const player = useContext(Player);
                     </IonButton>
                     <IonButton fill="clear" onClick={() => swiperRef.slideTo(2)}>
                       <div className="flex flex-col">
-                        <span className="text-md mobile:text-lg">Donation</span>
+                        <span className="text-md mobile:text-lg">Subscription</span>
                         {(tabIndex === 2) &&
                           <div className="w-full h-0.5 bg-primary rounded-full"></div>
                         }
@@ -819,12 +820,12 @@ const player = useContext(Player);
               </SwiperSlide>
               <SwiperSlide>
                 <div className="flex flex-col items-center w-full px-1 pb-8">
-                  {!user?.subscriptionId &&<h2 className="w-full text-3xl font-bold text-left dark:text-primary text-light">Become a Godible Donor</h2>}
+                  {!user?.subscriptionId &&<h2 className="w-full text-3xl font-bold text-left dark:text-primary text-light">Get Godible Pro</h2>}
                   <div className='flex items-center justify-between w-full'>
                     <div className='flex items-center justify-between w-full'>
                       <div className='flex items-center justify-center space-x-2 text-lg font-medium'>
                         <span className='text-2xl font-bold'>{`$${Math.floor(donations[0]/100)}`}</span>
-                        <span className='text-sm text-medium'>{`from ${donations[1]} donors`}</span> 
+                        <span className='text-sm text-medium'>{`from ${donations[1]} subscribers`}</span> 
                       </div>
                       <span className='text-sm font-medium text-medium'>
                         {`$${Math.floor(goal/100)/10}k ${thisMonth} goal `}<span className="hidden xs:inline">covers expenses</span>
@@ -845,19 +846,19 @@ const player = useContext(Player);
                       color="primary" 
                       onClick={() => {player.togglePlayPause(false);
                         setReroutePath(undefined);
-                        router.push("/donation")}
+                        router.push("/subscription")}
                       }
                       >
-                        Donate Now
+                        Subscribe
                       </IonButton>
                     }
                   </div>
-                  <h2 className="w-full pt-12 text-2xl font-bold dark:text-dark">{user?.subscriptionId ? "Thank you for your donation" : "And Upgrade to Unlimited Access"}</h2>
+                  <h2 className="w-full pt-12 text-2xl font-bold dark:text-dark">{user?.subscriptionId ? "Thank you for your subscription" : "And Upgrade to Unlimited Access"}</h2>
                   <Pricing 
                     onClick={() => {
                       setReroutePath(undefined);
                       player.togglePlayPause(false);
-                      router.push("/donation")
+                      router.push("/subscription")
                     }} 
                     />
                 </div>

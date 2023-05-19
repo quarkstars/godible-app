@@ -481,8 +481,8 @@ useEffect(() => {
             </div>
           </div>
         </div>
-        <div className="flex justify-center px-4 py-4 width-full">  
-          <div className="justify-center px-4" style={{ maxWidth: "768px"}}> 
+        <div className="flex justify-center px-1 py-4 width-full">  
+          <div className="justify-center px-2" style={{ maxWidth: "768px"}}> 
             <div className='flex flex-wrap justify-center w-full -ml-3 xs:ml-0'>
               {(episode?._bookTitle && episode?._chapterName) && 
               <IonBreadcrumbs color="dark">
@@ -619,7 +619,7 @@ useEffect(() => {
                   color="primary" 
                   onClick={() => {
                     setReroutePath(router.routeInfo.pathname);
-                    router.push("/donation");
+                    router.push("/subscription");
                   }}>
                   Become a Donor
                 </IonButton>

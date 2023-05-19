@@ -259,7 +259,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
           onClick={() => {
             if (props.router) {
               setReroutePath(props.router.routeInfo.pathname);
-              props.router?.push("/donation")
+              props.router?.push("/subscription")
             }
             props.onDismiss()
           } } 

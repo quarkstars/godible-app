@@ -110,7 +110,7 @@ export const pages:IPage[] = [
     }, 
     {
         label: "Donation",
-        path: "/donation", //ProfilePage
+        path: "/subscription", //ProfilePage
         component: DonationPage,
         icon: square,
         isNav: false,

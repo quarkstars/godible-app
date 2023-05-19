@@ -216,15 +216,19 @@ const Menu: React.FC = () => {
                   >
                     <IonIcon slot="icon-only" size="small" icon={settingsSharp} />
                   </IonButton>
-                  <div className="h-full border-r dark:border-gray-800" />
-                <IonButton 
-                    routerLink={"/profile?tab=donation"}
-                    routerDirection="forward" 
-                    fill="clear"
-                    size="small" 
-                  >
-                    <span className="text-medium">Donate</span>
-                  </IonButton>
+                  {!user.subscriptionId &&
+                  <>
+                    <div className="h-full border-r dark:border-gray-800" />
+                    <IonButton 
+                        routerLink={"/profile?tab=donation"}
+                        routerDirection="forward" 
+                        fill="clear"
+                        size="small" 
+                      >
+                        <span className="text-medium">Subscribe</span>
+                    </IonButton>
+                  </>
+                  }
                   <div className="h-full border-r dark:border-gray-800" />
                 <IonButton 
                     routerLink={"/faq"}

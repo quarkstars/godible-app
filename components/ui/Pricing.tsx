@@ -71,7 +71,7 @@ const Pricing = ({onClick}) => {
         }
         <div className="p-5 bg-white border border-t-4 rounded-lg shadow border-primary dark:bg-gray-800">
             <p className="text-sm font-medium text-gray-500 uppercase">
-            {user?.subscriptionId ? `Your Donor Account` : "Donor Account"}
+            {user?.subscriptionId ? `Your Pro Account` : "Pro Account"}
             </p>
 
             {!user?.subscriptionId && 
@@ -115,8 +115,8 @@ const Pricing = ({onClick}) => {
             </div>
 
             <div className="mt-8">
-            <IonButton size="large" color="primary" expand="block" onClick={(e) => onClick(e)}>
-                {`${user?.subscriptionId ? "Manage Donation" : "Donate Now"}`}
+            <IonButton color="primary" expand="block" onClick={(e) => onClick(e)}>
+                {`${user?.subscriptionId ? "Manage Subscription" : "Subscribe Now"}`}
             </IonButton>
             </div>
         </div>

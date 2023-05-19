@@ -49,6 +49,7 @@ const {
     <div 
       style={{
         maxWidth: "100vw",
+        backgroundColor: "#888888",
         backgroundImage: `url(${bgImageUrl})`,
         backgroundSize: "cover",
         backgroundPosition: "center center",
@@ -125,12 +126,14 @@ const {
           <div className="flex items-start justify-center w-full h-10 opacity-50 sm:hidden">
             <div className='flex flex-col items-center justify-start'>
               <span className="w-full text-xs uppercase text-dark">Scroll</span>
-              <IonIcon icon={chevronDown} color="light" size="small" />
+              <IonIcon icon={chevronDown} color="fullwhite" size="small" />
             </div>
           </div>
         }
       </div>
     </div>
+
+    
   )
 }
 
