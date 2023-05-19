@@ -65,6 +65,8 @@ const BillingHistoryModal = (props: IBillingHistory) => {
       const eventDate = new Date(event.createdTime).toLocaleDateString();
       let amount =
         event.eventData?.object?.amount_paid && (event.eventData.object.amount_paid / 100).toFixed(2);
+      if (!amount) amount = event.eventData?.object?.amount_refunded && (event.eventData.object.amount_refunded / 100).toFixed(2);
+      if (!amount) amount = event.eventData?.object?.amount_due && (event.eventData.object.amount_due / 100).toFixed(2);
   
       let label = "";
       let cssClass = "";
@@ -72,7 +74,7 @@ const BillingHistoryModal = (props: IBillingHistory) => {
       switch (eventType) {
         case "invoice.payment_succeeded":
           label = "Payment";
-          cssClass = "text-normal";
+          cssClass = "text-light dark:text-dark";
           break;
         case "invoice.payment_failed":
           label = "Failed payment";
@@ -80,23 +82,23 @@ const BillingHistoryModal = (props: IBillingHistory) => {
           break;
         case "charge.refunded":
           label = "Refund";
-          cssClass = "text-normal";
+          cssClass = "text-primary";
           break;
         case "customer.subscription.created":
           label = "Subscription created";
-          cssClass = "text-normal";
+          cssClass = "text-light dark:text-dark";
           break;
         case "customer.subscription.updated":
           label = "Subscription updated";
-          cssClass = "text-normal";
+          cssClass = "text-light dark:text-dark";
           break;
         case "customer.subscription.deleted":
           label = "Subscription canceled";
-          cssClass = "text-normal";
+          cssClass = "text-light dark:text-dark";
           break;
         default:
           label = eventType;
-          cssClass = "text-normal";
+          cssClass = "text-light dark:text-dark";
       }
   
   
@@ -104,15 +106,15 @@ const BillingHistoryModal = (props: IBillingHistory) => {
         <IonItem key={event?.objectId }>
           <IonLabel>
             <div className="flex flex-col">
-              <p className='font-medium text-light dark:text-dark'>{label}</p>
+              <p className={`font-medium ${cssClass}`}>{label}</p>
               <p className='text-medium'>{eventDate}</p>
             </div>
           </IonLabel>
-          {amount && (
-            <IonNote slot="end" className={`text-xl font-medium text-light dark:text-dark ${cssClass}`}>
+          {amount ? (
+            <IonNote slot="end" className={`text-xl font-medium ${cssClass}`}>
               ${amount}
             </IonNote>
-          )}
+          ):<></>}
         </IonItem>
       );
     });

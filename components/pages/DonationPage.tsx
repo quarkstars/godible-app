@@ -367,8 +367,9 @@ const DonationPage: React.FC = () => {
                 color="primary" 
                 expand="block"
                 disabled={isLoading}
-                onClick={() => {
-                  savePaymentMethod();
+                onClick={async () => {
+                  let paymentMethodSucceded = await savePaymentMethod();
+                  if (paymentMethodSucceded) setChangingMethod(false)
                 }}
             >
                 Save Card
@@ -377,7 +378,7 @@ const DonationPage: React.FC = () => {
 
             </>}
             {!enteringMethod && user?.paymentMethod && 
-            <div className='flex flex-col px-8 pt-4 pb-8 border rounded-md'>
+            <div className='flex flex-col px-5 pt-3 pb-6 border rounded-md'>
               <div className="flex items-center justify-between">
                 <h5 className="text-sm xs:text-lg">Payment Method</h5>
                 <IonButton size="small" fill="clear" onClick={(e) => {setChangingMethod(true)}}>
@@ -689,7 +690,7 @@ const SuccessModal = ({onDismiss, router, reroutePath}) => {
             </IonButton>
           </IonButtons>
           <div className="pr-10">
-          <IonTitle>Donation Successful!</IonTitle>
+          <IonTitle>Payment Successful!</IonTitle>
           </div>
         </IonToolbar>
       </IonHeader>

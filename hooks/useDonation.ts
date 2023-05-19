@@ -155,8 +155,10 @@ const useDonation = () => {
       setError(undefined);
     } catch (error) {
       setError(error);
+      return false;
     } finally {
       setIsLoading(false);
+      return true;
     }
   };
 
