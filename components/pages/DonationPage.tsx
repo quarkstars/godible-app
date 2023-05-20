@@ -698,7 +698,7 @@ const SuccessModal = ({onDismiss, router, reroutePath}) => {
         <div className="flex justify-center w-full"><IonIcon icon={heartCircle} color="primary" size="large" /></div>
         
         <h2 className="w-full text-center">Thank you for your support</h2>
-        <p className="w-full text-center text-medium">Godible Pro access is granted after your first payment is complete.</p>
+        <p className="w-full pb-2 text-center text-medium">Godible Pro access will be granted shortly pending your first payment.</p>
 
 
         
