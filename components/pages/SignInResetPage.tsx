@@ -62,7 +62,7 @@ const SignInResetPage: React.FC = () => {
 
       <div className="flex flex-col items-center justify-center w-full min-h-full p-4 space-y-4 sm:bg-gray-100 dark:bg-light">
         <img src='/logo/godible-logo.png' className='w-40'></img>
-          <div className="block max-w-md p-6 bg-white rounded-lg dark:bg-light">
+          <div className="flex-col block max-w-md p-6 bg-white rounded-lg dark:bg-light">
 
               {(resetError && !message) &&
               <AlertInline
@@ -92,7 +92,7 @@ const SignInResetPage: React.FC = () => {
               <div className="mb-6 form-group">
                     <IonItem>
                       <IonLabel position='floating'>Enter Email</IonLabel>
-                      <IonInput value={user.email} placeholder="Your Account Email" onIonChange={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
+                      <IonInput placeholder="Your Account Email" onIonChange={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                     </IonItem>
               </div>
               <IonButton 
