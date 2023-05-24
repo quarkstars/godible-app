@@ -143,18 +143,43 @@ const useUser = () => {
         catch (err) { console.error(err) }
     }, [isPlatform]);
     
+    //Clear user if no user
+    // useEffect(() => {
+    //     console.log("CHECK SESSION")
+    //     const checkAndClearSession = async () => {
+    //     const currentUser = Parse.User.current();
+    //     console.log("Parse", JSON.stringify(currentUser))
+    //     if (currentUser === null) {
+    //         console.log("CLEAR SESSION")
+    //         // If no user is logged in, clear the session token
+    //         await Parse.User.logOut();
+    //     }
+    //     }
+    
+    //     // Call this function when the app starts
+    //     checkAndClearSession();
+    // }, []);
+
 
 
     //Get Current User
     const getCurrentUser = async function (): Promise<IUser> {
         setIsLoading(true);
-        const currentUser: Parse.User|undefined|null = await Parse.User.current();
-        if (currentUser) {
-            await currentUser.fetch();
-            const currentUserJSON = currentUser.toJSON();
-            setUser(currentUserJSON);
-            setIsLoading(false);
-            return currentUserJSON;
+        console.log("GET CURRENT USER")
+        try {
+            const currentUser: Parse.User|undefined|null = await Parse.User.current();
+            if (currentUser) {
+                console.log("FOUND USER")
+                await currentUser.fetch();
+                const currentUserJSON = currentUser.toJSON();
+                setUser(currentUserJSON);
+                setIsLoading(false);
+                return currentUserJSON;
+            }
+        } catch (err) {
+            // Invalid session token, log out the user
+            console.log("CURRENT USER ERROR", err)
+            await Parse.User.logOut();
         }
         setIsLoading(false);
         return getResetUser({});
@@ -234,8 +259,10 @@ const useUser = () => {
       // Function to log into Google
       const logInWithGoogle = async function () {
             let googleUser:any;
+            let currentUser:any;
             try {
                 googleUser = await GoogleAuth.signIn();
+                currentUser = new Parse.User()
             }
             catch (error) {
                 setLogInError(error);    
@@ -246,7 +273,6 @@ const useUser = () => {
                 return;
             }
 
-            let currentUser = new Parse.User();
             currentUser.set('username', googleUser.email);
             currentUser.set('email', googleUser.email);
             currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -309,10 +335,11 @@ const useUser = () => {
       };
       const logInWithApple = async function () {
         let appleUser:any;
+        let currentUser:any;
         try {
             appleUser = await SignInWithApple.authorize(options);
             appleUser = appleUser.response;
-            console.log("GOT APPLE", appleUser)
+            currentUser = new Parse.User();
         }
         catch (error) {
             setLogInError(error);    
@@ -326,7 +353,7 @@ const useUser = () => {
         let idToken = appleUser.identityToken;
         let user = appleUser.user;
         
-        let currentUser = new Parse.User();
+        
         if (appleUser.givenName) currentUser.set('firstName', appleUser.givenName);
         if (appleUser.familyName) currentUser.set('lastName', appleUser.familyName);
         try {
