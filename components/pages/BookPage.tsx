@@ -1,14 +1,16 @@
-import { IonButton, IonContent, IonFooter, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItemDivider, IonPage, IonSelect, IonSelectOption, IonSkeletonText, IonTitle, IonToolbar, useIonRouter, useIonViewDidEnter, useIonViewDidLeave } from '@ionic/react'
+import { IonButton, IonContent, IonFooter, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItemDivider, IonPage, IonSelect, IonSelectOption, IonSkeletonText, IonTitle, IonToolbar, useIonModal, useIonRouter, useIonViewDidEnter, useIonViewDidLeave } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import { BookCard } from 'components/ui/BookCard'
 import Copyright from 'components/ui/Copyright'
 import EpisodeListItem from 'components/ui/EpisodeListItem'
+import ListModal from 'components/ui/ListModal'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import TextDivider from 'components/ui/TextDivider'
 import Toolbar from 'components/ui/Toolbar'
 import { sampleBooks, sampleEpisodes } from 'data/sampleEpisodes'
 import { userDefaultLanguage } from 'data/translations'
+import { IEpisode } from 'data/types'
 import useBooks from 'hooks/useBooks'
 import useEpisodes from 'hooks/useEpisodes'
 import { search } from 'ionicons/icons'
@@ -26,7 +28,9 @@ const BookPage:React.FC = () => {
   } = useBooks();
 
   const {
-    user
+    user,
+    setReroutePath,
+    isModalOpen,
   } = useContext(UserState);
   const lang = (user.language) ? user.language : userDefaultLanguage;
 
@@ -74,11 +78,11 @@ const BookPage:React.FC = () => {
     episodes: gotoEpisodes,
     setEpisodes: setGotoEpisodes,
   } = useEpisodes();
-  const [goto, setGoto] = useState<string>("1")
+  const [goto, setGoto] = useState<string>("")
   const handleGoto = async (e, index: number) => {
     e.preventDefault();
     setGoto(e.detail.value)
-    if (!episodes || !book) return;
+    if (!episodes || !book || e.detail.value === "") return;
     let episode = episodes.find((ep) => {
       return ep.number.toString() === e.detail.value;
     })
@@ -131,6 +135,16 @@ const BookPage:React.FC = () => {
     await getEpisodes(undefined,{limit: 24, bookIds, sort: "-publishedAt", exclude: ["text"], skip: (skip||0)+1}, true);
     e.target.complete()
   }
+  //List modal trigger
+  const [inspectedEpisode, setInspectedEpisode] = useState<IEpisode|undefined>();
+  const [presentList, dimissList] = useIonModal(ListModal, {
+      onDismiss: (data: string, role: string) => {
+        dimissList(data, role); 
+        if (isModalOpen) isModalOpen.current = false;
+      },
+        isAddingEpisode: true,
+        addEpisodeId: inspectedEpisode?.objectId,
+    });
 
   //Render components
   const episodeListItems = useMemo(() => {
@@ -143,17 +157,35 @@ const BookPage:React.FC = () => {
         onPlay={(e) => {
           handleListenClick(e, index);
         }}
+        onAdd={(e: any) => {
+          if (!user?.objectId){
+
+            setReroutePath(router.routeInfo.pathname)
+            player.togglePlayPause(false);
+            return router.push("/signin?message=Log in to save lists");
+          }
+          setInspectedEpisode(episode);
+          presentList({
+            onDidDismiss: (e: CustomEvent) => {
+              setInspectedEpisode(undefined);
+            },
+          });
+        }}
       />
     ));
   }, [episodes, handleListenClick]);
   //Select options
   const episodeSelectOptions = useMemo(() => {
     const episodeCount = book?.episodeCount || 0;
-    return new Array(episodeCount).fill(undefined).map((item, index) => (
-      <IonSelectOption value={(index + 1).toString()} key={"select-" + index}>
-        {`Episode ${index + 1}`}
-      </IonSelectOption>
-    ));
+    return (<>
+      <IonSelectOption value=""></IonSelectOption>
+      { new Array(episodeCount).fill(undefined).map((item, index) => (
+        <IonSelectOption value={(index + 1).toString()} key={"select-" + index}>
+          {`Episode ${index + 1}`}
+        </IonSelectOption>
+      ))}
+    </>
+    )
   }, [book]);
   
 
@@ -191,10 +223,11 @@ const BookPage:React.FC = () => {
                   <TextDivider>{`${book?.episodeCount ? book?.episodeCount +" ": ""}Episodes`}</TextDivider>
                   <div className="flex justify-between w-full">
                     <div className="flex items-center w-full space-x-2">
-                    <span className="pl-4 font-medium uppercase">Go to</span>
+                    <span className="pl-4 font-medium uppercase">Go</span>
                     <IonSelect 
                       value={goto} 
                       interface="action-sheet" 
+                      placeholder=''
                       onIonChange={(e)=>{
                         if (typeof e.detail.value !== "string") return;
                           handleGoto(e, Number(e.detail.value)-1);
