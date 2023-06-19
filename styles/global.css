@@ -251,11 +251,8 @@ input.InputElement {
 h1, h2, h3, h4, h5, h6, p, ion-label, ion-button, ion-item {
   color: #44585d;
 }
-h1, h2, h3, h4, h5, h6, ion-button {
-  font-weight: 700;
-}
-.ion-label {
-  font-weight: bold;
+.ion-label, .ion-button {
+  font-weight: medium;
 }
 
 .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6, .dark p, .dark ion-label, .dark ion-item  {
@@ -273,6 +270,10 @@ body {
   background-color: #ecf0f1;
   padding: 1.5rem;
   margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700 !important;
 }
 .container {
   background-color: #fdfdfd;
