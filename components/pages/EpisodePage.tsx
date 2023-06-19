@@ -208,6 +208,8 @@ useEffect(() => {
   }, [episode]);
   const userRef = useRef(user);
   const updateUserRef = useRef(updateUser);
+
+  const contentRef = useRef<HTMLIonContentElement>(null);
     
   useEffect(() => {
     userRef.current = user; // Update userRef whenever user changes
@@ -429,7 +431,7 @@ useEffect(() => {
             </div>
         </Toolbar>
         </IonHeader>
-        <IonContent>
+        <IonContent ref={contentRef}>
         <div 
           style={{
             maxWidth: "100vw",
@@ -632,7 +634,10 @@ useEffect(() => {
             {adjacentEpisodes[0] &&
                 <IonButton 
                   fill="clear"
-                  onClick={(e) => {if (adjacentEpisodes[0]?._path) router.push(adjacentEpisodes[0]._path)}}
+                  onClick={(e) => {
+                    if (contentRef.current) contentRef.current.scrollToTop();
+                    if (adjacentEpisodes[0]?._path) router.push(adjacentEpisodes[0]._path)
+                  }}
                 >
                   <IonIcon icon={arrowBack} slot="start" />
                   {adjacentEpisodes[0]._bookImageUrl && <img className="w-4 h-4 mx-1" src={adjacentEpisodes[0]._bookImageUrl} />}
@@ -644,7 +649,11 @@ useEffect(() => {
                 <IonButton 
                   fill="clear"
                   disabled={(adjacentEpisodes[1]?.publishedAt && adjacentEpisodes[1]?.publishedAt > Date.now())? true: false}
-                  onClick={(e) => {if (adjacentEpisodes[1]?._path) router.push(adjacentEpisodes[1]._path)}}
+                  onClick={(e) => {
+                    if (contentRef.current) contentRef.current.scrollToTop();
+
+                    if (adjacentEpisodes[1]?._path) router.push(adjacentEpisodes[1]._path)
+                  }}
                 >
                   <IonIcon icon={(adjacentEpisodes[1]?.publishedAt && adjacentEpisodes[1]?.publishedAt > Date.now())? timeOutline: arrowForward} slot="end" />
                   {adjacentEpisodes[1]._bookImageUrl && <img className="w-4 h-4 mx-1" src={adjacentEpisodes[1]._bookImageUrl} />}
