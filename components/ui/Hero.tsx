@@ -74,7 +74,7 @@ const {
                       <img src={preImageUrl} alt="Pre Image"></img>
                     </div>
                   }
-                  <div className="max-w-5xl mb-2 sm:mx-auto sm:text-center lg:max-w-5xl sm:mb-3">
+                  <div className="max-w-5xl font-bold mb-2 sm:mx-auto sm:text-center lg:max-w-5xl sm:mb-3">
                     {preText &&
                       <p className="pb-6 text-sm tracking-wide text-center text-gray-300 uppercase dark:text-gray-300 sm:text-md">
                         {preText}
@@ -102,7 +102,7 @@ const {
                         <img src={postImageUrl} className="w-full h-full"/>
                       </div>
                     }
-                    {postText && <span className="pl-2 text-sm italic text-center text-white dark:text-white">{postText}</span>}
+                    {postText && <span className="pl-2 font-bold text-sm italic text-center text-white dark:text-white">{postText}</span>}
                   </div>
                   <div className="flex mt-4 -ml-5 sm:ml-0">
                     {mainButtonText &&

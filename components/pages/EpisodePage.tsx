@@ -470,7 +470,7 @@ useEffect(() => {
                         animate={{ height: "auto", opacity: 1}}
                         exit={{opacity: 0,  height: 0}}
                       >
-                      <div className="p-3 font-serif text-xl font-medium leading-relaxed text-white dark:text-white">
+                      <div className="p-3 font-serif text-xl font-bold leading-relaxed text-white dark:text-white px-10">
                         {quote}
                       </div>
                       </motion.div>
@@ -486,7 +486,7 @@ useEffect(() => {
             <div className='flex flex-wrap justify-center w-full -ml-3 xs:ml-0'>
               {(episode?._bookTitle && episode?._chapterName) && 
               <IonBreadcrumbs color="dark">
-                <IonBreadcrumb href={episode?._bookPath}>{episode?._bookTitle}</IonBreadcrumb>
+                <IonBreadcrumb  className="font-bold" href={episode?._bookPath}>{episode?._bookTitle}</IonBreadcrumb>
                 {episode && <IonBreadcrumb href={episode?._chapterPath}>{episode?._chapterName}</IonBreadcrumb>}
               </IonBreadcrumbs>
               }
