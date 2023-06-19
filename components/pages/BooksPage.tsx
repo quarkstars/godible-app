@@ -15,7 +15,7 @@ const BooksPage:React.FC = () => {
     getBooks(undefined, {sort: "+index"});
   });  //Clear books when leaving
   useIonViewDidLeave(() => {
-    // setBooks(undefined)
+    setBooks(undefined)
   });
   
 

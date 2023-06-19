@@ -57,8 +57,8 @@ const BookPage:React.FC = () => {
       setGotoEpisodes(undefined);
   }, [location.pathname]);
   useIonViewDidLeave(() => {
-    // setBooks(undefined);
-    // setEpisodes(undefined);
+    setBooks(undefined);
+    setEpisodes(undefined);
   });
   
   const book = (books) ? books[0] : undefined;

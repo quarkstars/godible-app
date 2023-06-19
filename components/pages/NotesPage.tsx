@@ -49,8 +49,8 @@ const NotesPage:React.FC = () => {
 
     
     useIonViewDidLeave(() => {
-      // setNotes(undefined);
-      // setUserNotes(undefined);
+      setNotes(undefined);
+      setUserNotes(undefined);
     });
 
 

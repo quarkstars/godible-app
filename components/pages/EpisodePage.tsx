@@ -389,13 +389,13 @@ useEffect(() => {
   }, [])
 
   useIonViewDidLeave(() => {
-    // if (location.pathname.includes("episode")) return;
-    // setEpisodes(undefined);
-    // setLists(undefined);
-    // setEpisode(undefined);
-    // setAdjacentEpisodes([null, null])
+    if (location.pathname.includes("episode")) return;
+    setEpisodes(undefined);
+    setLists(undefined);
+    setEpisode(undefined);
+    setAdjacentEpisodes([null, null])
 
-    // if (!player.list?.episodes?.[player.index]?.audioPath && player.isVisible) player.setIsVisible(false);
+    if (!player.list?.episodes?.[player.index]?.audioPath && player.isVisible) player.setIsVisible(false);
   });
 
 

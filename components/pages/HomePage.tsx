@@ -109,9 +109,9 @@ const HomePage:React.FC = () => {
     });
 
   useIonViewDidLeave(() => {
-    // setEpisodes(undefined);
-    // setTopics(undefined);
-    // setBooks(undefined);
+    setEpisodes(undefined);
+    setTopics(undefined);
+    setBooks(undefined);
   });
 
 
