@@ -290,7 +290,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
             </IonButton>
           </IonButtons>
           <div className="pr-10">
-          <IonTitle>{props?.isOnboarding ? "Account Setup" : "Settings"}</IonTitle>
+          <IonTitle className="font-bold">{props?.isOnboarding ? "Account Setup" : "Settings"}</IonTitle>
           </div>
             {/* <IonIcon icon={isLoading ? sync : checkmarkCircle} slot="end" className="ion-padding" /> */}
             {/* <IonSpinner name="dots" slot="end" className="ion-padding" /> */}

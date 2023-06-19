@@ -115,7 +115,7 @@ const Note = (props: INoteProps) => {
             <div className="flex items-center">
                  {avatar}
 
-                <div className="flex items-center mr-2 space-x-1 text-sm font-medium text-gray-900 line-clamp-1 sm:mr-3 dark:text-white">
+                <div className="flex items-center mr-2 space-x-1 text-sm font-bold text-gray-900 line-clamp-1 sm:mr-3 dark:text-white">
                     {isUser ? "Me" : userName}
                 </div>
                 <p className={`hidden text-sm italic mobile:inline line-clamp-1 ${isUser && note?.isPublic ? "font-medium text-primary" : " text-medium "}`}>
@@ -190,7 +190,7 @@ const Note = (props: INoteProps) => {
                         <img src={note.episode.book?.thumbUrl} className="w-full h-full"/>
                     </div>
                     }
-                    <IonLabel><div className="text-sm font-medium text-medium">{note?.episode.number ? note?.episode.number : ""}</div></IonLabel>
+                    <IonLabel><div className="text-sm font-bold text-medium">{note?.episode.number ? note?.episode.number : ""}</div></IonLabel>
                     <IonIcon slot="end" size="small" color="medium" icon={chevronForward} />
                 </IonButton>
                 :

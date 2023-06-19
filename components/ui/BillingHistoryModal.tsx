@@ -106,7 +106,7 @@ const BillingHistoryModal = (props: IBillingHistory) => {
         <IonItem key={event?.objectId }>
           <IonLabel>
             <div className="flex flex-col">
-              <p className={`font-medium ${cssClass}`}>{label}</p>
+              <p className={`font-bold ${cssClass}`}>{label}</p>
               <p className='text-medium'>{eventDate}</p>
             </div>
           </IonLabel>
@@ -131,7 +131,7 @@ const BillingHistoryModal = (props: IBillingHistory) => {
             </IonButton>
           </IonButtons>
           <div className="pr-10">
-          <IonTitle>History</IonTitle>
+          <IonTitle className="font-bold">History</IonTitle>
           </div>
         </IonToolbar>
       </IonHeader>

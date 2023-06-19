@@ -21,7 +21,7 @@ const EpisodeListItem = (props: IEpisodeListItemProps) => {
   });
 
   let highlight = (props.isActive) ? "light" : undefined;
-  let weight = (props.isActive) ? "font-bold" : "font-medium";
+  let weight = (props.isActive) ? "font-bold" : "font-bold";
 
   let textHighlighted = useMemo(() => {
     if (!episode.textHighlighted) return <></>;
@@ -67,7 +67,7 @@ const EpisodeListItem = (props: IEpisodeListItemProps) => {
     </div>
     <div className='flex flex-col'>
       <span className={`pl-3 line  ${weight}`}>{`Episode ${episode.number}`}</span>
-      <div className={`flex space-x-1 pl-3 text-light dark:text-dark font-medium text-xs items-center ${weight}`}>
+      <div className={`flex space-x-1 pl-3 text-light dark:text-dark font-bold text-xs items-center ${weight}`}>
         {!props.customSubText && <span className="hidden truncated xs:inline">{episode?._bookTitle}</span>}
         {(episode?._chapterName && !props.customSubText) && <span className="hidden xs:inline"><IonIcon icon={chevronForward} /></span> }
         {(episode?._chapterName &&  !props.customSubText ) && <span className="truncated">{episode?._chapterName}</span>}

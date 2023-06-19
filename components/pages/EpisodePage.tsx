@@ -229,7 +229,7 @@ useEffect(() => {
     // If the user remains on the same episode for 2 minutes, assign the next episode to the user
 
     if (userRef.current?.objectId && adjacentEpisodes[1]) {
-      timer = setTimeout(() => saveNextEpisode(episode!.slug), 30000); // Assign the timeout to timer variable.
+      timer = setTimeout(() => {if (episode?.slug) saveNextEpisode(episode?.slug)}, 30000); // Assign the timeout to timer variable.
     }
   
     return () => {
@@ -402,7 +402,7 @@ useEffect(() => {
       <IonHeader>
         <Toolbar>
             <div className='flex flex-row items-center justify-center w-full space-x-2'>
-              <div className="flex items-center h-full font-medium text-md xs:text-lg">
+              <div className="flex items-center h-full font-bold text-md xs:text-lg">
                 {episode ? 
                   episode._title
                   :
@@ -593,7 +593,7 @@ useEffect(() => {
             </div>    
             
             {episode?.isFirstSpeechEpisode && episode?._speechTitle && 
-                <h1 className="w-full pb-2 text-left text-light dark:text-dark">{episode._speechTitle.toUpperCase()}</h1>
+                <h1 className="w-full pb-2 text-left text-light dark:text-dark font-bold">{episode._speechTitle.toUpperCase()}</h1>
              } 
             {episode?.isFirstSpeechEpisode && episode?._speechMetaDataBlocks && 
             <div className="pb-6">

@@ -13,15 +13,15 @@ const Pricing = ({onClick}) => {
     <div className="grid w-full grid-cols-1 gap-6 mx-auto xs:grid-cols-2">
         {!user?.subscriptionId &&
         <div className="p-5 bg-white border border-t-4 rounded-lg shadow border-medium dark:bg-gray-800">
-            <p className="text-sm font-medium text-gray-500 uppercase">
+            <p className="text-sm font-bold text-gray-500 uppercase">
                 Free Account
             </p>
 
-            <p className="mt-4 text-3xl font-medium text-gray-700 dark:text-gray-100">
+            <p className="mt-4 text-3xl font-bold text-gray-700 dark:text-gray-100">
                 $0 <span className="text-base font-normal"></span>
             </p>
 
-            <p className="mt-4 font-medium text-gray-700 dark:text-gray-100">
+            <p className="mt-4 font-bold text-gray-700 dark:text-gray-100">
                 Not yet supporting Godible
             </p>
 
@@ -70,12 +70,12 @@ const Pricing = ({onClick}) => {
             </div>
         }
         <div className="p-5 bg-white border border-t-4 rounded-lg shadow border-primary dark:bg-gray-800">
-            <p className="text-sm font-medium text-gray-500 uppercase">
+            <p className="text-sm font-bold text-gray-500 uppercase">
             {user?.subscriptionId ? `Your Pro Account` : "Pro Account"}
             </p>
 
             {!user?.subscriptionId && 
-                <p className="mt-4 text-3xl font-medium text-gray-700 dark:text-gray-100">
+                <p className="mt-4 text-3xl font-bold text-gray-700 dark:text-gray-100">
                     $Any <span className="text-base font-normal">/month</span>
                 </p>
             }

@@ -74,14 +74,14 @@ const ListListItem = (props: IListListItemProps) => {
     </div>
     <div className='flex flex-col'>
       <div className='flex items-center space-x-1'>
-        <span className='pl-3 text-sm font-medium text-medium line text-md'>{list.name === "Saved" ? "Saved" : `List`}</span>
+        <span className='pl-3 text-sm font-bold text-medium line text-md'>{list.name === "Saved" ? "Saved" : `List`}</span>
       
         
-        <span className='pl-4 text-sm italic line text-medium'>{`${list.episodes.length} Episodes `}</span>
+        <span className='pl-4 text-sm italic line text-bold'>{`${list.episodes.length} Episodes `}</span>
 
       </div>
       {list.name !== "Saved" &&
-        <div className="flex items-center pl-3 space-x-1 font-medium leading-tight line-clamp-1 text-md">
+        <div className="flex items-center pl-3 space-x-1 font-bold leading-tight line-clamp-1 text-md">
           {list.name}
         </div>
       }

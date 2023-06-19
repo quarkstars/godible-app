@@ -459,7 +459,7 @@ const ListModal = (props: IPlayerListModalProps) => {
           </IonButtons>
           </div>
           :
-            <span className="font-medium text-light dark:text-dark">
+            <span className="font-bold text-light dark:text-dark">
               {isLoading ? 
                 `Saving...`
               :
@@ -493,7 +493,7 @@ const ListModal = (props: IPlayerListModalProps) => {
             player.list?.episodes?.[player.index]?.objectId &&
             episode?.objectId === player.list?.episodes?.[player.index]?.objectId
           ) {
-            weight = (player.index === _index) ? "font-bold" : "font-medium";
+            weight = (player.index === _index) ? "font-extrabold" : "font-bold";
             highlight = (typeof index === "number" && player.index === _index) ? "light" : undefined;
             isCurrent = (typeof index === "number" && player.index === _index);
             isPlaying = (isCurrent && player.isPlaying)
@@ -526,7 +526,7 @@ const ListModal = (props: IPlayerListModalProps) => {
                 </div>
                 <div className='flex flex-col'>
                   <span className={`pl-3 truncated ${weight}`}>{`Episode ${episode.number}`}</span>
-                  <div className={`hidden xs:flex space-x-1 pl-3 text-medium font-medium text-xs items-center ${weight}`}>
+                  <div className={`hidden xs:flex space-x-1 pl-3 text-medium font-bold text-xs items-center ${weight}`}>
                     <span className="truncated">{episode?._bookTitle}</span>
                     {episode?._chapterName && <IonIcon icon={chevronForward} /> }
                     {episode?._chapterName && <span className="truncated">{episode?._chapterName}</span>}

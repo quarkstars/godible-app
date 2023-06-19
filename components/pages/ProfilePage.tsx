@@ -407,7 +407,7 @@ const player = useContext(Player);
 
             </IonButtons>
             <IonTitle>
-              <div className={`flex items-center text-lg ${isPlatform('ios') ? "pl-6" : ""}`}>
+              <div className={`flex items-center font-bold text-lg ${isPlatform('ios') ? "pl-6" : ""}`}>
               {user?.objectId ? "My Profile" : "Welcome to Godible"}
               {user?.objectId &&
                 <IonButtons>
@@ -508,9 +508,10 @@ const player = useContext(Player);
               </IonAvatar>
               <div className='flex flex-col justify-start'>
                 <div className="flex items-center justify-start">
-                  <span className="w-full pl-3 font-medium text-md mobile:text-2xl">{userName}</span>
+                  <span className="w-full pl-3 font-bold text-md mobile:text-xl">{userName}</span>
                   <div className="block mobile:hidden" style={{zoom:.7}}>
                     <IonChip color="primary"
+                    
                     onClick={(e: any) => {
                         if (user?.objectId) {
                             presentStreak({
@@ -527,7 +528,7 @@ const player = useContext(Player);
                       }
                     >
                       {user?.objectId && <IonIcon icon={flame} color="primary" />}
-                      {user?.objectId ? <span className="font-black ">{user.currentStreak||0}</span> : <span className="font-medium ">Login</span>}
+                      {user?.objectId ? <span className="font-bold text-xl">{user.currentStreak||0}</span> : <span className="font-bold ">Login</span>}
                     </IonChip>   
                   </div>
                 </div>
@@ -542,7 +543,7 @@ const player = useContext(Player);
                       My Next Episode
                       <IonIcon size="small" icon={(user.nextEpisode?.publishedAt && user.nextEpisode?.publishedAt > Date.now())? timeOutline: arrowForward} slot="end" />
                     </div>
-                    <div className="flex items-center text-xs text-medium">
+                    <div className="flex items-center text-xs text-medium pb-1">
                       {`${resolveLangString(user.nextEpisode.book?.title, lang)} Ep ${user.nextEpisode.number}`}
                     </div>
                   </div>
@@ -569,7 +570,7 @@ const player = useContext(Player);
                     }
                     >
                     <IonIcon icon={user?.objectId ? flame : arrowForward} color="primary" />
-                    {user?.objectId ? <span className="font-black">{user.currentStreak||0}</span> : <span className="font-medium "  style={{minWidth: "50px"}}>Log in</span>}
+                    {user?.objectId ? <span className="font-bold text-xl">{user.currentStreak||0}</span> : <span className="font-bold "  style={{minWidth: "50px"}}>Log in</span>}
                   </IonChip>      
               </div>
               <div className="block mobile:hidden"></div>
@@ -820,14 +821,14 @@ const player = useContext(Player);
               </SwiperSlide>
               <SwiperSlide>
                 <div className="flex flex-col items-center w-full px-1 pb-8">
-                  {!user?.subscriptionId &&<h2 className="w-full text-3xl font-bold text-left dark:text-primary text-light">Get Godible Pro</h2>}
+                  {!user?.subscriptionId &&<h2 className="w-full text-3xl font-bold text-left dark:text-primary text-light">Upgrade to Godible Pro</h2>}
                   <div className='flex items-center justify-between w-full'>
                     <div className='flex items-center justify-between w-full'>
                       <div className='flex items-center justify-center space-x-2 text-lg font-medium'>
                         <span className='text-2xl font-bold'>{`$${Math.floor(donations[0]/100)}`}</span>
-                        <span className='text-sm text-medium'>{`from ${donations[1]} subscribers`}</span> 
+                        <span className='text-sm text-medium font-bold'>{`from ${donations[1]} subscribers`}</span> 
                       </div>
-                      <span className='text-sm font-medium text-medium'>
+                      <span className='text-sm font-medium text-medium font-bold'>
                         {`$${Math.floor(goal/100)/10}k ${thisMonth} goal `}<span className="hidden xs:inline">covers expenses</span>
                       </span>
                     </div>
@@ -880,11 +881,11 @@ const StreakDetails = ({currentStreak, maxStreak}) => {
     
     <IonContent className="ion-padding">
     <div className="flex flex-col items-center space-x-1">
-      <div className="flex items-center space-x-2 font-medium">
+      <div className="flex items-center space-x-2 font-bold">
         <IonIcon size="small" icon={flame} color="primary" />
           {`${currentStreak}-day Streak`}
       </div>
-      <div className="flex items-center space-x-1 text-medium">
+      <div className="flex items-center space-x-1 text-bold">
           {`${maxStreak}-day max streak`}
       </div>
     </div>
