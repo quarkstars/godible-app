@@ -24,7 +24,7 @@ import useEpisodes from 'hooks/useEpisodes'
 import useLists from 'hooks/useLists'
 import useTopics from 'hooks/useTopics'
 import { addCircleOutline, bulb, card, chevronDown, closeCircle, filter, grid, list, playCircle } from 'ionicons/icons'
-import React, {useRef, useState, useContext, useEffect, useMemo} from 'react'
+import React, {useRef, useState, useContext, useEffect, useMemo, useCallback} from 'react'
 import { SwiperSlide } from 'swiper/react'
 import { resolveLangString } from 'utils/resolveLangString'
 
@@ -83,23 +83,23 @@ const SearchPage = (props: ISearchPageProps) => {
   }, [topics, router.routeInfo.search]);
   
   //Set topic to the url param (keeping book param if it exists)
-  const topicClickHandler = (e, topic:ITopic) => {
+  const topicClickHandler = useCallback((e, topic: ITopic) => {
     e.preventDefault();
     const urlParams = new URLSearchParams(router.routeInfo.search)
     const bookSlug = urlParams.get("book");
     let bookParam = (bookSlug) ? `&book=${bookSlug}` : "";
     router.push(`${router.routeInfo.pathname}?topic=${topic.slug}${bookParam}`);
     setTopicFilter(topic);
-  }
+  }, [router, setTopicFilter]);
     //Set topic to the url param (keeping book param if it exists)
-    const removeTopicHandler = (e) => {
+    const removeTopicHandler = useCallback((e) => {
       e.preventDefault();
       const urlParams = new URLSearchParams(router.routeInfo.search)
       const bookSlug = urlParams.get("book");
       let bookParam = (bookSlug) ? `&book=${bookSlug}` : "";
       router.push(`${router.routeInfo.pathname}?${bookParam}`);
       setTopicFilter(undefined);
-    }
+    }, [router, setTopicFilter]);
 
 
   //Get books
@@ -124,23 +124,23 @@ const SearchPage = (props: ISearchPageProps) => {
   }, [books, router.routeInfo.search]);
   
   //Set book to the url param (keeping book param if it exists)
-  const bookClickHandler = (e, book:IBook) => {
+  const bookClickHandler = useCallback((e, book: IBook) => {
     e.preventDefault();
     const urlParams = new URLSearchParams(router.routeInfo.search)
     const topicSlug = urlParams.get("topic");
     let topicParam = (topicSlug) ? `&topic=${topicSlug}` : "";
     router.push(`${router.routeInfo.pathname}?book=${book.slug}${topicParam}`);
     setBookFilter(book);
-  }
-    //Set book to the url param (keeping book param if it exists)
-    const removeBookHandler = (e) => {
-      e.preventDefault();
+  }, [router, setBookFilter]);
+  //Set book to the url param (keeping book param if it exists)
+  const removeBookHandler = useCallback((e) => {
+    e.preventDefault();
       const urlParams = new URLSearchParams(router.routeInfo.search)
       const topicSlug = urlParams.get("topic");
       let topicParam = (topicSlug) ? `&topic=${topicSlug}` : "";
       router.push(`${router.routeInfo.pathname}?${topicParam}`);
       setBookFilter(undefined);
-    }
+    }, [router, setBookFilter]);
 
 
   //Focus search bar when entering the page
@@ -157,11 +157,11 @@ const SearchPage = (props: ISearchPageProps) => {
 
   //Search bar query
   const [search, setSearch] = useState<string|undefined>();
-  const searchChangeHandler = (e) => {
+  const searchChangeHandler = useCallback((e) => {
     const query = e.target.value as string|undefined;
     if (!query || query.length < 3) return setSearch(undefined);
     setSearch(query);
-  }
+  }, [setSearch]);
 
   const [max, setMax] = useState<number|undefined>();
   const [reachedMax, setReachedMax] = useState<boolean>(false);
@@ -289,7 +289,9 @@ const SearchPage = (props: ISearchPageProps) => {
 
   //Fetch more episodes
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
-  const fetchMoreEpisodes = async (e) => {
+  const [listIsLoadingMore, setListIsLoadingMore] = useState<boolean>(false);
+
+  const fetchMoreEpisodes = useCallback(async (e) => {
     e.preventDefault();
     // if (!max) return setReachedMax(true);
     const displayCount = 24 + ((skip||0)*24);
@@ -303,10 +305,9 @@ const SearchPage = (props: ISearchPageProps) => {
     const topicIds = topicFilter ? [topicFilter.objectId!] : undefined;
     await getEpisodes(undefined,{limit: 24, search, bookIds, topicIds, sort, skip: (skip||0)+1, exclude: ["text"]}, true);
     setIsLoadingMore(false);
-  }
+  }, [getEpisodes, search, bookFilter, topicFilter, max, skip, setReachedMax, setListIsLoadingMore]);
   //Fetch more Lists
-  const [listIsLoadingMore, setListIsLoadingMore] = useState<boolean>(false);
-  const fetchMoreLists = async (e) => {
+  const fetchMoreLists = useCallback(async (e) => {
     e.preventDefault();
     const displayCount = 24 + ((listSkip||0)*24);
     if (max && displayCount >= max)  {
@@ -319,9 +320,9 @@ const SearchPage = (props: ISearchPageProps) => {
     const topicId = topicFilter ? topicFilter.objectId! : undefined;
     await getLists(undefined, {search, bookId, topicId, limit: 24, sort, isSpeech: true, skip: (listSkip||0)+1, exclude: ["episodes.text", "episodes.quote", "episodes.metaData"] }, true);
     setListIsLoadingMore(false);
-  }
+  }, [getLists, search, bookFilter, topicFilter, max, listSkip, setReachedListMax, setListIsLoadingMore]);
   // Handle Episode Listen
-  const handleListenClick = (e, index: number) => {
+  const handleListenClick = useCallback((e, index: number) => {
     e.preventDefault();
     if (!episodes) return;
     if (episodes.length < 1) return;
@@ -335,8 +336,8 @@ const SearchPage = (props: ISearchPageProps) => {
       player.setList({episodes: newEpisodes});
       player.setIndex(newIndex);
       router.push(newEpisodes[newIndex]?._path!);
-  }
-  //Handle add to list
+    }, [episodes, player, router]);
+    //Handle add to list
   //List modal trigger
   const [inspectedEpisode, setInspectedEpisode] = useState<IEpisode|undefined>();
   const [presentList, dimissList] = useIonModal(ListModal, {
@@ -350,7 +351,7 @@ const SearchPage = (props: ISearchPageProps) => {
   
 
   // Handle Speech Listen
-  const handleSpeechClick = (e, index: number, epIndex = 0) => {
+  const handleSpeechClick = useCallback((e, index: number, epIndex = 0) => {
     e.preventDefault();
     if (!speeches) return;
     if (speeches.length < 1) return;
@@ -366,7 +367,7 @@ const SearchPage = (props: ISearchPageProps) => {
       player.setIndex(epIndex);
       if (list.episodes[epIndex]?._path) router.push(list.episodes[epIndex]._path!);
 
-  }
+    }, [speeches, player, router]);
 
   
   const [presentDisplay, dismissDisplay] = useIonPopover(EpisodeDisplay, {
