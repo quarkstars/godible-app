@@ -474,7 +474,7 @@ const player = useContext(Player);
                   overlayColor={"linear-gradient(90deg, rgba(97,219,146,.4) 0%, rgba(0,165,196,.2) 100%)"}
                   bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
                   preImageUrl={"/logo/godible-logo-white.png"}
-                  postText={"Try full Godible Pro access with a free account until June 30!"}
+                  postText={"Try full Godible Pro access with a free account until July 31"}
                   // postText={"Now available as an Android and iOS Phone App"}
                   isRounded
                 /> 

@@ -389,10 +389,10 @@ const SearchPage = (props: ISearchPageProps) => {
 
   
   useIonViewDidLeave(() => {
-    setBooks(undefined);
-    setLists(undefined);
-    setTopics(undefined);
-    setEpisodes(undefined);
+    // setBooks(undefined);
+    // setLists(undefined);
+    // setTopics(undefined);
+    // setEpisodes(undefined);
   });
 
   //Render Topic Cards

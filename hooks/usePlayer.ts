@@ -104,7 +104,8 @@ const usePlayer = ():IPlayer => {
         let audioPath = episode._audioPath;
         if (!audioPath)  {
             if (episode?.isForbidden) {
-                setMessage("Become a donor to access this audio");
+                // setMessage("Join Godible Plus to access this audio");
+                setMessage("Sign in to get free trial access to this audio");
             }
             else {
                 setMessage("Failed to load audio");

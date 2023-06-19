@@ -342,7 +342,7 @@ export const PlayerControls = () => {
                                             transition={{ scale: "easeInOut" }}
                                         >
                                             <span 
-                                                onClick={() => {if (player.message?.includes("donor")) {
+                                                onClick={() => {if (player.message?.includes("access")) {
                                                     userState.setReroutePath(router.routeInfo.pathname);
                                                     router.push("/profile?tab=donation")}
                                                 } 

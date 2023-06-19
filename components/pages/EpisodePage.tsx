@@ -387,13 +387,13 @@ useEffect(() => {
   }, [])
 
   useIonViewDidLeave(() => {
-    if (location.pathname.includes("episode")) return;
-    setEpisodes(undefined);
-    setLists(undefined);
-    setEpisode(undefined);
-    setAdjacentEpisodes([null, null])
+    // if (location.pathname.includes("episode")) return;
+    // setEpisodes(undefined);
+    // setLists(undefined);
+    // setEpisode(undefined);
+    // setAdjacentEpisodes([null, null])
 
-    if (!player.list?.episodes?.[player.index]?.audioPath && player.isVisible) player.setIsVisible(false);
+    // if (!player.list?.episodes?.[player.index]?.audioPath && player.isVisible) player.setIsVisible(false);
   });
 
 
@@ -611,7 +611,7 @@ useEffect(() => {
             }
           <Copyright />
           <div id="topics" className="flex flex-col items-center w-full p-8 py-4 rounded-lg bg-dark dark:bg-light">
-              {episode?.isForbidden && <h3 className="font-bold leading-relaxed text-center text-light dark:text-dark">Become a donor to access this episode</h3>}
+              {episode?.isForbidden && <h3 className="font-bold leading-relaxed text-center text-light dark:text-dark">Join Godible Pro to access this episode</h3>}
               <h4 className="pb-2 leading-relaxed text-center">{user?.subscriptionId ? `Godible is possible because of your support. Thank you.` : `Godible is possible because of the support of listeners like you`}</h4>
               {!user?.subscriptionId &&
               <div className="flex justify-center w-full">
@@ -621,7 +621,7 @@ useEffect(() => {
                     setReroutePath(router.routeInfo.pathname);
                     router.push("/subscription");
                   }}>
-                  Become a Donor
+                  Upgrade
                 </IonButton>
               </div>
               }

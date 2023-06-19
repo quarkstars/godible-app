@@ -254,7 +254,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding" ref={content}>
-        <h2 className="w-full text-center">Become a donor and get unlimited access</h2>
+        <h2 className="w-full text-center">Join Godible Pro to get unlimited access</h2>
         <Pricing 
           onClick={() => {
             if (props.router) {

@@ -14,7 +14,7 @@ import { IEpisode } from 'data/types'
 import useBooks from 'hooks/useBooks'
 import useEpisodes from 'hooks/useEpisodes'
 import { search } from 'ionicons/icons'
-import React, {useContext, useEffect, useState, useMemo} from 'react'
+import React, {useContext, useEffect, useState, useMemo, useCallback} from 'react'
 import { resolveLangString } from 'utils/resolveLangString'
 
 const BookPage:React.FC = () => {      
@@ -57,8 +57,8 @@ const BookPage:React.FC = () => {
       setGotoEpisodes(undefined);
   }, [location.pathname]);
   useIonViewDidLeave(() => {
-    setBooks(undefined);
-    setEpisodes(undefined);
+    // setBooks(undefined);
+    // setEpisodes(undefined);
   });
   
   const book = (books) ? books[0] : undefined;
@@ -78,8 +78,9 @@ const BookPage:React.FC = () => {
     episodes: gotoEpisodes,
     setEpisodes: setGotoEpisodes,
   } = useEpisodes();
+
   const [goto, setGoto] = useState<string>("")
-  const handleGoto = async (e, index: number) => {
+  const handleGoto =  useCallback(async (e, index: number) => {
     e.preventDefault();
     setGoto(e.detail.value)
     if (!episodes || !book || e.detail.value === "") return;
@@ -92,10 +93,10 @@ const BookPage:React.FC = () => {
     }
     let bookIds = (book) ? [book?.objectId] : undefined;
     await getGotoEpisodes(undefined, {limit: 1, bookIds, number: Number(e.detail.value)});
-}
+  }, [episodes, book, getGotoEpisodes, router]);
 
   // Handle Click
-  const handleListenClick = (e, index: number) => {
+  const handleListenClick = useCallback((e, index: number) => {
     e.preventDefault();
     if (!episodes) return;
     if (episodes.length < 1) return;
@@ -112,7 +113,7 @@ const BookPage:React.FC = () => {
       player.setList({episodes: newEpisodes});
       player.setIndex(newIndex);
       router.push(episodes[index]._path!);
-  }
+  }, [episodes, player, router]);
 
   useEffect(() => {
     if (!gotoEpisodes) return;
@@ -129,12 +130,12 @@ const BookPage:React.FC = () => {
   }, [episodes]);
 
 
-  const fetchMoreEpisodes = async (e) => {
+  const fetchMoreEpisodes = useCallback(async (e) => {
     e.preventDefault();
     let bookIds = (book) ? [book?.objectId] : undefined;
     await getEpisodes(undefined,{limit: 24, bookIds, sort: "-publishedAt", exclude: ["text"], skip: (skip||0)+1}, true);
     e.target.complete()
-  }
+  }, [book, getEpisodes, skip]);
   //List modal trigger
   const [inspectedEpisode, setInspectedEpisode] = useState<IEpisode|undefined>();
   const [presentList, dimissList] = useIonModal(ListModal, {
