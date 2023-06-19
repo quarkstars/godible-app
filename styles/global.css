@@ -244,14 +244,14 @@ input.InputElement {
 
 /* fonts and basic setup */
 * {
-  font-family: 'Inter', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,  sans-serif;
+  font-family: 'Helvetica Neue', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,  sans-serif;
   line-height: 1.5;
   box-sizing: border-box;
 }
 h1, h2, h3, h4, h5, h6, p, ion-label, ion-button, ion-item {
   color: #44585d;
 }
-.ion-label, .ion-button {
+ion-label,ion-button {
   font-weight: medium;
 }
 
@@ -274,6 +274,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700 !important;
+  text-rendering: optimizeLegibility;
 }
 .container {
   background-color: #fdfdfd;
