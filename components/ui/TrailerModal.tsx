@@ -64,7 +64,7 @@ const TrailerModal = (props: ISettingsModalProps) => {
             {/* <IonSpinner name="dots" slot="end" className="ion-padding" /> */}
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
+      <IonContent>
         <SlideList hasDots>
           <SwiperSlide>
             <div className="video-wrapper">

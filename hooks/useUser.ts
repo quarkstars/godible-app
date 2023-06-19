@@ -19,6 +19,7 @@ import {
     SignInWithAppleResponse,
     SignInWithAppleOptions,
   } from '@capacitor-community/apple-sign-in';
+import { App } from '@capacitor/app';
 
 // This is also where a non logged in user will store Language Preference, Volume and logically resolve when logging in 
 // where existing user language takes precedemce
@@ -131,6 +132,29 @@ const useUser = () => {
     //is Modal open, lets the back button
     const isModalOpen = useRef(false)
 
+
+    //Go back if android back button is pressed
+    useEffect(() => {
+        let backButtonListener;
+    
+        const addListenerAsync = async () => {
+            backButtonListener = await App.addListener('backButton', (data) => {
+                if (isModalOpen && isModalOpen.current) return;
+                if (router.current?.canGoBack()) router.current?.goBack();
+            });
+        };
+    
+        addListenerAsync();
+    
+        return () => {
+            // Clean up listener
+            if (backButtonListener) {
+                backButtonListener.remove();
+            }
+        };
+    }, []);
+
+    
     useEffect(() => {
         if (isPlatform('capacitor')) return;
         try {

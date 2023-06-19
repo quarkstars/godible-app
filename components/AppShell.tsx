@@ -21,6 +21,7 @@ import UserStateProvider from "./UserStateProvider";
  
 import {Elements} from "@stripe/react-stripe-js"
 import { loadStripe } from '@stripe/stripe-js';
+import { App } from "@capacitor/app";
 
 
 
@@ -84,6 +85,8 @@ const AppShell: React.FC = () => {
 
   const theme = useTheme();
   const player = usePlayer();
+
+
 
   return (
     <Elements stripe={stripePromise}>

@@ -5,7 +5,6 @@ import { arrowForward } from 'ionicons/icons';
 import React, { useContext, useEffect } from 'react'
 import InitialsAvatar from 'react-initials-avatar';
 import 'react-initials-avatar/lib/ReactInitialsAvatar.css';
-import { App } from '@capacitor/app';
 
 
 
@@ -21,25 +20,7 @@ const Toolbar = ({children}) => {
       const router = useIonRouter();
 
       if (userRouter) userRouter.current = router;
-    useEffect(() => {
-        let backButtonListener;
-    
-        const addListenerAsync = async () => {
-            backButtonListener = await App.addListener('backButton', (data) => {
-                if (isModalOpen && isModalOpen.current) return;
-                if (router.canGoBack()) router.goBack();
-            });
-        };
-    
-        addListenerAsync();
-    
-        return () => {
-            // Clean up listener
-            if (backButtonListener) {
-                backButtonListener.remove();
-            }
-        };
-    }, []);
+
     
 
     let userName = `${user?.firstName ? user?.firstName:""}${user?.lastName ? " "+user?.lastName:""}`

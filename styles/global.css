@@ -1,5 +1,5 @@
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Inter');
+  @import url('https://fonts.googleapis.com/css2?family=Lato');
 
 :root {
   --safe-area-top: env(safe-area-inset-top);
@@ -244,7 +244,7 @@ input.InputElement {
 
 /* fonts and basic setup */
 * {
-  font-family: 'Helvetica Neue', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,  sans-serif;
+  font-family:'Lato', 'Helvetica Neue',  -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,  sans-serif;
   line-height: 1.5;
   box-sizing: border-box;
 }
