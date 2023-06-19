@@ -201,7 +201,7 @@ const HomePage:React.FC = () => {
     if (!books) return;
     return books.map((book, index) => {
     return (
-      <SwiperSlide key={"lateps-"+book.objectId}>
+      <SwiperSlide key={"books-"+book.objectId}>
         <BookCard 
           size={bookWidth}
           book={book}
