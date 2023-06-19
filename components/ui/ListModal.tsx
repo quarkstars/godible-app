@@ -459,7 +459,7 @@ const ListModal = (props: IPlayerListModalProps) => {
           </IonButtons>
           </div>
           :
-            <span className="font-bold text-light dark:text-dark">
+            <span className="font-medium text-light dark:text-dark">
               {isLoading ? 
                 `Saving...`
               :
@@ -493,7 +493,7 @@ const ListModal = (props: IPlayerListModalProps) => {
             player.list?.episodes?.[player.index]?.objectId &&
             episode?.objectId === player.list?.episodes?.[player.index]?.objectId
           ) {
-            weight = (player.index === _index) ? "font-extrabold" : "font-bold";
+            weight = (player.index === _index) ? "font-bold" : "font-medium";
             highlight = (typeof index === "number" && player.index === _index) ? "light" : undefined;
             isCurrent = (typeof index === "number" && player.index === _index);
             isPlaying = (isCurrent && player.isPlaying)

@@ -51,13 +51,14 @@ export const BookCard = (props: IBookCardProps) => {
     return (
         <div 
             className={`flex flex-row flex-wrap items-stretch justify-center ${props.breakpoint ? props.breakpoint: "mobile"}:justify-start p-4 mobile:flex-row bg-dark dark:bg-light rounded-xl ${props.onClick ? "hover:opacity-80 cursor-pointer" : ""}`} 
+            style={{width: props.isFullWidth? "100%" : props.size}}
             onMouseEnter={()=>setHovering(true)}
             onMouseLeave={()=>setHovering(false)}
             onClick = {(e) => {
                 if (props.onClick) props.onClick(e);
             }}
         >
-            <motion.div className={`w-full overflow-hidden ${props.breakpoint ? props.breakpoint: "mobile"}:w-1/3 flex justify-center`} animate={controls} style={{maxWidth:"290px"}}>
+            <motion.div className={`w-full overflow-hidden ${props.breakpoint ? props.breakpoint: "mobile"}:w-1/3`} animate={controls} style={{maxWidth:"320px"}}>
                 <div className='w-full h-auto overflow-hidden rounded-lg'>
                     <img 
                         className="w-full"

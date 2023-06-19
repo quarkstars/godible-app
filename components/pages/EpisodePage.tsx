@@ -486,7 +486,7 @@ useEffect(() => {
             <div className='flex flex-wrap justify-center w-full -ml-3 xs:ml-0'>
               {(episode?._bookTitle && episode?._chapterName) && 
               <IonBreadcrumbs color="dark">
-                <IonBreadcrumb  className="font-bold" href={episode?._bookPath}>{episode?._bookTitle}</IonBreadcrumb>
+                <IonBreadcrumb href={episode?._bookPath}>{episode?._bookTitle}</IonBreadcrumb>
                 {episode && <IonBreadcrumb href={episode?._chapterPath}>{episode?._chapterName}</IonBreadcrumb>}
               </IonBreadcrumbs>
               }
