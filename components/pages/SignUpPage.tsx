@@ -91,8 +91,8 @@ const SignUpPage: React.FC = () => {
       </IonHeader>
 
       <IonContent>
-      <div className="flex flex-col items-center justify-center w-full min-h-full p-4 space-y-4 sm:bg-green-800">
-        <img src='/logo/godible-logo.png' className='w-40'></img>
+      <div className="flex flex-col items-center justify-center w-full min-h-full p-4 space-y-4" style={{background: "linear-gradient(90deg, rgba(97,219,146,1) 0%, rgba(0,165,196,1) 100%)"}}>
+        <img src='/logo/godible-logo-white.png' className='w-40'></img>
         {user?.objectId ?
           <LoggedInAlready />
         :

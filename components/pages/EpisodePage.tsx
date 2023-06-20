@@ -231,7 +231,7 @@ useEffect(() => {
     // If the user remains on the same episode for 2 minutes, assign the next episode to the user
 
     if (userRef.current?.objectId && adjacentEpisodes[1]) {
-      timer = setTimeout(() => {if (episode?.slug) saveNextEpisode(episode?.slug)}, 30000); // Assign the timeout to timer variable.
+      timer = setTimeout(() => {if (episode?.slug) saveNextEpisode(episode?.slug)}, 10000); // Assign the timeout to timer variable.
     }
   
     return () => {
@@ -699,11 +699,6 @@ useEffect(() => {
               </IonButton>
             </IonButtons>
             <IonTitle><span className="pr-10">Notes</span></IonTitle>
-            {/* <IonButtons slot="end">
-              <IonButton onClick={() => {}}>
-                <IonIcon icon={calendar} slot="icon-only" />
-              </IonButton>
-            </IonButtons> */}
           </IonToolbar>
         </IonHeader>
       <IonContent class="ion-padding">

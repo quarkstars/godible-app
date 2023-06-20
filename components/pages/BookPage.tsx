@@ -1,4 +1,5 @@
-import { IonButton, IonContent, IonFooter, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItemDivider, IonPage, IonSelect, IonSelectOption, IonSkeletonText, IonTitle, IonToolbar, useIonModal, useIonRouter, useIonViewDidEnter, useIonViewDidLeave } from '@ionic/react'
+import { App } from '@capacitor/app'
+import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonItemDivider, IonItemGroup, IonPage, IonSelect, IonSelectOption, IonSkeletonText, IonSpinner, IonTitle, IonToolbar, useIonModal, useIonRouter, useIonViewDidEnter, useIonViewDidLeave } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import { BookCard } from 'components/ui/BookCard'
@@ -13,7 +14,7 @@ import { userDefaultLanguage } from 'data/translations'
 import { IEpisode } from 'data/types'
 import useBooks from 'hooks/useBooks'
 import useEpisodes from 'hooks/useEpisodes'
-import { search } from 'ionicons/icons'
+import { close, reorderFour, search } from 'ionicons/icons'
 import React, {useContext, useEffect, useState, useMemo, useCallback} from 'react'
 import { resolveLangString } from 'utils/resolveLangString'
 
@@ -77,22 +78,25 @@ const BookPage:React.FC = () => {
     getEpisodes: getGotoEpisodes, 
     episodes: gotoEpisodes,
     setEpisodes: setGotoEpisodes,
+    isLoading: isLoadingGoto
   } = useEpisodes();
 
   const [goto, setGoto] = useState<string>("")
-  const handleGoto =  useCallback(async (e, index: number) => {
-    e.preventDefault();
-    setGoto(e.detail.value)
-    if (!episodes || !book || e.detail.value === "") return;
+  const handleGoto =  useCallback(async (episodeNumber: string) => {
+    setGoto(episodeNumber)
+    if (!episodes || !book || episodeNumber === "") return;
     let episode = episodes.find((ep) => {
-      return ep.number.toString() === e.detail.value;
+      return ep.number.toString() === episodeNumber;
     })
     if (episode) {
       router.push(episode._path!);
+      dismissGoto();
       return;
     }
     let bookIds = (book) ? [book?.objectId] : undefined;
-    await getGotoEpisodes(undefined, {limit: 1, bookIds, number: Number(e.detail.value)});
+    await getGotoEpisodes(undefined, {limit: 1, bookIds, number: Number(episodeNumber)});
+    dismissGoto();
+    
   }, [episodes, book, getGotoEpisodes, router]);
 
   // Handle Click
@@ -129,6 +133,15 @@ const BookPage:React.FC = () => {
     };
   }, [episodes]);
 
+  const [presentGoto, dismissGoto] = useIonModal(GotoEpisodeModel, {
+    onDismiss: (data: string, role: string) => {
+      dismissGoto(data, role); 
+      if (isModalOpen) isModalOpen.current = false;
+      },
+      count: book?.episodeCount,
+      onGoto: (episodeNumber: string) => {handleGoto(episodeNumber)},
+      episodeCount: book?.episodeCount,
+  });
 
   const fetchMoreEpisodes = useCallback(async (e) => {
     e.preventDefault();
@@ -175,19 +188,7 @@ const BookPage:React.FC = () => {
       />
     ));
   }, [episodes, handleListenClick]);
-  //Select options
-  const episodeSelectOptions = useMemo(() => {
-    const episodeCount = book?.episodeCount || 0;
-    return (<>
-      <IonSelectOption value=""></IonSelectOption>
-      { new Array(episodeCount).fill(undefined).map((item, index) => (
-        <IonSelectOption value={(index + 1).toString()} key={"select-" + index}>
-          {`Episode ${index + 1}`}
-        </IonSelectOption>
-      ))}
-    </>
-    )
-  }, [book]);
+
   
 
 
@@ -224,26 +225,24 @@ const BookPage:React.FC = () => {
                   <TextDivider>{`${book?.episodeCount ? book?.episodeCount +" ": ""}Episodes`}</TextDivider>
                   <div className="flex justify-between w-full">
                     <div className="flex items-center w-full space-x-2">
-                    <span className="pl-4 font-medium uppercase">Go</span>
-                    <IonSelect 
-                      value={goto} 
-                      interface="action-sheet" 
-                      placeholder=''
-                      onIonChange={(e)=>{
-                        if (typeof e.detail.value !== "string") return;
-                          handleGoto(e, Number(e.detail.value)-1);
+                    
+                    <IonButton 
+                      fill="clear"  
+                      onClick={() => {
+                        presentGoto();
                       }}
                     >
-                      {episodeSelectOptions}
-                    </IonSelect>
-                    </div>
+                      <IonIcon icon={reorderFour} slot="start" />
+                      Jump to Episode
+                    </IonButton>
+                  </div>
                   <IonButton fill="clear"  onClick={() => router.push(`/search?book=${book?.slug}`)}>
                     <IonIcon icon={search} slot="start" />
                     Search Book
                   </IonButton>
                   </div>
                   {episodeListItems}
-
+                
                   
                 {(!episodes && episodesIsLoading) && Array(12).fill(undefined).map((skel, index) => {
                     return (
@@ -271,5 +270,76 @@ const BookPage:React.FC = () => {
     </IonPage>
   )
 }
+
+
+
+const GotoEpisodeModel = ({onDismiss, episodeCount, onGoto, isLoading}) => {
+  const {isModalOpen} = useContext(UserState);
+  useEffect(() => {
+    let backButtonListener;
+    if (isModalOpen) isModalOpen.current = true;
+
+    const addListenerAsync = async () => {
+        backButtonListener = await App.addListener('backButton', (data) => {
+            onDismiss();
+        });
+    };
+
+    addListenerAsync();
+
+    return () => {
+        // Clean up listener
+        if (backButtonListener) {
+            backButtonListener.remove();
+        }
+        if (isModalOpen) isModalOpen.current = false;
+    };
+  }, []);
+
+  const [clickIndex, setClickIndex] = useState<number>();
+  const episodeList = useMemo(() => {
+      return new Array(episodeCount).fill(undefined).map((item, index) => (
+          <IonItem
+            button
+            onClick={()=> {
+                onGoto((index+1).toString());
+                setClickIndex(index);
+              }}
+            disabled={isLoading}
+            key={"ep"+index}
+          >
+          {`Episode ${index + 1}`}
+          {clickIndex === index && <IonSpinner slot="end"/>}
+          </IonItem>
+      ));
+  }, [episodeCount]);
+
+  return (
+    
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonButton color="medium" onClick={() => onDismiss(null, 'close')}>
+              <IonIcon icon={close} slot="icon-only"/>
+              {/* Default */}
+            </IonButton>
+          </IonButtons>
+          <div className="pr-10">
+          <IonTitle>Jump to Episode</IonTitle>
+          </div>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="ion-padding">
+        <IonItemGroup>
+          {episodeList}
+        </IonItemGroup>
+      </IonContent>
+    </IonPage>
+  )
+}
+
+
+
 
 export default BookPage

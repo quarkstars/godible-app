@@ -220,12 +220,12 @@ const Menu: React.FC = () => {
                   <>
                     <div className="h-full border-r dark:border-gray-800" />
                     <IonButton 
-                        routerLink={"/profile?tab=donation"}
+                        routerLink={"/profile?tab=pro"}
                         routerDirection="forward" 
                         fill="clear"
                         size="small" 
                       >
-                        <span className="text-medium">Subscribe</span>
+                        <span className="text-medium">Pro</span>
                     </IonButton>
                   </>
                   }

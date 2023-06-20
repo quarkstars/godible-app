@@ -47,8 +47,8 @@ const HomePage:React.FC = () => {
     setReappends,
     reappends
   } = useEpisodes();
-  const {getBooks, books, setBooks} = useBooks();
-  const {getTopics, topics, setTopics} = useTopics();
+  const {getBooks, books, setBooks, isLoading: isLoadingBooks} = useBooks();
+  const {getTopics, topics, setTopics, isLoading: isLoadingTopics} = useTopics();
   //Get episodes
   useIonViewWillEnter(() => {
     getEpisodes(undefined, {limit: 12, sort:"-publishedAt", exclude: ["text"]});
@@ -283,45 +283,63 @@ const HomePage:React.FC = () => {
 
         </SlideList>
         <div className="flex flex-col p-4 sm:p-10">
-          <div className="flex flex-row items-center w-full py-2 space-x-5">
-            <h2 className="py-0 my-0 text-lg xs:text-2xl">
-              Latest Episodes
-            </h2>
-            <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=episodes&init=0")}>
-              Show All
-            </IonButton>
-          </div>
+          {(!episodes && episodesIsLoading) && <IonSkeletonText  style={{width:"30%", height:"36px"}} />}
+          {episodes &&
+            <div className="flex flex-row items-center w-full py-2 space-x-5">
+              <h2 className="py-0 my-0 text-lg xs:text-2xl">
+                Latest Episodes
+              </h2>
+              <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=episodes&init=0")}>
+                Show All
+              </IonButton>
+            </div>
+          }
+          
           
           <SlideList isCarousel spaceBetween={5} setItemWidth={setEpisodeWidth} idealWidth={210}>
             {episodesList}
-            {(!episodes && !episodesIsLoading) && 
-            Array(6).fill(undefined).map((skel, index) => {
-              return (
-              <SwiperSlide key={"skeleton-"+index}>
-                <IonSkeletonText  style={{width:episodeWidth, height:"194px"}} />
-              </SwiperSlide>
-              )
-            })
+            {(!episodes && episodesIsLoading) && 
+              Array(6).fill(undefined).map((skel, index) => {
+                return (
+                <SwiperSlide key={"epskel-"+index}>
+                  <IonSkeletonText  style={{width:episodeWidth, height:"194px"}} />
+                </SwiperSlide>
+                )
+              })
             }
           </SlideList>
 
         </div>
         <div className="flex flex-col p-4 sm:p-10">
-          <div className="flex flex-row items-center w-full space-x-5">
-            <h2 className="py-0 my-0 mt-0 text-lg xs:text-2xl">
-              Topics
-            </h2>
-            <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=topics&init=0")}>
-              Show All
-            </IonButton>
-          </div>
-          
+          {(!topics && isLoadingTopics) && <IonSkeletonText  style={{width:"30%", height:"36px"}} />}
+          {topics && 
+            <div className="flex flex-row items-center w-full space-x-5">
+              <h2 className="py-0 my-0 mt-0 text-lg xs:text-2xl">
+                Topics
+              </h2>
+              <IonButton fill="clear" color="medium" onClick={() => router.push("/search?mode=topics&init=0")}>
+                Show All
+              </IonButton>
+            </div>
+          }
           <SlideList isCarousel spaceBetween={5} setItemWidth={setTopicWidth} idealWidth={180}>
             {topicsLists}
+
+            {(!topics && isLoadingTopics) && 
+              Array(6).fill(undefined).map((skel, index) => {
+                return (
+                <SwiperSlide key={"topicskel-"+index}>
+                  <IonSkeletonText  style={{width:episodeWidth, height:"194px"}} />
+                </SwiperSlide>
+                )
+              })
+            }
           </SlideList>
 
         </div>
         <div className="flex flex-col p-4 sm:p-10">
+          {(!books && isLoadingBooks) && <IonSkeletonText  style={{width:"30%", height:"36px"}} />}
+          {books &&
           <div className="flex flex-row items-center w-full space-x-5">
             <h2 className="py-0 my-0 text-lg xs:text-2xl">
               Books
@@ -330,9 +348,19 @@ const HomePage:React.FC = () => {
               Show All
             </IonButton>
           </div>
+          }
           
           <SlideList isCarousel spaceBetween={5} setItemWidth={setBookWidth} idealWidth={376}>
             {booksList}
+            {(!books && isLoadingBooks) && 
+              Array(6).fill(undefined).map((skel, index) => {
+                return (
+                <SwiperSlide key={"bookskel-"+index}>
+                  <IonSkeletonText  style={{width:episodeWidth, height:"194px"}} />
+                </SwiperSlide>
+                )
+              })
+            }
           </SlideList>
 
         </div>

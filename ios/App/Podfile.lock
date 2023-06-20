@@ -13,6 +13,8 @@ PODS:
     - Capacitor
   - CapacitorCommunityAppleSignIn (4.0.0):
     - Capacitor
+  - CapacitorCommunityKeepAwake (3.0.0):
+    - Capacitor
   - CapacitorCordova (4.3.0)
   - CapacitorPushNotifications (4.1.2):
     - Capacitor
@@ -35,6 +37,7 @@ DEPENDENCIES:
   - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
   - "CapacitorCamera (from `../../node_modules/@capacitor/camera`)"
   - "CapacitorCommunityAppleSignIn (from `../../node_modules/@capacitor-community/apple-sign-in`)"
+  - "CapacitorCommunityKeepAwake (from `../../node_modules/@capacitor-community/keep-awake`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorPushNotifications (from `../../node_modules/@capacitor/push-notifications`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
@@ -56,6 +59,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/camera"
   CapacitorCommunityAppleSignIn:
     :path: "../../node_modules/@capacitor-community/apple-sign-in"
+  CapacitorCommunityKeepAwake:
+    :path: "../../node_modules/@capacitor-community/keep-awake"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
   CapacitorPushNotifications:
@@ -71,6 +76,7 @@ SPEC CHECKSUMS:
   CapacitorApp: acd42fe8561fe751ad5b5f459aa85e6acd7bee24
   CapacitorCamera: 8e1f9eac46c6a0b7df5619d20f021d852ccaa99a
   CapacitorCommunityAppleSignIn: a9bd8eb7006e3556c59b624e7ad13f3b836e1f06
+  CapacitorCommunityKeepAwake: d0d94fed3cdd798f75687146f64e06dd4e811d81
   CapacitorCordova: 19a82a3b91fbeb9bdd049729551edc3cd7e5e648
   CapacitorPushNotifications: b59c99fb4041a4f2c450f9287d158cca48a788f0
   CapacitorStatusBar: e6cf2a9ed07f92ddae9ca101be36d08c61866b35
@@ -79,6 +85,6 @@ SPEC CHECKSUMS:
   GTMAppAuth: 0ff230db599948a9ad7470ca667337803b3fc4dd
   GTMSessionFetcher: 3a63d75eecd6aa32c2fc79f578064e1214dfdec2
 
-PODFILE CHECKSUM: a70f9e2cf248fbd8ad6e2013eb57dd2b70bd1036
+PODFILE CHECKSUM: d12090088cd755f734a58cdad4db53ab4ed9d06f
 
 COCOAPODS: 1.11.3

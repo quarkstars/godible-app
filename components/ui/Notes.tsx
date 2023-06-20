@@ -126,7 +126,7 @@ const Notes = (props: INotesProps) => {
                 }
             </div>
             {/* New Notes */}
-            {(isCreatingNewNote && !isUserNoteLoading && !reachedUserNoteMax) && 
+            {(isCreatingNewNote && !reachedUserNoteMax) && 
                 <NoteInput 
                     episode={episode} 
                     isLoading={isUserNoteLoading}

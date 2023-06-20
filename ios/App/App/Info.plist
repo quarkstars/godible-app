@@ -66,5 +66,11 @@
 	<string>Let Godible Access Your Photos</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>fetch</string>
+	</array>
 </dict>
 </plist>

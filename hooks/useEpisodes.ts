@@ -5,6 +5,7 @@ import { IEpisode } from 'data/types';
 import React, {useContext, useState, useRef, useEffect} from 'react'
 import { resolveLangString } from 'utils/resolveLangString';
 import { Player } from 'components/AppShell';
+import { isNumeric } from 'utils/isNumeric';
 
 
 //Construct useful strings based on episode data and append them to the episode
@@ -102,7 +103,7 @@ const useEpisodes = () => {
         const _speechTitle = resolveLangString(episode?.speechTitle, _lang);
         const _speechMetaDataBlocks:string[]|undefined = (speechMetaData) ? speechMetaData.split("\\n") : undefined;
         // const episodePath = "/episode/" + episode?.slug;
-        const number =  episode?.number;
+        let number =  episode?.number;
         let _bookTitle = resolveLangString(episode?.book?.title, _lang)
         //If bookTitle exists but not in user's language, use book's default language
         if (!_bookTitle && episode?.book?.title) _bookTitle = episode?.book.title[episode?.book.title.defaultLanguage];
@@ -122,6 +123,7 @@ const useEpisodes = () => {
         if (!_hasChapter && typeof episode?.chapterNumber === "string") {
             _hasChapter = true;
             _chapterName = episode?.chapterNumber
+            if (isNumeric(_chapterName)) _chapterName = "Chapter "+_chapterName
         }
         //TODO: Find a way to group chapters because chapter number is often too numerous...eh or maybe who cares?
         // let _chapterGroup = episode?.chapterNumber;

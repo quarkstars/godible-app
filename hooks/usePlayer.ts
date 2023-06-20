@@ -1,4 +1,4 @@
-import { UseIonRouterResult, useIonRouter } from '@ionic/react';
+import { UseIonRouterResult, isPlatform, useIonRouter } from '@ionic/react';
 //Used in AppShell to create a PlayerContext and interact with a consistent player while browsing the app
 
 import { IEpisode, IList } from 'data/types';
@@ -8,6 +8,9 @@ import { UserState, UserStateDefault } from 'components/UserStateProvider';
 import { IUserState } from './useUser';
 import { toIsoString } from 'utils/toIsoString';
 import useEpisodes from './useEpisodes';
+import { KeepAwake } from '@capacitor-community/keep-awake';
+
+
 
 interface IProgressBar {
     value: number,
@@ -75,6 +78,7 @@ const usePlayer = ():IPlayer => {
     //User needed to save position
     const userState = useRef<IUserState>(UserStateDefault);
     const { user } = userState.current;
+
 
     //User needed to save position
     const router = useRef<UseIonRouterResult|undefined>();
@@ -165,6 +169,35 @@ const usePlayer = ():IPlayer => {
     }, [_audio.current?.duration]);
     
     
+    //Keep awake while playing
+    const [canKeepAwake, setCanKeepAwake] = useState(false);
+    useEffect(() => {
+        const isSupported = async () => {
+            const result = await KeepAwake.isSupported();
+            setCanKeepAwake(result.isSupported);
+        };
+        if (isPlatform("capacitor")) isSupported();
+    }, [])
+    useEffect(() => {
+        if (!canKeepAwake) return;
+
+        const keepAwake = async () => {
+            await KeepAwake.keepAwake();
+        };
+        
+        const allowSleep = async () => {
+            await KeepAwake.allowSleep();
+        };
+        if (isPlaying) keepAwake();
+        else allowSleep();
+
+        // Return a cleanup function
+        return () => {
+            allowSleep();
+        }
+    }, [isPlaying]);
+
+
     //Keep volume updated
     const [volume, setVolume] = useState<number>(.75);
     useEffect(() => {

@@ -138,12 +138,25 @@ const useUser = () => {
         let backButtonListener;
     
         const addListenerAsync = async () => {
+            console.log("EXECUTED backbutton listener")
             backButtonListener = await App.addListener('backButton', (data) => {
                 if (isModalOpen && isModalOpen.current) return;
-                if (router.current?.canGoBack()) router.current?.goBack();
+
+            console.log("GOING BACK")
+                // if (router.current?.canGoBack()) {
+                //     router.current?.goBack();
+
+                //    backButtonListener.remove();
+                // }
             });
         };
-    
+        
+        // const resetBackButtonListener = async () => {
+        //     backButtonListener.remove();
+        //     addListenerAsync();
+        // }
+
+        console.log("CREATED backbutton listener")
         addListenerAsync();
     
         return () => {

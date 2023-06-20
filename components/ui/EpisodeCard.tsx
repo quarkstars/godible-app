@@ -44,7 +44,7 @@ export const EpisodeCard = (props: IEpisodeCardProps) => {
     return (
         <div 
             className='flex flex-col items-center justify-start py-4 cursor-pointer bg-dark dark:bg-light rounded-xl hover:opacity-80' 
-            style={{width: props.size, minHeight: "230px"}}
+            style={{width: props.size, minHeight: "220px"}}
             onMouseEnter={()=>setHovering(true)}
             onMouseLeave={()=>setHovering(false)}
             onClick={handleEpisodeClick}

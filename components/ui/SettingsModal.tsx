@@ -259,7 +259,8 @@ const SettingsModal = (props: ISettingsModalProps) => {
           onClick={() => {
             if (props.router) {
               setReroutePath(props.router.routeInfo.pathname);
-              props.router?.push("/subscription")
+              if (isPlatform("capacitor")) props.router?.push("/profile?tab=pro")
+              else props.router?.push("/subscription")
             }
             props.onDismiss()
           } } 

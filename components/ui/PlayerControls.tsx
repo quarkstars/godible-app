@@ -344,7 +344,7 @@ export const PlayerControls = () => {
                                             <span 
                                                 onClick={() => {if (player.message?.includes("access")) {
                                                     userState.setReroutePath(router.routeInfo.pathname);
-                                                    router.push("/profile?tab=donation")}
+                                                    router.push("/profile?tab=pro")}
                                                 } 
                                             }>
                                                     {player.message}

@@ -1,9 +1,11 @@
+import { App } from '@capacitor/app'
 import { IonAvatar, IonBackButton, IonButton, IonButtons, IonChip, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonMenuButton, IonPage, IonPopover, IonReorder, IonReorderGroup, IonRippleEffect, IonTabBar, IonTabButton, IonText, IonTitle, IonToolbar, ItemReorderEventDetail, isPlatform, useIonModal, useIonPopover, useIonRouter, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react'
 import { Player } from 'components/AppShell'
 import { UserState } from 'components/UserStateProvider'
 import Hero from 'components/ui/Hero'
 import ListListItem from 'components/ui/ListListItem'
 import ListModal from 'components/ui/ListModal'
+import PayInBrowserModal from 'components/ui/PayInBrowserModal'
 import { PlayerControls } from 'components/ui/PlayerControls'
 import Pricing from 'components/ui/Pricing'
 import SettingsModal from 'components/ui/SettingsModal'
@@ -15,7 +17,7 @@ import { userDefaultLanguage } from 'data/translations'
 import { IList } from 'data/types'
 import useDonation from 'hooks/useDonation'
 import useLists from 'hooks/useLists'
-import { arrowForward, calendar, card, cardOutline, documentText, chevronForward, checkmarkCircle, today, pencil, play, flame, settingsSharp, person, swapVertical, add, ban, closeCircle, timeOutline, logOutOutline, playCircle } from 'ionicons/icons'
+import { arrowForward, calendar, card, cardOutline, documentText, chevronForward, checkmarkCircle, today, pencil, play, flame, settingsSharp, person, swapVertical, add, ban, closeCircle, timeOutline, logOutOutline, playCircle, close } from 'ionicons/icons'
 import { list } from 'postcss'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import InitialsAvatar from 'react-initials-avatar';
@@ -80,8 +82,18 @@ const ProfilePage:React.FC = () => {
     isScrollToReminders,
     onLogout,
     router,
-    // isOnboarding: true,
 });
+
+
+const [presentPayInBrowser, dismissPayInBrowser] = useIonModal(PayInBrowserModal, {
+  onDismiss: (data: string, role: string) => {
+    dismissPayInBrowser(data, role); 
+    if (isModalOpen) isModalOpen.current = false;
+  },
+  router,
+});
+
+
 //Handle unsubsribe or reminder in url params
   const urlParams = new URLSearchParams(router.routeInfo.search)
   const emailParam = urlParams.get("unsubscribe");
@@ -266,7 +278,7 @@ const player = useContext(Player);
       case "lists":
         swiperRef.slideTo(1);
         break;
-      case "donation":
+      case "pro":
         swiperRef.slideTo(2);
         break;
     }  
@@ -470,7 +482,7 @@ const player = useContext(Player);
                   onClickMain={() => {player.togglePlayPause(false);router.push("/signup")}}
                   subButtonText={"Trailers"}
                   subButtonIcon={playCircle}
-                  onClickSub={() => {presentTrailer({})}}
+                  onClickSub={() => {presentTrailer({ initialBreakpoint: 0.65 });}}
                   overlayColor={"linear-gradient(90deg, rgba(97,219,146,.4) 0%, rgba(0,165,196,.2) 100%)"}
                   bgImageUrl={"/img/godible-bg.jpg"} //"/logo/godible.png"
                   preImageUrl={"/logo/godible-logo-white.png"}
@@ -597,7 +609,7 @@ const player = useContext(Player);
                     </IonButton>
                     <IonButton fill="clear" onClick={() => swiperRef.slideTo(2)}>
                       <div className="flex flex-col">
-                        <span className="text-md mobile:text-lg">Subscription</span>
+                        <span className="text-md mobile:text-lg">Pro</span>
                         {(tabIndex === 2) &&
                           <div className="w-full h-0.5 bg-primary rounded-full"></div>
                         }
@@ -847,7 +859,9 @@ const player = useContext(Player);
                       color="primary" 
                       onClick={() => {player.togglePlayPause(false);
                         setReroutePath(undefined);
-                        router.push("/subscription")}
+                        if (isPlatform("capacitor")) presentPayInBrowser({ initialBreakpoint: 0.35 });
+                        else router.push("/subscription")
+                      }
                       }
                       >
                         Subscribe
@@ -859,7 +873,8 @@ const player = useContext(Player);
                     onClick={() => {
                       setReroutePath(undefined);
                       player.togglePlayPause(false);
-                      router.push("/subscription")
+                      if (isPlatform("capacitor")) presentPayInBrowser({ initialBreakpoint: 0.35 });
+                      else router.push("/subscription")
                     }} 
                     />
                 </div>
@@ -945,5 +960,9 @@ const unsubscribePopOver = ({onDismiss, email, isSuccess}) => {
   </IonContent>  
   )
 }
+
+
+
+
 
 export default ProfilePage
