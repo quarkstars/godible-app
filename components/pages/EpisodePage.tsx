@@ -472,7 +472,7 @@ useEffect(() => {
                         animate={{ height: "auto", opacity: 1}}
                         exit={{opacity: 0,  height: 0}}
                       >
-                      <div className="p-3 font-serif text-xl font-bold leading-relaxed text-white dark:text-white px-10">
+                      <div className="p-3 px-10 font-serif text-xl font-bold leading-relaxed text-center text-white balance dark:text-white">
                         {quote}
                       </div>
                       </motion.div>
@@ -483,7 +483,7 @@ useEffect(() => {
             </div>
           </div>
         </div>
-        <div className="flex justify-center px-1 py-4 width-full">  
+        <div className="flex justify-center px-1 py-4 width-full selectable">  
           <div className="justify-center px-2" style={{ maxWidth: "768px"}}> 
             <div className='flex flex-wrap justify-center w-full -ml-3 xs:ml-0'>
               {(episode?._bookTitle && episode?._chapterName) && 
@@ -595,7 +595,7 @@ useEffect(() => {
             </div>    
             
             {episode?.isFirstSpeechEpisode && episode?._speechTitle && 
-                <h1 className="w-full pb-2 text-left text-light dark:text-dark font-bold">{episode._speechTitle.toUpperCase()}</h1>
+                <h1 className="w-full pb-2 font-bold text-left text-light dark:text-dark">{episode._speechTitle.toUpperCase()}</h1>
              } 
             {episode?.isFirstSpeechEpisode && episode?._speechMetaDataBlocks && 
             <div className="pb-6">

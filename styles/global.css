@@ -50,6 +50,14 @@ body.dark {
   display: none;
 }
 
+.selectable {
+  -moz-user-select: text;
+  -khtml-user-select: auto;
+  -webkit-user-select: auto ;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+
 /*STRIPE INPUT DARK */
 input.InputElement {
   color: #FFFFFF !important;
@@ -496,6 +504,10 @@ ion-item.selected {
 
   zoom: 1.8;
   filter: drop-shadow(1px 0px 2px rgb(0 0 0 / 1));
+}
+
+.balance {
+  text-wrap: balance;
 }
 
 /* END SWIPER JS */

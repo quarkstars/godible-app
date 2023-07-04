@@ -81,7 +81,7 @@ const {
                       </p>
                     }
                     {title &&
-                    <h2 className="max-w-5xl mb-6 font-sans text-5xl font-bold leading-none tracking-tight text-center text-white dark:text-white md:8xl xs:text-6xl sm:text-7xl sm:mx-auto text-shadow">
+                    <h2 className="max-w-5xl balance mb-6 font-sans text-5xl font-bold leading-none tracking-tight text-center text-white dark:text-white md:8xl xs:text-6xl sm:text-7xl sm:mx-auto text-shadow">
                       {title}
                     </h2>
                     }
@@ -91,7 +91,7 @@ const {
                     </div>
                     }
                     {subtitle &&
-                    <p className={`font-serif  text-white text-md mobile:text-lg dark:text-white xs:text-2xl ${isQuote ? "text-left xs:text-center pl-3" : "text-center"}`} style={{marginTop: isQuote ? "-15px" : "0px"}}>
+                    <p className={`balance font-serif text-white text-md mobile:text-lg dark:text-white xs:text-2xl text-center`} style={{marginTop: isQuote ? "-15px" : "0px"}}>
                       {`${subtitle}${isQuote?"”":""}`}
                     </p>
                     }
