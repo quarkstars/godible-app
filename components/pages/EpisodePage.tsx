@@ -317,6 +317,8 @@ useEffect(() => {
       if (line[1] === "#") hCount=2;
       if (line[2] === "#") hCount=3;
       if (line[3] === "#") hCount=4;
+      const hasBreak = line.includes('<br>');
+      line = line.replace(/<br>/g, '');
       if (/^\d+\s/.test(line)) {
         line = line.replace(/^(\d+)\s/, '$1\u00A0\u00A0');
       }
@@ -373,6 +375,9 @@ useEffect(() => {
             <p
               className={`leading-relaxed ${paddingSize} ${fontStyle} ${fontSize} ${fontContrast}`}
               key={episode?.objectId+index}
+              style={{
+                paddingBottom: hasBreak ? '0' : undefined
+              }}
             >
               {segments}
             </p>
