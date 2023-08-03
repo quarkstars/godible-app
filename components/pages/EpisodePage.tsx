@@ -20,6 +20,7 @@ import useLists from 'hooks/useLists'
 import useNotes from 'hooks/useNotes'
 import { useParams } from 'react-router'
 import { resolveLangString } from 'utils/resolveLangString'
+import SectionDivider from 'components/ui/SectionDivider'
 
 
 
@@ -333,7 +334,10 @@ useEffect(() => {
         return segment.replace(/#/g,'');
       });
   
-      switch (hCount) {
+      if (line.trim() === "* * *" || line.trim() === "***" ) {
+        return <SectionDivider key={'divider'+index} />
+      } 
+      else switch (hCount) {
         case 1:
           return(
             <h1
@@ -611,6 +615,8 @@ useEffect(() => {
               })}
             </div>
             }
+            
+            <SectionDivider />
             {(episode && episode.text) ? 
                 episodeText
               :
