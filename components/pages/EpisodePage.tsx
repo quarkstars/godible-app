@@ -616,7 +616,6 @@ useEffect(() => {
             </div>
             }
             
-            <SectionDivider />
             {(episode && episode.text) ? 
                 episodeText
               :
