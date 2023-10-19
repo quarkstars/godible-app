@@ -990,7 +990,8 @@ const ProfilePage: React.FC = () => {
                   <div className="w-full h-8 p-1 overflow-hidden bg-gray-200 border rounded-lg dark:bg-gray-600">
                     <div
                       className="bg-primary flex justify-center items-center p-0.5 h-6 rounded-md text-xs font-medium leading-none overflow-hidden text-dark"
-                      style={{ width: `${meter}%` }}
+                      // style={{ width: `${meter}%` }}
+                      style={{ width: `33%` }}
                     ></div>
                   </div>
                   <h5 className="w-full text-left">
