@@ -204,7 +204,6 @@ const EpisodePage: React.FC = () => {
     getEpisodes(undefined, { slug: currentSlug, token });
   }, [player.list?.episodes?.[player.index], router.routeInfo]);
 
-  //Update the episode when episodes is updated
   useEffect(() => {
     if (!episodes) return;
     setEpisode(episodes[0]);
