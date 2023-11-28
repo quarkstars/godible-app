@@ -391,7 +391,7 @@ const EpisodePage: React.FC = () => {
           return segment.replace(/#/g, '');
         });
 
-        // Split line into segments based on <centerbold> tags
+        // <centerbold> tags
         segments = line.split(/(<centerbold>.*?<\/centerbold>)/g).map((segment, i) => {
           // If segment is an <centerbold> tag, replace it with JSX <span> tag
           if (/^<centerbold>.*<\/centerbold>$/.test(segment)) {
