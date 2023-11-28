@@ -393,7 +393,6 @@ const EpisodePage: React.FC = () => {
 
         // <centerbold> tags
         segments = line.split(/(<centerbold>.*?<\/centerbold>)/g).map((segment, i) => {
-          // If segment is an <centerbold> tag, replace it with JSX <span> tag
           if (/^<centerbold>.*<\/centerbold>$/.test(segment)) {
             return (
               <p key={i} className="w-full text-xl font-bold text-center">
