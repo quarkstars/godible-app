@@ -374,7 +374,7 @@ const EpisodePage: React.FC = () => {
         if (/^\d+\s/.test(line)) {
           line = line.replace(/^(\d+)\s/, '$1\u00A0\u00A0');
         }
-
+  
         // Split line into segments based on <em> tags
         let segments = line.split(/(<em>.*?<\/em>)/g).map((segment, i) => {
           // If segment is an <em> tag, replace it with JSX <span> tag
@@ -385,25 +385,25 @@ const EpisodePage: React.FC = () => {
               </span>
             );
           }
-
+  
           // Else return the segment as is
           return segment.replace(/#/g, '');
         });
-
+  
         // <centerbold> tags
-        segments = line.split(/(<centerbold>.*?<\/centerbold>)/g).map((segment, i) => {
-          if (/^<centerbold>.*<\/centerbold>$/.test(segment)) {
+        segments = segments.map((segment, i) => {
+          if (typeof segment === 'string' && /^<centerbold>.*<\/centerbold>$/.test(segment)) {
             return (
               <p key={i} className="w-full text-xl font-bold text-center">
                 {segment.replace(/<\/?centerbold>/g, '')}
               </p>
             );
           }
-
+  
           // Else return the segment as is
-          return segment.replace(/#/g, '');
+          return segment;
         });
-
+  
         if (line.trim() === '* * *' || line.trim() === '***') {
           return <SectionDivider key={'divider' + index} />;
         } else
