@@ -115,12 +115,12 @@ const useEpisodes = () => {
 
         //Chapter Name
         let _hasChapter = (typeof episode?.chapterNumber === "number")
-        let _chapterName = "";
-        // let _chapterName = (_hasChapter) ? `${text["Chapter"][_lang]} ${episode?.chapterNumber}` : undefined;
-        // if (_chapterName && episode?.chapterName) _chapterName = _chapterName + ": " + episode?.chapterName;
-        // else if (episode?.chapterName) _chapterName = episode?.chapterName[_lang];
+        // let _chapterName = "";
+        let customChapterName = episode?.chapterName?.[_lang];
+        let _chapterName = (customChapterName) ? customChapterName : episode?.chapterNumber;
+
         
-        if (!_hasChapter && typeof episode?.chapterNumber === "string") {
+        if (!_hasChapter && typeof episode?.chapterNumber === "string" && !customChapterName) {
             _hasChapter = true;
             _chapterName = episode?.chapterNumber
             if (isNumeric(_chapterName)) _chapterName = "Chapter "+_chapterName
