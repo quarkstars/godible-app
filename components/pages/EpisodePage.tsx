@@ -403,6 +403,21 @@ const EpisodePage: React.FC = () => {
           // Else return the segment as is
           return segment;
         });
+
+        // <center> tags
+        segments = segments.map((segment, i) => {
+          if (typeof segment === 'string' && /^<center>.*<\/center>$/.test(segment)) {
+            return (
+              <p key={i} className={`w-full text-center mt-4 leading-relaxed ${paddingSize} ${fontStyle} ${fontSize} ${fontContrast}`}>
+                {segment.replace(/<\/?center>/g, '')}
+              </p>
+            );
+          }
+
+          // Else return the segment as is
+          return segment;
+        });
+        
   
         if (line.trim() === '* * *' || line.trim() === '***') {
           return <SectionDivider key={'divider' + index} />;
