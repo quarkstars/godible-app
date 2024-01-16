@@ -418,6 +418,19 @@ const EpisodePage: React.FC = () => {
           return segment;
         });
         
+        // <centeritalic> tags
+        segments = segments.map((segment, i) => {
+          if (typeof segment === 'string' && /^<centeritalic>.*<\/centeritalic>$/.test(segment)) {
+            return (
+              <p key={i} className={`w-full text-center italic mt-4 leading-relaxed ${paddingSize} ${fontStyle} ${fontSize} ${fontContrast}`}>
+                {segment.replace(/<\/?centeritalic>/g, '')}
+              </p>
+            );
+          }
+
+          // Else return the segment as is
+          return segment;
+        });
   
         if (line.trim() === '* * *' || line.trim() === '***') {
           return <SectionDivider key={'divider' + index} />;
