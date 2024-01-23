@@ -404,13 +404,27 @@ const EpisodePage: React.FC = () => {
           return segment;
         });
 
-        // <center> tags
+        // <centeritalic> tags
         segments = segments.map((segment, i) => {
           if (typeof segment === 'string' && /^<center>.*<\/center>$/.test(segment)) {
             return (
-              <p key={i} className={`w-full text-center mt-4 leading-relaxed ${paddingSize} ${fontStyle} ${fontSize} ${fontContrast}`}>
+              <span key={i} className={`w-full block text-center leading-relaxed ${paddingSize} ${fontStyle} ${fontSize} ${fontContrast}`}>
                 {segment.replace(/<\/?center>/g, '')}
-              </p>
+              </span>
+            );
+          }
+
+          // Else return the segment as is
+          return segment;
+        });
+
+        // <center> tags
+        segments = segments.map((segment, i) => {
+          if (typeof segment === 'string' && /^<centeritalic>.*<\/centeritalic>$/.test(segment)) {
+            return (
+              <span key={i} className={`w-full block text-center italic -my-2 leading-relaxed ${paddingSize} ${fontStyle} ${fontSize} ${fontContrast}`}>
+                {segment.replace(/<\/?centeritalic>/g, '')}
+              </span>
             );
           }
 
@@ -418,19 +432,7 @@ const EpisodePage: React.FC = () => {
           return segment;
         });
         
-        // <centeritalic> tags
-        segments = segments.map((segment, i) => {
-          if (typeof segment === 'string' && /^<centeritalic>.*<\/centeritalic>$/.test(segment)) {
-            return (
-              <p key={i} className={`w-full text-center italic mt-4 leading-relaxed ${paddingSize} ${fontStyle} ${fontSize} ${fontContrast}`}>
-                {segment.replace(/<\/?centeritalic>/g, '')}
-              </p>
-            );
-          }
 
-          // Else return the segment as is
-          return segment;
-        });
   
         if (line.trim() === '* * *' || line.trim() === '***') {
           return <SectionDivider key={'divider' + index} />;
