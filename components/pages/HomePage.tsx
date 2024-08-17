@@ -420,7 +420,7 @@ const HomePage: React.FC = () => {
             </SlideList>
           </div>
         </div>
-        <Copyright />
+        <div className="w-full px-5"><Copyright /></div>
       </IonContent>
       <IonFooter>
         <PlayerControls />
