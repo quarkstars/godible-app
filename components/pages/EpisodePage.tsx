@@ -374,7 +374,7 @@ const EpisodePage: React.FC = () => {
         if (/^\d+\s/.test(line)) {
           line = line.replace(/^(\d+)\s/, '$1\u00A0\u00A0');
         }
-  
+
         // Split line into segments based on <em> tags
         let segments = line.split(/(<em>.*?<\/em>)/g).map((segment, i) => {
           // If segment is an <em> tag, replace it with JSX <span> tag
@@ -385,11 +385,11 @@ const EpisodePage: React.FC = () => {
               </span>
             );
           }
-  
+
           // Else return the segment as is
           return segment.replace(/#/g, '');
         });
-  
+
         // <centerbold> tags
         segments = segments.map((segment, i) => {
           if (typeof segment === 'string' && /^<centerbold>.*<\/centerbold>$/.test(segment)) {
@@ -399,12 +399,12 @@ const EpisodePage: React.FC = () => {
               </p>
             );
           }
-  
+
           // Else return the segment as is
           return segment;
         });
 
-        // <centeritalic> tags
+        // <center> tags
         segments = segments.map((segment, i) => {
           if (typeof segment === 'string' && /^<center>.*<\/center>$/.test(segment)) {
             return (
@@ -418,7 +418,7 @@ const EpisodePage: React.FC = () => {
           return segment;
         });
 
-        // <center> tags
+        // <centeritalic> tags
         segments = segments.map((segment, i) => {
           if (typeof segment === 'string' && /^<centeritalic>.*<\/centeritalic>$/.test(segment)) {
             return (
@@ -431,9 +431,21 @@ const EpisodePage: React.FC = () => {
           // Else return the segment as is
           return segment;
         });
-        
 
-  
+        // <right> tags
+        segments = segments.map((segment, i) => {
+          if (typeof segment === 'string' && /^<right>.*<\/right>$/.test(segment)) {
+            return (
+              <span key={i} className="w-full block text-right">
+                {segment.replace(/<\/?right>/g, '')}
+              </span>
+            );
+          }
+
+          // Else return the segment as is
+          return segment;
+        });
+
         if (line.trim() === '* * *' || line.trim() === '***') {
           return <SectionDivider key={'divider' + index} />;
         } else
