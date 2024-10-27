@@ -202,11 +202,9 @@ const useUser = () => {
     //Get Current User
     const getCurrentUser = async function (): Promise<IUser> {
         setIsLoading(true);
-        console.log("GET CURRENT USER")
         try {
             const currentUser: Parse.User|undefined|null = await Parse.User.current();
             if (currentUser) {
-                console.log("FOUND USER")
                 await currentUser.fetch();
                 const currentUserJSON = currentUser.toJSON();
                 setUser(currentUserJSON);
