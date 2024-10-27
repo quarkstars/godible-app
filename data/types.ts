@@ -115,6 +115,8 @@ export interface IEpisode extends ParseObjectToJson {
     speechMetaData?: ILangString,
     isFirstSpeechEpisode?: boolean,
     speechTitle?: ILangString,
+    isVideo?: boolean,
+    videoPath?: ILangString, 
     // duration?: number,
 
     isForbidden?: boolean, 
@@ -136,6 +138,7 @@ export interface IEpisode extends ParseObjectToJson {
     _speechTitle?: string,
     _quote?: string,
     _audioPath?: string,
+    _videoPath?: string,
 
 
 }

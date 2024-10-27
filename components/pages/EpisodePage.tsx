@@ -69,6 +69,7 @@ import useNotes from 'hooks/useNotes';
 import { useParams } from 'react-router';
 import { resolveLangString } from 'utils/resolveLangString';
 import SectionDivider from 'components/ui/SectionDivider';
+import ReactPlayer from 'react-player';
 
 const EpisodePage: React.FC = () => {
   const {
@@ -82,7 +83,9 @@ const EpisodePage: React.FC = () => {
   } = useContext(UserState);
   const lang = user?.language ? user.language : userDefaultLanguage;
   const player = useContext(Player);
+  console.log("PLAYER", player.isPlaying)
   const router = useIonRouter();
+
 
   //Modal
   const [presentSettings, dimissSettings] = useIonModal(SettingsModal, {
@@ -634,11 +637,9 @@ const EpisodePage: React.FC = () => {
             </div>
             <div className="flex flex-wrap justify-center w-full pb-8">
               <div
-                className={`rounded-md p-2 flex justify-center items-start ${
-                  !episode ? 'py-6' : ''
-                } ${showMeta ? 'bg-gray-100 dark:bg-gray-800' : ''} ${
-                  episode?._metaDataBlocks && episode?._metaDataBlocks.length > 1 ? 'w-full' : ''
-                }`}
+                className={`rounded-md p-2 flex justify-center items-start ${!episode ? 'py-6' : ''
+                  } ${showMeta ? 'bg-gray-100 dark:bg-gray-800' : ''} ${episode?._metaDataBlocks && episode?._metaDataBlocks.length > 1 ? 'w-full' : ''
+                  }`}
               >
                 <motion.div
                   className="overflow-hidden rounded-md pointer-cursor"
@@ -781,17 +782,31 @@ const EpisodePage: React.FC = () => {
               </div>
             )}
 
+            <div className="w-full rounded-lg overflow-hidden">
+              <ReactPlayer
+                url="https://res.cloudinary.com/dcgw7rsyo/video/upload/v1728755336/PSWM_Masterclass_message_ihfozw.mp4"
+                controls
+                width="100%"
+                light="https://res.cloudinary.com/dcgw7rsyo/image/upload/c_thumb,h_250,w_250/The%20Life%20and%20Mission%20of%20Jesus%20Christ%2016.jpg"
+                playing={player.isPlaying}
+                onClickPreview={() => {player.togglePlayPause(true)}}
+                onStart={() => player.togglePlayPause(true)}
+                onDuration={(seconds) => {player.setDuration(seconds)}}
+                onPause={() => {if (player.isPlaying) player.togglePlayPause(false)}}
+                onEnded={() => {if (player.isPlaying) player.togglePlayPause(false)}}
+              />
+            </div>
             {episode && episode.text
               ? episodeText
               : new Array(20).fill(undefined).map((item, index) => {
-                  return (
-                    <IonSkeletonText
-                      key={'skel-' + index}
-                      animated={true}
-                      style={{ width: '100%' }}
-                    ></IonSkeletonText>
-                  );
-                })}
+                return (
+                  <IonSkeletonText
+                    key={'skel-' + index}
+                    animated={true}
+                    style={{ width: '100%' }}
+                  ></IonSkeletonText>
+                );
+              })}
             <Copyright />
             <div
               id="topics"
@@ -844,7 +859,7 @@ const EpisodePage: React.FC = () => {
                   fill="clear"
                   disabled={
                     adjacentEpisodes[1]?.publishedAt &&
-                    adjacentEpisodes[1]?.publishedAt > Date.now()
+                      adjacentEpisodes[1]?.publishedAt > Date.now()
                       ? true
                       : false
                   }
@@ -857,7 +872,7 @@ const EpisodePage: React.FC = () => {
                   <IonIcon
                     icon={
                       adjacentEpisodes[1]?.publishedAt &&
-                      adjacentEpisodes[1]?.publishedAt > Date.now()
+                        adjacentEpisodes[1]?.publishedAt > Date.now()
                         ? timeOutline
                         : arrowForward
                     }

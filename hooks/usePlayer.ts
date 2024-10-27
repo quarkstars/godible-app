@@ -72,8 +72,10 @@ const usePlayer = ():IPlayer => {
 
     const [list, setList] = useState<IList|undefined>();
     const [index, setIndex] = useState<number>(0);
-    const _audio = useRef(new Audio()) 
+    const _audio = useRef(new Audio());
     const [isAutoPlay, setIsAutoPlay] = useState<boolean>(false);
+    // TODO: PROD set to true
+    const [isVideoEpisode, setIsVideoEpisode] = useState<boolean>(true);
 
     //User needed to save position
     const userState = useRef<IUserState>(UserStateDefault);
@@ -88,6 +90,7 @@ const usePlayer = ():IPlayer => {
     //Check if the audio is actually synced correctly
     const doubleCheckCurrentTime= useRef<number|undefined>();
     const doubleCheckTime = (pastTime: number) => {
+        if (isVideoEpisode) return;
         // if (typeof doubleCheckCurrentTime.current !== "number") return;
         // if (isPlaying && pastTime === doubleCheckCurrentTime.current) {setIsPlaying(false);}
         // else if (!isPlaying && pastTime < doubleCheckCurrentTime.current) {setIsPlaying(true);}
@@ -149,8 +152,19 @@ const usePlayer = ():IPlayer => {
 
         // return () => {if (timer) clearTimeout(timer);}
     }
+
+
+
     useEffect(() => {
-        initializeAudio();
+        if (!list?.episodes || typeof index !== "number") return;
+        const episode = list?.episodes[index] as IEpisode;
+        if (!episode) return
+        if (episode.isVideo) {
+            setIsVideoEpisode(true);
+        } else {
+            // setIsVideoEpisode(false);
+            initializeAudio();
+        }
     }, [_audio.current, list?.episodes, index]);
 
 
@@ -163,6 +177,7 @@ const usePlayer = ():IPlayer => {
     //Keep duration updated when available
     const [duration, setDuration] = useState<number|undefined>();
     useEffect(() => {
+        if (isVideoEpisode) return;
         const audio = _audio.current;
         if (!audio?.duration) return setDuration(undefined);
         if (audio?.duration) setDuration(audio.duration);
@@ -250,6 +265,7 @@ const usePlayer = ():IPlayer => {
     }
     useEffect(() => {
 
+        if (isVideoEpisode) return;
         //save Listening and Position every 10 seconds
         if (user?.objectId && duration && !isNaN(duration) && currentSeconds > savedSeconds.current + 10) {
             let episode = list?.episodes[index];
@@ -302,6 +318,13 @@ const usePlayer = ():IPlayer => {
 
 
     const togglePlayPause = (setIsPlay?: boolean) => {
+        // video control
+        if (isVideoEpisode) {
+            if (setIsPlay !== undefined) setIsPlaying(setIsPlay);
+            else setIsPlaying(prev => !prev);
+            return;
+        }
+        // audio control
         const audio = _audio.current;
         if (!audio || !audio.src) return;
         if (setIsPlay) return audio.play();
@@ -318,6 +341,7 @@ const usePlayer = ():IPlayer => {
     const [ticked, setTicked] = useState<number>(0);
     const [isSeeking, setIsSeeking] = useState<boolean>(false);
     useEffect(() => {
+        if (isVideoEpisode) return;
         const audio = _audio.current;
         //Automatically move value only if playing and the user is not seeking
         if (audio && isPlaying && !isSeeking) {
