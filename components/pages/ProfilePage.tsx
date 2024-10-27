@@ -584,7 +584,7 @@ const ProfilePage: React.FC = () => {
                   }
                   bgImageUrl={'/img/godible-bg.jpg'} //"/logo/godible.png"
                   preImageUrl={'/logo/godible-logo-white.png'}
-                  postText={'Sign in to try Godible Pro until July 31!'}
+                  // postText={'Sign in to try Godible Pro until July 31!'}
                   // postText={"Now available as an Android and iOS Phone App"}
                   isRounded
                 />
