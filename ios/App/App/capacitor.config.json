@@ -26,5 +26,14 @@
 			]
 		}
 	},
-	"cordova": {}
+	"cordova": {},
+	"packageClassList": [
+		"SignInWithApple",
+		"KeepAwakePlugin",
+		"AppPlugin",
+		"CAPCameraPlugin",
+		"PushNotificationsPlugin",
+		"StatusBarPlugin",
+		"GoogleAuth"
+	]
 }
