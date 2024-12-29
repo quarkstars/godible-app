@@ -601,7 +601,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
         </IonItem>
         <IonItem> 
             <IonIcon icon={mail} slot="start" />
-            <IonLabel>{`Email ${user?.isEmailOn ? "on": "off"}`}</IonLabel>
+            <IonLabel>{`Email Reminders`}</IonLabel>
             {user.lastEmailResponse && 
               <IonIcon 
                 size="small" 
@@ -636,7 +636,8 @@ const SettingsModal = (props: ISettingsModalProps) => {
             />
         </IonItem>
         }
-        <IonItem> 
+        {/* Text messages are disabled until further notice */}
+        {/* <IonItem> 
             <IonIcon icon={chatbox} slot="start" />
             
             <IonLabel>{`Text message ${user?.isTextOn ? "on": "off"}`}</IonLabel>
@@ -659,7 +660,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 if (user?.objectId) updateUser({isTextOn: e.detail.checked})
               }}
             />
-        </IonItem>
+        </IonItem> */}
         <IonItem > 
             {/* <IonLabel slot="start">Mobile</IonLabel> */}
             <div className="flex justify-start w-full ml-10">

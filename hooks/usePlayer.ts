@@ -1,13 +1,12 @@
-import { UseIonRouterResult, isPlatform, useIonRouter } from '@ionic/react';
+import { UseIonRouterResult, isPlatform } from '@ionic/react';
 //Used in AppShell to create a PlayerContext and interact with a consistent player while browsing the app
 
 import { IEpisode, IList } from 'data/types';
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Pointer } from 'parse';
-import { UserState, UserStateDefault } from 'components/UserStateProvider';
+import { UserStateDefault } from 'components/UserStateProvider';
 import { IUserState } from './useUser';
 import { toIsoString } from 'utils/toIsoString';
-import useEpisodes from './useEpisodes';
 import { KeepAwake } from '@capacitor-community/keep-awake';
 
 

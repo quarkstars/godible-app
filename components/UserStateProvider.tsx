@@ -13,6 +13,8 @@ export const UserStateDefault = {
   getCurrentUser: () => null,
   isOnboarding: false,
   setIsOnboarding: () => null,
+  isFirstTimeVisitor: false,
+  setIsFirstTimeVisitor: () => null,
 
   //SIGN UP 
   signUpError: undefined,

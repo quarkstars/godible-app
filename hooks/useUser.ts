@@ -39,6 +39,8 @@ export interface IUserState {
     setNotice: React.Dispatch<SetStateAction<INotice | undefined>>,
     isOnboarding: boolean,
     setIsOnboarding: React.Dispatch<SetStateAction<boolean>>,
+    isFirstTimeVisitor: boolean,
+    setIsFirstTimeVisitor: React.Dispatch<SetStateAction<boolean>>,
 
     //UPDATE
     updateUser: (update: IUser) => Promise<IUser>,
@@ -121,10 +123,11 @@ const useUser = () => {
     const [notice, setNotice] = useState<INotice|undefined>();
 
     //Loading State, waiting for server response
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     
-    //Loading State, waiting for server response
-    const [isOnboarding, setIsOnboarding] = useState<any>();
+    // Onboarding state
+    const [isOnboarding, setIsOnboarding] = useState<boolean>(false);
+    const [isFirstTimeVisitor, setIsFirstTimeVisitor] = useState<boolean>(true);
 
     const router = useRef<UseIonRouterResult|undefined>();
 
@@ -138,11 +141,9 @@ const useUser = () => {
         let backButtonListener;
     
         const addListenerAsync = async () => {
-            console.log("EXECUTED backbutton listener")
             backButtonListener = await App.addListener('backButton', (data) => {
                 if (isModalOpen && isModalOpen.current) return;
 
-            console.log("GOING BACK")
                 // if (router.current?.canGoBack()) {
                 //     router.current?.goBack();
 
@@ -156,7 +157,6 @@ const useUser = () => {
         //     addListenerAsync();
         // }
 
-        console.log("CREATED backbutton listener")
         addListenerAsync();
     
         return () => {
@@ -209,6 +209,7 @@ const useUser = () => {
                 const currentUserJSON = currentUser.toJSON();
                 setUser(currentUserJSON);
                 setIsLoading(false);
+                setIsFirstTimeVisitor(false);
                 return currentUserJSON;
             }
         } catch (err) {
@@ -237,7 +238,7 @@ const useUser = () => {
     //Get Current User
     useEffect(() => {
         if (!Parse) return;
-        if (user?.objectId) return;
+        if (user?.objectId) return setIsLoading(false);
         getCurrentUser();
     }, [Parse]);
 
@@ -409,7 +410,6 @@ const useUser = () => {
 
         try {
             setIsLoading(true);
-            console.log("APPLE LOGIN WITH", appleUser)
             currentUser = await currentUser.linkWith('apple',
                 {authData: {
                     clientId: 'com.hsa.godible',
@@ -774,6 +774,8 @@ const useUser = () => {
         getCurrentUser,
         isOnboarding,
         setIsOnboarding,
+        isFirstTimeVisitor,
+        setIsFirstTimeVisitor,
 
    
         //SIGN UP
