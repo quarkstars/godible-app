@@ -93,17 +93,17 @@ const Pricing = ({onClick}) => {
                     <IonIcon icon={checkmarkCircle} color="primary" size="small" />
                 </div>
                     <span><span className="inline font-bold">Full access to all episodes</span> 
-                    <span className="block text-sm">1200+ episodes with 200+ speeches & 6 Holy Books</span>
+                    <span className="block text-sm">1500+ episodes with 200+ speeches & 9 Holy Books</span>
                 </span>
                 </li>
 
-                <li className="flex items-start text-gray-600 dark:text-gray-200">
+                {/* <li className="flex items-start text-gray-600 dark:text-gray-200">
                 <div className="w-6 pt-1 pr-2">
                     <IonIcon icon={checkmarkCircle} color="primary" size="small" />
                 </div>
 
                 Text daily reminders
-                </li>                          
+                </li>                           */}
                 <li className="flex items-start text-gray-600 dark:text-gray-200">
                 <div className="w-6 pt-1 pr-2">
                     <IonIcon icon={checkmarkCircle} color="medium" size="small" />

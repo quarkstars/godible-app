@@ -47,18 +47,41 @@ import useNotes from 'hooks/useNotes';
 import { UserState } from 'components/UserStateProvider';
 import { TopicCard } from 'components/ui/TopicCard';
 import ListModal from 'components/ui/ListModal';
+import TutorialVideoModal from 'components/ui/TutorialVideoModal';
 import { resolveLangString } from 'utils/resolveLangString';
 import { userDefaultLanguage } from 'data/translations';
 
 const HomePage: React.FC = () => {
   const router = useIonRouter();
 
-  const { user, isModalOpen, isLoading } = useContext(UserState);
+  const { user, isModalOpen, isLoading, isFirstTimeVisitor, setIsFirstTimeVisitor } = useContext(UserState);
 
   const lang = user?.language ? user.language : userDefaultLanguage;
   const [episodeWidth, setEpisodeWidth] = useState<number>(148);
   const [topicWidth, setTopicWidth] = useState<number>(148);
   const [bookWidth, setBookWidth] = useState<number>(376);
+
+  // Show Welcome if not logged in and not visited before
+  const [presentWelcomeModal, dismissWelcomeModal] = useIonModal(TutorialVideoModal, {
+    onDismiss: (data: string, role: string) => {
+      dismissWelcomeModal(data, role);
+      if (isModalOpen) isModalOpen.current = false;
+    },
+    onClick: () => {
+      player.togglePlayPause(false);
+      router.push('/signup');
+      setIsFirstTimeVisitor(false);
+    },
+    router,
+    
+  });
+  useEffect(() => {
+    if (!isLoading && !Object.keys(user||{}).length && isFirstTimeVisitor) {
+      setIsFirstTimeVisitor(false);
+      presentWelcomeModal();
+    }
+  }, [user, isLoading]);
+
 
   const player = useContext(Player);
   const {

@@ -1,19 +1,26 @@
-import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonNote, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail, UseIonRouterResult, useIonPopover } from '@ionic/react'
+import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonNote, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail, UseIonRouterResult, useIonPopover, useIonRouter } from '@ionic/react'
 import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send, sync, camera, logOutOutline, closeCircle } from 'ionicons/icons';
 import React, {useContext, useEffect} from 'react'
 import { UserState } from 'components/UserStateProvider';
-import { SwiperSlide } from 'swiper/react';
-import SlideList from './SlideList';
 import { App } from '@capacitor/app';
+import { Player } from 'components/AppShell';
 
-interface ISettingsModalProps {
+interface TutorialVideoModalProps {
   onDismiss: (data?: string | null | undefined | number, role?: string) => void;
+  onClick?: () => void;
+  isMobile?: boolean;
+  router?: UseIonRouterResult;
   
 }
 
-const TrailerModal = (props: ISettingsModalProps) => {
+const TutorialVideoModal = (props: TutorialVideoModalProps) => {
 
-  
+  const {
+    onClick,
+    isMobile,
+    router,
+  } = props
+
   const {
     isModalOpen,
   } = useContext(UserState);
@@ -49,28 +56,39 @@ const TrailerModal = (props: ISettingsModalProps) => {
             </IonButton>
           </IonButtons>
           <div className="pr-10">
-          <IonTitle>Watch Trailers</IonTitle>
+          <IonTitle><strong>Welcome to the NEW Godible!</strong></IonTitle>
           </div>
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <SlideList hasDots>
-          <SwiperSlide>
-            <div className="video-wrapper">
+          <div className="video-wrapper">
               <iframe src="https://www.youtube.com/embed/aptk_auyQcY" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+          </div>
+          {onClick ?
+            <div className="ion-padding">
+                <div className="flex mt-4 -ml-5 sm:ml-0 justify-center items-center flex-col">
+                  <IonText>Get started with your current Godible email</IonText>
+                  <IonButton fill="solid" color="primary" onClick={(e) => {
+                      if (onClick) {
+                        onClick();
+                        props.onDismiss();
+                      }
+                  }}>
+                    Create Your Account
+                  </IonButton>
+                </div>
             </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="video-wrapper">
-              <iframe src="https://www.youtube.com/embed/AlEmobLlavo" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="video-wrapper">
-              <iframe src="https://www.youtube.com/embed/wIsTYXlzJ_c" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
-            </div>
-          </SwiperSlide>
-        </SlideList>
+          : 
+          <div className="ion-padding">
+              <div className="flex mt-4 -ml-5 sm:ml-0 justify-center items-center flex-col">
+                <IonButton fill="clear" onClick={(e) => {
+                      props.onDismiss();
+                }}>
+                  Okay, Got it!
+                </IonButton>
+              </div>
+          </div>
+          }
       </IonContent>
     </IonPage>
   )
@@ -80,4 +98,4 @@ const TrailerModal = (props: ISettingsModalProps) => {
 
 
 
-export default TrailerModal
+export default TutorialVideoModal
