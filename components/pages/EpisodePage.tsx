@@ -539,9 +539,10 @@ const EpisodePage: React.FC = () => {
         return newNotes;
       });
     } else { 
-    setUserNotes(prev => {
-      return [newNote!, ...(prev || [])];
-    });}
+      setUserNotes(prev => {
+        return [newNote!, ...(prev || [])];
+      });
+    }
   }
 
   async function handleDeleteNote(objectId: string) {
