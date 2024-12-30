@@ -874,6 +874,10 @@ const ProfilePage: React.FC = () => {
                     )}
                     <IonIcon size="small" icon={pencil} slot="icon-only" />
                   </button>
+                  <IonButton fill="clear" className="mt-2" onClick={() => presentGamification()} > 
+                  <IonIcon size="small" icon={leaf} slot="start" />
+                    My Vitality
+                  </IonButton>
                 </div>
               </SwiperSlide>
               <SwiperSlide>
