@@ -97,14 +97,14 @@ const useEpisodes = () => {
         const _bookImageUrl = episode?.book?.thumbUrl || episode?.book?.imageUrl;
         const _authorImageUrl = episode?.book?.authorImageUrl;
         const _bookPath = (episode?.book?.slug) ? "/book/" + episode?.book?.slug : undefined;
-        const metaData = resolveLangString(episode?.metaData, _lang);
+        const metaData = resolveLangString(episode?.metaData, _lang)[0];
         const _metaDataBlocks:string[]|undefined = (metaData) ? metaData.split("\\n") : undefined;
-        const speechMetaData = resolveLangString(episode?.speechMetaData, _lang);
-        const _speechTitle = resolveLangString(episode?.speechTitle, _lang);
+        const speechMetaData = resolveLangString(episode?.speechMetaData, _lang)[0];
+        const _speechTitle = resolveLangString(episode?.speechTitle, _lang)[0];
         const _speechMetaDataBlocks:string[]|undefined = (speechMetaData) ? speechMetaData.split("\\n") : undefined;
         // const episodePath = "/episode/" + episode?.slug;
         let number =  episode?.number;
-        let _bookTitle = resolveLangString(episode?.book?.title, _lang)
+        let _bookTitle = resolveLangString(episode?.book?.title, _lang)[0]
         //If bookTitle exists but not in user's language, use book's default language
         if (!_bookTitle && episode?.book?.title) _bookTitle = episode?.book.title[episode?.book.title.defaultLanguage];
         let _title = `${text["Episode"][_lang]} ${number}`;
@@ -127,15 +127,14 @@ const useEpisodes = () => {
         }
         //TODO: Find a way to group chapters because chapter number is often too numerous...eh or maybe who cares?
         // let _chapterGroup = episode?.chapterNumber;
-        // if (episode?.chapterName?.english && episode?.chapterName?.english?.length > 0) _chapterGroup = resolveLangString(episode?.chapterName, _lang)
+        // if (episode?.chapterName?.english && episode?.chapterName?.english?.length > 0) _chapterGroup = resolveLangString(episode?.chapterName, _lang)[0]
         let _chapterPath = (_hasChapter) ? _bookPath+"?chapter="+episode?.chapterNumber : _bookPath;
 
         //Text
-        const textInLanguage = resolveLangString(episode?.text, _lang); 
+        const [textInLanguage, hasLangText] = resolveLangString(episode?.text, _lang); 
         const _textBlocks:string[] = (textInLanguage) ? textInLanguage.split("\\n") : [];
-        const _quote = resolveLangString(episode?.quote, _lang); 
-        const _audioPath = resolveLangString(episode?.audioPath, _lang);
-
+        const _quote = resolveLangString(episode?.quote, _lang)[0]; 
+        const [_audioPath, hasLangAudio] = resolveLangString(episode?.audioPath, _lang);
         
         return {
             ...episode,
@@ -156,12 +155,15 @@ const useEpisodes = () => {
             _audioPath,
             _speechTitle,
             _speechMetaDataBlocks,
+            hasLangText,
+            hasLangAudio,
         };
     }
     
     //When the user changes their language, if episodes exists, redo the episode setrings
     const [reappends, setReappends] = useState(0)
     useEffect(() => {
+
         if (!user?.language) return;
 
         if (episodes && reappends < 2) {

@@ -726,7 +726,7 @@ const ProfilePage: React.FC = () => {
                           />
                         </div>
                           <div className="flex items-center pb-1 text-sm break-words">
-                            {`${resolveLangString(user.nextEpisode.book?.title, lang)} Ep ${user.nextEpisode.number}`}
+                            {`${resolveLangString(user.nextEpisode.book?.title, lang)[0]} Ep ${user.nextEpisode.number}`}
                           </div>
                       </div>
                     </IonButton>

@@ -138,8 +138,8 @@ export interface IEpisode extends ParseObjectToJson {
     _speechTitle?: string,
     _quote?: string,
     _audioPath?: string,
-
-
+    hasLangAudio?: boolean,
+    hasLangText?: boolean,
 }
 
 export interface ILangString {
