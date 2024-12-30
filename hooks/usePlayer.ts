@@ -8,6 +8,7 @@ import { UserStateDefault } from 'components/UserStateProvider';
 import { IUserState } from './useUser';
 import { toIsoString } from 'utils/toIsoString';
 import { KeepAwake } from '@capacitor-community/keep-awake';
+import { flame } from 'ionicons/icons';
 
 
 
@@ -76,7 +77,7 @@ const usePlayer = ():IPlayer => {
 
     //User needed to save position
     const userState = useRef<IUserState>(UserStateDefault);
-    const { user } = userState.current;
+    const { user, pointNotice, postPoint } = userState.current;
 
 
     //User needed to save position
@@ -158,6 +159,7 @@ const usePlayer = ():IPlayer => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [timeTilNext, setTimeTilNext] = useState<number|undefined>();
     const [currentSeconds, setCurrentSeconds] = useState(0);
+    const [completedEpisodeIds, setCompletedEpisodeIds] = useState<string[]>([]);
     
     //Keep duration updated when available
     const [duration, setDuration] = useState<number|undefined>();
@@ -242,7 +244,14 @@ const usePlayer = ():IPlayer => {
     const listenedSeconds = useRef<number>(0);
     const postListening = async (params) => {
         try {
-             const listening = await  Parse.Cloud.run("postListening", params);
+             const result = await  Parse.Cloud.run("postListening", params);
+             if (result?.message && user.isGamificationOn) {
+                 let message = result.message;
+                 if (result.streak && !message.includes("streak")) message += ` (day ${result.streak})`; ;
+                 if (result.amount) message += `. +${result.amount} vitality!`;
+                 const newLevel = (result.isNewLevel) ? result.levelName : null;
+                 pointNotice(message, flame, newLevel);
+             };
             } catch (err) {
                 console.error(err)
             }
@@ -280,6 +289,11 @@ const usePlayer = ():IPlayer => {
             listenedSeconds.current += 10;
             savedSeconds.current = currentSeconds;
             postListening({listening, position});
+            const completedBefore = completedEpisodeIds.includes(episode.objectId);
+            if (isComplete &&  !completedBefore) {
+                setCompletedEpisodeIds(prevEpisodeIds => [...prevEpisodeIds, episode.objectId]);
+                postPoint("Listen");
+            }
             //Invalidate position of episode when first fetched because the user has listened to another position
             if (!invalidPositionEpisodeIds.current.includes(episode.objectId)) {
                 invalidPositionEpisodeIds.current = [...invalidPositionEpisodeIds.current, episode.objectId]

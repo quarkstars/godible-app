@@ -7,7 +7,7 @@ import useEpisodes from './useEpisodes';
 
 const useNotes = () => {
 
-    const {user} = useContext(UserState);
+    const {user, postPoint} = useContext(UserState);
     const [error, setError] = useState<any>();
     const [isLoading, setIsLoading] = useState<boolean>();
     const [notes, setNotes] = useState<INote[]|undefined>();
@@ -87,6 +87,7 @@ const useNotes = () => {
             const month = date.slice(0, 7);  
 
             newNote = await Parse.Cloud.run("postNote", {...note, date, month, user:userPointer, episode:episodePointer});
+            if (newNote?.objectId) postPoint("Note");
 
             setError(undefined);
         } catch (error) { 
@@ -105,7 +106,11 @@ const useNotes = () => {
         try {
             if (!noteFeedback) return;        
 
-            await Parse.Cloud.run("postNoteFeedback", noteFeedback);
+            const result = await Parse.Cloud.run("postNoteFeedback", noteFeedback);
+            console.log("result", result, noteFeedback);
+            if (result?.note?.isPublic && noteFeedback?.isHearted) {
+                postPoint("Heart");
+            }
 
             setError(undefined);
         } catch (error) { 
