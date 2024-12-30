@@ -290,7 +290,7 @@ const usePlayer = ():IPlayer => {
             savedSeconds.current = currentSeconds;
             postListening({listening, position});
             const completedBefore = completedEpisodeIds.includes(episode.objectId);
-            if (isComplete &&  !completedBefore) {
+            if (isComplete && !completedBefore && episode?.objectId) {
                 setCompletedEpisodeIds(prevEpisodeIds => [...prevEpisodeIds, episode.objectId]);
                 postPoint("Listen");
             }
