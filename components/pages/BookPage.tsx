@@ -197,7 +197,7 @@ const BookPage:React.FC = () => {
       <IonHeader>
         <Toolbar>
           <IonTitle>
-            {resolveLangString(book?.title, lang) || ""}
+            {resolveLangString(book?.title, lang)[0] || ""}
           </IonTitle>
         </Toolbar>
       </IonHeader>

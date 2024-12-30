@@ -66,7 +66,7 @@ export const TopicCard = (props: ITopicCardProps) => {
                 onClick={(e) => {handleTopicClick(e)}}
             >
                 <motion.div animate={controls} className="flex justify-center w-full">
-                    <span className="w-full px-2 text-xl font-bold text-center text-white">{resolveLangString(topic.name, lang)}</span>
+                    <span className="w-full px-2 text-xl font-bold text-center text-white">{resolveLangString(topic.name, lang)[0]}</span>
                 </motion.div>
         </Thumbnail>
       </div>

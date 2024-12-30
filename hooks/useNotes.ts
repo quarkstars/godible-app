@@ -11,6 +11,7 @@ const useNotes = () => {
     const [error, setError] = useState<any>();
     const [isLoading, setIsLoading] = useState<boolean>();
     const [notes, setNotes] = useState<INote[]|undefined>();
+    const [lastGetTime, setLastGetTime] = useState<number>(0);
 
     //Gets all notes by default will be user's notes, otherwise query public notes based on key: value
     //Here is where you can get a note of speeches

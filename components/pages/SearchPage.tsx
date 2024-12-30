@@ -358,7 +358,7 @@ const SearchPage = (props: ISearchPageProps) => {
       //Change speech to list
       let speech = speeches[index];
       const list: IList = {
-        name: resolveLangString(speech?.title, lang),
+        name: resolveLangString(speech?.title, lang)[0],
         episodes: speech.episodes,
         description: speech.description,
       };
@@ -415,7 +415,10 @@ const SearchPage = (props: ISearchPageProps) => {
 
   //Episode List Component
   const episodeListItems = useMemo(() => {
-    if (!episodes || display === "quote" || display === "card") return;
+    if (display === "quote" || display === "card") return;
+
+    
+    if (!episodes || !episodes?.length) return <span className="w-full text-medium text-center text-xs">No episodes found</span>
   
     return episodes.map((_episode, index) => {
       let episode = _episode;
@@ -509,7 +512,7 @@ const SearchPage = (props: ISearchPageProps) => {
 
   //Speech List Item
   const speechListItems = useMemo(() => {
-    if (!speeches) return;
+    if (!speeches || !speeches?.length) return <span className="w-full text-medium text-center text-xs">No speeches found</span>
   
     return speeches.map((speech, index) => (
       <SpeechListItem
@@ -568,7 +571,7 @@ const SearchPage = (props: ISearchPageProps) => {
                     <span className="text-sm italic text-medium">By Book</span>
                     {bookFilter ?
                       <IonChip outline onClick={(e) => removeBookHandler(e)}>
-                        <IonLabel>{resolveLangString(bookFilter.title, lang)}</IonLabel>
+                        <IonLabel>{resolveLangString(bookFilter.title, lang)[0]}</IonLabel>
                         <IonIcon icon={closeCircle}></IonIcon>
                       </IonChip>
                       :
@@ -590,7 +593,7 @@ const SearchPage = (props: ISearchPageProps) => {
                               key={book.objectId} 
                               value={book.objectId}
                             >
-                              {resolveLangString(book.title, lang)}
+                              {resolveLangString(book.title, lang)[0]}
                             </IonSelectOption>
                             )
                           })
@@ -606,7 +609,7 @@ const SearchPage = (props: ISearchPageProps) => {
                       <span className="text-sm italic text-medium">By Topic</span>
                       {topicFilter ?
                         <IonChip outline onClick={(e) => removeTopicHandler(e)}>
-                          <IonLabel>{resolveLangString(topicFilter.name, lang)}</IonLabel>
+                          <IonLabel>{resolveLangString(topicFilter.name, lang)[0]}</IonLabel>
                           <IonIcon icon={closeCircle}></IonIcon>
                         </IonChip>
                       :
@@ -628,7 +631,7 @@ const SearchPage = (props: ISearchPageProps) => {
                               key={topic.objectId} 
                               value={topic.objectId}
                             >
-                              {resolveLangString(topic.name, lang)}
+                              {resolveLangString(topic.name, lang)[0]}
                             </IonSelectOption>
                             )
                           })
