@@ -551,7 +551,7 @@ const SearchPage = (props: ISearchPageProps) => {
           placeholder={'Search...'} 
           debounce={500} 
           mode={'ios'} 
-          onIonChange={(e)=>{searchChangeHandler(e)}}
+          onIonInput={(e)=>{searchChangeHandler(e)}}
         />
 
       </IonToolbar>

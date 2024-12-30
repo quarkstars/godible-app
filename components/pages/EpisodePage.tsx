@@ -201,7 +201,7 @@ const EpisodePage: React.FC = () => {
     const urlParams = new URLSearchParams(router.routeInfo.search);
     const tokenParam = urlParams.get('token');
     const token = tokenParam ? tokenParam : undefined;
-    getEpisodes(undefined, { slug: currentSlug, token });
+    if (episode?.[0]?.slug !== currentSlug) getEpisodes(undefined, { slug: currentSlug, token });
   }, [player.list?.episodes?.[player.index], router.routeInfo]);
 
   useEffect(() => {
@@ -892,6 +892,7 @@ const EpisodePage: React.FC = () => {
             ) : (
               <></>
             )}
+             <Notes episode={episode} isTitleHidden />
           </div>
         </div>
       </IonContent>
@@ -918,7 +919,7 @@ const EpisodeNotes = ({ onDismiss, notes, episode }) => {
         </IonToolbar>
       </IonHeader>
       <IonContent class="ion-padding">
-        <Notes isTitleHidden episode={episode} />
+        <Notes isTitleHidden episode={episode} autoFocus />
         <div className="pb-40"></div>
       </IonContent>
     </IonPage>

@@ -46,7 +46,8 @@ const GamificationModal = (props: IGamificationModalProps) => {
 
   const [dailyPoints, setDailyPoints] = useState<IPoint[]>();
   const availableActions = useMemo(() => {
-    const availableActions = actions.filter(action => !action.streakMin || (action.streakMin && currentStreak >= action.streakMin && currentStreak < (action?.streakMax || Infinity)));
+    const currentStreakOr1 = currentStreak || 1;
+    const availableActions = actions.filter(action => !action.streakMin || (action.streakMin && currentStreakOr1 >= action.streakMin && currentStreakOr1 < (action?.streakMax || Infinity)));
     if (dailyPoints) availableActions.forEach(action => {
       const actionPoints = dailyPoints.filter(dp => dp.action === action.name)
       if (actionPoints.length) {
@@ -59,7 +60,6 @@ const GamificationModal = (props: IGamificationModalProps) => {
 
   // get points on load
   const getPoints = async () => {
-    console.log('getPoints')
     try {
       const result = await Parse.Cloud.run("getPoints");
       setDailyPoints(result);

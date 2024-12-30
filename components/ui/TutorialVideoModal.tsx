@@ -1,5 +1,5 @@
 import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonNote, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail, UseIonRouterResult, useIonPopover, useIonRouter } from '@ionic/react'
-import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send, sync, camera, logOutOutline, closeCircle } from 'ionicons/icons';
+import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send, sync, camera, logOutOutline, closeCircle, arrowForwardSharp } from 'ionicons/icons';
 import React, {useContext, useEffect} from 'react'
 import { UserState } from 'components/UserStateProvider';
 import { App } from '@capacitor/app';
@@ -56,18 +56,29 @@ const TutorialVideoModal = (props: TutorialVideoModalProps) => {
             </IonButton>
           </IonButtons>
           <div className="pr-10">
-          <IonTitle><strong>Welcome to the NEW Godible!</strong></IonTitle>
+            <IonTitle><strong>Welcome to the NEW Godible!</strong></IonTitle>
           </div>
+          {onClick &&
+              <IonButton fill="solid" color="primary" className="mr-2" slot="end" onClick={(e) => {
+                  if (onClick) {
+                    onClick();
+                    props.onDismiss();
+                  }
+              }}>
+                <IonIcon icon={arrowForwardSharp} />
+              </IonButton>
+            }
+
         </IonToolbar>
       </IonHeader>
       <IonContent>
-          <div className="video-wrapper">
-              <iframe src="https://www.youtube.com/embed/aptk_auyQcY" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+          <div className="video-wrapper flex justify-center w-full">
+              <iframe src="https://www.youtube.com/embed/Gc_Z0ChpvMA?si=peVGR_cxUPD5PLGV" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
           </div>
           {onClick ?
             <div className="ion-padding">
-                <div className="flex mt-4 -ml-5 sm:ml-0 justify-center items-center flex-col">
-                  <IonText>Get started with your current Godible email</IonText>
+                <div className="flex mt-2 -ml-5 sm:ml-0 justify-center items-center flex-col">
+                  <IonText className="text-center">Get started with your current Godible email</IonText>
                   <IonButton fill="solid" color="primary" onClick={(e) => {
                       if (onClick) {
                         onClick();

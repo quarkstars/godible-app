@@ -14,6 +14,7 @@ interface INotesProps {
     isClickToSave?: boolean;
     isPublicCountHidden?: boolean;
     isShowMore?: boolean;
+    autoFocus?: boolean;
 }
 const Notes = (props: INotesProps) => {
 
@@ -99,12 +100,11 @@ const Notes = (props: INotesProps) => {
 
     let reachedUserNoteMax = (userNotes && userNotes.length >= 30) ? true : false;
 
-    
 
   return (
     <div className='flex flex-col w-full'>
         <div id="Notes" className="flex flex-col w-full">
-            {(!isCreatingNewNote && !reachedUserNoteMax) &&
+            {(!isCreatingNewNote && !reachedUserNoteMax && user?.objectId) &&
                 <IonButton 
                     color="medium" 
                     fill="clear" 
@@ -126,12 +126,13 @@ const Notes = (props: INotesProps) => {
                 }
             </div>
             {/* New Notes */}
-            {(isCreatingNewNote && !reachedUserNoteMax) && 
+            {(isCreatingNewNote && !reachedUserNoteMax && user?.objectId) && 
                 <NoteInput 
                     episode={episode} 
                     isLoading={isUserNoteLoading}
                     onSave={(note: INote) => {handleSaveNewNote(note);}} 
                     onCancel={(e) => setIsCreatingNewNote(false)}
+                    autoFocus={props.autoFocus}
                 />
             }
         </div>

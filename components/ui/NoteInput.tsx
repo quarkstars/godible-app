@@ -9,6 +9,7 @@ interface INotesProps {
     onSave?: (note: INote) => void,
     onCancel?: (e) => void,
     isLoading?: boolean,
+    autoFocus?: boolean,
 }
 
 const NoteInput = (props: INotesProps) => {
@@ -18,13 +19,14 @@ const NoteInput = (props: INotesProps) => {
         onSave,
         isLoading,
         onCancel,
+        autoFocus,
     } = props;
 
     const inputEl = useRef<HTMLIonTextareaElement>(null);
     useEffect(() => {
         if (!inputEl.current) return;
         if (note) inputEl.current.value = note.text;
-        setTimeout(async () => {await inputEl.current?.setFocus()}, 200);
+        if (autoFocus) setTimeout(async () => {await inputEl.current?.setFocus()}, 700);
     }, [note, inputEl.current])
     
     const [isPublic, setIsPublic] = useState<string>("private")

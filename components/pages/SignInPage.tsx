@@ -130,13 +130,13 @@ const SignInPage: React.FC = () => {
               <div className="mb-6 form-group">
                     <IonItem>
                       <IonLabel position='floating'>Email</IonLabel>
-                      <IonInput placeholder="Email" onIonChange={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
+                      <IonInput placeholder="Email" onIonInput={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                     </IonItem>
               </div>
               <div className="mb-6 form-group">
                     <IonItem>
                       <IonLabel position='floating'>Password</IonLabel>
-                      <IonInput type="password" onIonChange={(event) => setPassword(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
+                      <IonInput type="password" onIonInput={(event) => setPassword(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                     </IonItem>
 
               </div>
