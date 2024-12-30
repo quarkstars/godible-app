@@ -47,7 +47,7 @@ const GamificationModal = (props: IGamificationModalProps) => {
   const [dailyPoints, setDailyPoints] = useState<IPoint[]>();
   const availableActions = useMemo(() => {
     const currentStreakOr1 = currentStreak || 1;
-    const availableActions = actions.filter(action => !action.streakMin || (action.streakMin && currentStreakOr1 >= action.streakMin && currentStreakOr1 < (action?.streakMax || Infinity)));
+    const availableActions = actions.filter(action => !action.streakMin || (action.streakMin && currentStreakOr1 >= action.streakMin && currentStreakOr1 <= (action?.streakMax || Infinity)));
     if (dailyPoints) availableActions.forEach(action => {
       const actionPoints = dailyPoints.filter(dp => dp.action === action.name)
       if (actionPoints.length) {
@@ -124,9 +124,9 @@ const GamificationModal = (props: IGamificationModalProps) => {
             return (
               <IonItem key={index}>
                 {action.isComplete ? 
-                  <IonIcon icon={checkmarkCircle} className="text-green-500 ml-2" />
+                  <IonIcon icon={checkmarkCircle} className="text-green-500 mr-2" />
                  : 
-                 <IonIcon icon={ellipseOutline} className="text-gray-500 ml-2" />
+                 <IonIcon icon={ellipseOutline} className="text-gray-500 mr-2" />
                  }
                 <IonLabel>{`${action.message}${left ? ` (${left} left)` : ""}`}</IonLabel>
                 <IonNote slot="end">+{action.points}</IonNote>

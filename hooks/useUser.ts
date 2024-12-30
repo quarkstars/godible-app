@@ -131,7 +131,7 @@ const useUser = () => {
         present({
             message: notice.message,
             icon: notice.icon,
-            duration: notice.duration || 3000,
+            duration: notice.duration || 5000,
             position: notice.position || "top",
             color: notice.color || "light",
             mode: "ios",
@@ -240,6 +240,8 @@ const useUser = () => {
                 setUser(currentUserJSON);
                 setIsLoading(false);
                 setIsFirstTimeVisitor(false);
+                // Lazy get streak, updates when user opens next
+                getStreak(); 
                 return currentUserJSON;
             }
         } catch (err) {
@@ -285,7 +287,6 @@ const useUser = () => {
      * Send a point notice with follow up new level notice if provided
      */
     const pointNotice = (message: string, icon = leaf, newLevel = null) => {
-        console.log("SET NOTICE 288")
         setNotice({
             message,
             icon,
@@ -296,7 +297,7 @@ const useUser = () => {
                     message: `You have reached ${newLevel} level!`,
                     icon: rose,
                 });
-            }, 4000);
+            }, 6000);
         }
     }
 
