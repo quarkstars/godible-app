@@ -23,34 +23,34 @@ Consenting to our use of cookies in accordance with the terms of this policy whe
 ####B. Collecting personal information\n
 The following types of personal information may be collected, stored, and used:\n
 \n
-information about your computer including your IP address, geographical location, browser type and version, and operating system;\n
-information about your visits to and use of this website including the referral source, length of visit, page views, listening time, and website navigation paths;\n
-information, such as your email address and your name that you enter when you register with our website;\n
-information, such as your email address, profile photo, and your name when you register or login via social login (ie Continue with Google);\n
-information that you enter when you create a profile on our website - your name, address, and phone number;\n
-information that you enter while using the services on our website;\n
-information that is generated while using our website, including when, how often, and under what circumstances you use it;\n
-information relating to anything you purchase, services you use, or transactions you make through our website, which includes your name, address, telephone number, email address, and credit card details;\n
-information contained in any communications that you send to us by email or through our website, including its communication content and metadata;\n
-any other personal information that you send to us.\n
+Information about your computer including your IP address, geographical location, browser type and version, and operating system;\n
+Information about your visits to and use of this website including the referral source, length of visit, page views, listening time, and website navigation paths;\n
+Information, such as your email address and your name that you enter when you register with our website;\n
+Information, such as your email address, profile photo, and your name when you register or login via social login (ie Continue with Google);\n
+Information that you enter when you create a profile on our website - your name, address, and phone number;\n
+Information that you enter while using the services on our website;\n
+Information that is generated while using our website, including when, how often, and under what circumstances you use it;\n
+Information relating to anything you purchase, services you use, or transactions you make through our website, which includes your name, address, telephone number, email address, and credit card details;\n
+Information contained in any communications that you send to us by email or through our website, including its communication content and metadata;\n
+Any other personal information that you send to us.\n
 Before you disclose to us the personal information of another person, you must obtain that person’s consent to both the disclosure and the processing of that personal information in accordance with this policy.\n
 \n
 ####C. Using your personal information\n
 Personal information submitted to us through our website will be used for the purposes specified in this policy or on the relevant pages of the website. We may use your personal information for the following:\n
 \n
-administering our website and business;\n
+Administering our website and business;\n
 personalizing our website for you;\n
-enabling your use of the services available on our website;\n
-sending you goods purchased through our website;\n
-supplying services purchased through our website;\n
-sending statements, invoices, and payment reminders to you, and collecting payments from you;\n
-sending you non-marketing commercial communications;\n
-sending you email notifications that you have specifically requested;\n
-sending you our email newsletter, if you have requested it (you can inform us at any time if you no longer require the newsletter);\n
-providing third parties with statistical information about our users (but those third parties will not be able to identify any individual user from that information);\n
-dealing with inquiries and complaints made by or about you relating to our website;\n
-keeping our website secure and prevent fraud;\n
-verifying compliance with the terms and conditions governing the use of our website (including monitoring private messages sent through our website private messaging service); and\n
+Enabling your use of the services available on our website;\n
+Sending you goods purchased through our website;\n
+Supplying services purchased through our website;\n
+Sending statements, invoices, and payment reminders to you, and collecting payments from you;\n
+Sending you non-marketing commercial communications;\n
+Sending you email notifications that you have specifically requested;\n
+Sending you our email newsletter, if you have requested it (you can inform us at any time if you no longer require the newsletter);\n
+Providing third parties with statistical information about our users (but those third parties will not be able to identify any individual user from that information);\n
+Dealing with inquiries and complaints made by or about you relating to our website;\n
+Keeping our website secure and prevent fraud;\n
+Verifying compliance with the terms and conditions governing the use of our website (including monitoring private messages sent through our website private messaging service); and\n
 other uses.\n
 If you submit personal information for publication on our website, we will publish and otherwise use that information in accordance with the license you grant to us.\n
 \n
@@ -63,12 +63,12 @@ We may disclose your personal information to any of our employees, officers, ins
 \n
 We may disclose your personal information:\n
 \n
-to the extent that we are required to do so by law;\n
-to payment processor partners (ie Stripe) to complete transactions you have specifically requested;\n
-in connection with any ongoing or prospective legal proceedings;\n
-in order to establish, exercise, or defend our legal rights (including providing information to others for the purposes of fraud prevention and reducing credit risk);\n
-to the purchaser (or prospective purchaser) of any business or asset that we are (or are contemplating) selling; and\n
-to any person who we reasonably believe may apply to a court or other competent authority for disclosure of that personal information where, in our reasonable opinion, such court or authority would be reasonably likely to order disclosure of that personal information.\n
+To the extent that we are required to do so by law;\n
+To payment processor partners (ie Stripe) to complete transactions you have specifically requested;\n
+In connection with any ongoing or prospective legal proceedings;\n
+In order to establish, exercise, or defend our legal rights (including providing information to others for the purposes of fraud prevention and reducing credit risk);\n
+To the purchaser (or prospective purchaser) of any business or asset that we are (or are contemplating) selling; and\n
+To any person who we reasonably believe may apply to a court or other competent authority for disclosure of that personal information where, in our reasonable opinion, such court or authority would be reasonably likely to order disclosure of that personal information.\n
 Except as provided in this policy, we will not provide your personal information to third parties.\n
 \n
 ####E. International data transfers\n
@@ -79,9 +79,9 @@ You expressly agree to the transfers of personal information described in this S
 This Section F sets out our data retention policies and procedure, which are designed to help ensure that we comply with our legal obligations regarding the retention and deletion of personal information.\n
 Personal information that we process for any purpose or purposes shall not be kept for longer than is necessary for that purpose or those purposes.\n
 Notwithstanding the other provisions of this Section F, we will retain documents (including electronic documents) containing personal data:\n
-to the extent that we are required to do so by law;\n
-if we believe that the documents may be relevant to any ongoing or prospective legal proceedings; and\n
-in order to establish, exercise, or defend our legal rights (including providing information to others for the purposes of fraud prevention and reducing credit risk).\n
+To the extent that we are required to do so by law;\n
+If we believe that the documents may be relevant to any ongoing or prospective legal proceedings; and\n
+In order to establish, exercise, or defend our legal rights (including providing information to others for the purposes of fraud prevention and reducing credit risk).\n
 ####G. Security of your personal information\n
 We will take reasonable technical and organizational precautions to prevent the loss, misuse, or alteration of your personal information.\n
 We will store all the personal information you provide on our secure (password- and firewall-protected) servers.\n

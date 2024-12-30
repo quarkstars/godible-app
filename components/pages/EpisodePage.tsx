@@ -26,7 +26,7 @@ import { Player } from 'components/AppShell';
 import { PlayerControls } from 'components/ui/PlayerControls';
 import Toolbar from 'components/ui/Toolbar';
 import { text, userDefaultLanguage } from 'data/translations';
-import { IEpisode, IList } from 'data/types';
+import { IEpisode, IList, INote } from 'data/types';
 import useEpisodes from 'hooks/useEpisodes';
 import {
   add,
@@ -38,20 +38,11 @@ import {
   language,
   pauseCircle,
   playCircle,
-  settings,
-  settingsOutline,
-  documentText,
-  megaphone,
-  send,
-  checkmarkCircle,
-  calendar,
   close,
   addCircleOutline,
-  list,
   bookmarkOutline,
   arrowBack,
   arrowForward,
-  time,
   timeOutline,
 } from 'ionicons/icons';
 import React, { useContext, useEffect, useMemo, useState, useRef } from 'react';
@@ -98,7 +89,7 @@ const EpisodePage: React.FC = () => {
     });
   }
 
-  const { getEpisodes, episodes, getAdjacentEpisodes, setEpisodes } = useEpisodes();
+  const { getEpisodes, episodes, getAdjacentEpisodes, setEpisodes, isLoading } = useEpisodes();
 
   //User Bookmarks
   const { getLists, lists, addEpisodeToList, removeEpisodeFromList, setLists } = useLists();
@@ -166,6 +157,7 @@ const EpisodePage: React.FC = () => {
     if (user?.objectId) return;
     setLoaded(true);
     const urlParams = new URLSearchParams(router.routeInfo.search);
+    // Shortcut to update language to japanese 
     const languageParam = urlParams.get('l');
     if (languageParam === 'j') updateUser({ language: 'japanese' });
   }, [router.routeInfo, user]);
@@ -201,13 +193,13 @@ const EpisodePage: React.FC = () => {
     const urlParams = new URLSearchParams(router.routeInfo.search);
     const tokenParam = urlParams.get('token');
     const token = tokenParam ? tokenParam : undefined;
-    getEpisodes(undefined, { slug: currentSlug, token });
+    if (episode?.slug !== currentSlug) getEpisodes(undefined, { slug: currentSlug, token });
   }, [player.list?.episodes?.[player.index], router.routeInfo]);
 
   useEffect(() => {
     if (!episodes) return;
     setEpisode(episodes[0]);
-  }, [episodes]);
+  }, [episodes, user?.language]);
 
   const [adjacentEpisodes, setAdjacentEpisodes] = useState<Array<IEpisode | null>>([null, null]);
   const [isAdjacentEpisodeFromList, setIsAdjacentEpisodesFromList] = useState<Array<boolean>>([
@@ -330,13 +322,6 @@ const EpisodePage: React.FC = () => {
       }
   }, [showMeta, episode?._metaDataBlocks]);
 
-  const [presentNotes, dismissNotes] = useIonModal(EpisodeNotes, {
-    onDismiss: (data: string, role: string) => {
-      dismissNotes(data, role);
-      if (isModalOpen) isModalOpen.current = false;
-    },
-    episode,
-  });
   useEffect(() => {
     if (!router.routeInfo.search) return;
     const urlParams = new URLSearchParams(router.routeInfo.search);
@@ -507,6 +492,80 @@ const EpisodePage: React.FC = () => {
       player.setIsVisible(false);
   });
 
+  // Fetch Notes
+  const {
+    error: publicNoteError,
+    isLoading: isNoteLoading,
+    notes: publicNotes,
+    setNotes: setPublicNotes,
+    postNoteFeedback,
+    getNotes,
+    skip: noteSkip,
+  } = useNotes();
+
+  const {
+    error: userNoteError,
+    isLoading: isUserNoteLoading,
+    notes: userNotes,
+    setNotes: setUserNotes,
+    postNote: postUserNote,
+    deleteNote: deleteUserNote,
+    getNotes: getUserNotes,
+    skip: noteUserSkip,
+  } = useNotes();
+
+  useEffect(() => {
+    if (!episode) {
+      setPublicNotes(undefined);
+      setUserNotes(undefined);
+      return;
+    }
+    if (!user?.objectId) {
+      setUserNotes(undefined);
+      return;
+    }
+    getNotes(undefined, { sort: "+heartCount", userIdNot: user?.objectId, episodeId: episode?.objectId, flagDifference: 2, limit: 30 });
+    getUserNotes(undefined, { sort: "-createdTime", episodeId: episode?.objectId, limit: 30, userId: user?.objectId });
+  }, [user?.objectId, episode]);
+
+  async function handleSaveNote(note: INote, index?: number) {
+    if (!user?.objectId) return;
+    let newNote = await postUserNote(note);
+    if (!newNote) return;
+    if (typeof index === 'number') {
+      setUserNotes(prev => {
+        const newNotes = [...(prev || [])];
+        newNotes[index] = newNote!;
+        return newNotes;
+      });
+    } else { 
+      setUserNotes(prev => {
+        return [newNote!, ...(prev || [])];
+      });
+    }
+  }
+
+  async function handleDeleteNote(objectId: string) {
+    await deleteUserNote(objectId);
+    getUserNotes(undefined, { sort: "-createdTime", episodeId: episode?.objectId, limit: 30, userId: user?.objectId });
+  }
+
+  const [presentNotes, dismissNotes] = useIonModal(EpisodeNotes, {
+    onDismiss: (data: string, role: string) => {
+      dismissNotes(data, role);
+      if (isModalOpen) isModalOpen.current = false;
+    },
+    episode,
+    userNotes,
+    publicNotes,
+    isNoteLoading,
+    isUserNoteLoading,
+    userNoteError,
+    publicNoteError,
+    handleSaveNote,
+    handleDeleteNote,
+  });
+
   return (
     <IonPage>
       <IonHeader>
@@ -634,11 +693,9 @@ const EpisodePage: React.FC = () => {
             </div>
             <div className="flex flex-wrap justify-center w-full pb-8">
               <div
-                className={`rounded-md p-2 flex justify-center items-start ${
-                  !episode ? 'py-6' : ''
-                } ${showMeta ? 'bg-gray-100 dark:bg-gray-800' : ''} ${
-                  episode?._metaDataBlocks && episode?._metaDataBlocks.length > 1 ? 'w-full' : ''
-                }`}
+                className={`rounded-md p-2 flex justify-center items-start ${!episode ? 'py-6' : ''
+                  } ${showMeta ? 'bg-gray-100 dark:bg-gray-800' : ''} ${episode?._metaDataBlocks && episode?._metaDataBlocks.length > 1 ? 'w-full' : ''
+                  }`}
               >
                 <motion.div
                   className="overflow-hidden rounded-md pointer-cursor"
@@ -703,67 +760,69 @@ const EpisodePage: React.FC = () => {
                 </AnimatePresence>
               </div>
             </div>
-            <div className="flex justify-center w-full pb-8">
-              <IonButtons>
-                <IonButton
-                  fill="clear"
-                  size="small"
-                  onClick={() => {
-                    player.togglePlayPause();
-                  }}
-                >
-                  <IonIcon
-                    icon={player.isPlaying ? pauseCircle : playCircle}
-                    color="primary"
-                    slot="icon-only"
-                  />
-                </IonButton>
-              </IonButtons>
-              <IonButtons>
-                <IonButton
-                  fill="clear"
-                  size="small"
-                  onClick={() => {
-                    if (!user?.objectId) {
-                      setReroutePath(router.routeInfo.pathname);
-                      player.togglePlayPause(false);
-                      router.push('/signin?message=Log in to save bookmarks');
-                      return;
-                    }
-                    handleBookmark(!hasBookmark);
-                  }}
-                >
-                  <IonIcon
-                    icon={hasBookmark ? bookmark : bookmarkOutline}
-                    color="medium"
-                    slot="icon-only"
-                  />
-                </IonButton>
-              </IonButtons>
-              <IonButtons>
-                <IonButton
-                  fill="clear"
-                  size="small"
-                  onClick={e => {
-                    if (!user?.objectId) {
-                      player.togglePlayPause(false);
-                      setReroutePath(router.routeInfo.pathname);
-                      router.push('/signin?message=Log in to save lists');
-                      return;
-                    }
-                    presentList({});
-                  }}
-                >
-                  <IonIcon icon={addCircleOutline} color="medium" slot="icon-only" />
-                </IonButton>
-              </IonButtons>
-              <IonButtons>
-                <IonButton fill="clear" size="small" onClick={() => openSettingsModal()}>
-                  <IonIcon icon={language} color="medium" slot="icon-only" />
-                </IonButton>
-              </IonButtons>
+            <div className="flex flex-col justify-center items-center pb-8">
+              <div className="flex justify-center w-full">
+                <IonButtons>
+                  <IonButton
+                    fill="clear"
+                    size="small"
+                    onClick={() => {
+                      player.togglePlayPause();
+                    }}
+                  >
+                    <IonIcon
+                      icon={player.isPlaying ? pauseCircle : playCircle}
+                      color="primary"
+                      slot="icon-only"
+                    />
+                  </IonButton>
+                </IonButtons>
+                <IonButtons>
+                  <IonButton
+                    fill="clear"
+                    size="small"
+                    onClick={() => {
+                      if (!user?.objectId) {
+                        setReroutePath(router.routeInfo.pathname);
+                        player.togglePlayPause(false);
+                        router.push('/signin?message=Log in to save bookmarks');
+                        return;
+                      }
+                      handleBookmark(!hasBookmark);
+                    }}
+                  >
+                    <IonIcon
+                      icon={hasBookmark ? bookmark : bookmarkOutline}
+                      color="medium"
+                      slot="icon-only"
+                    />
+                  </IonButton>
+                </IonButtons>
+                <IonButtons>
+                  <IonButton
+                    fill="clear"
+                    size="small"
+                    onClick={e => {
+                      if (!user?.objectId) {
+                        player.togglePlayPause(false);
+                        setReroutePath(router.routeInfo.pathname);
+                        router.push('/signin?message=Log in to save lists');
+                        return;
+                      }
+                      presentList({});
+                    }}
+                  >
+                    <IonIcon icon={addCircleOutline} color="medium" slot="icon-only" />
+                  </IonButton>
+                </IonButtons>
+                <IonButtons>
+                  <IonButton fill="clear" size="small" onClick={() => openSettingsModal()}>
+                    <IonIcon icon={language} color="medium" slot="icon-only" />
+                  </IonButton>
+                </IonButtons>
+              </div>
+              {episode && user.language && (!episode?.hasLangAudio || !episode?.hasLangText) && <span className="text-medium text-xs">{`${user.language.charAt(0).toUpperCase() + user.language.slice(1)} ${!episode.hasLangText ? "text" : ""}${!episode.hasLangAudio && !episode.hasLangText ? " and " : ""}${!episode.hasLangAudio ? "audio" : ""} are not available`}</span>}
             </div>
-
             {episode?.isFirstSpeechEpisode && episode?._speechTitle && (
               <h1 className="w-full pb-2 font-bold text-left text-light dark:text-dark">
                 {episode._speechTitle.toUpperCase()}
@@ -784,14 +843,14 @@ const EpisodePage: React.FC = () => {
             {episode && episode.text
               ? episodeText
               : new Array(20).fill(undefined).map((item, index) => {
-                  return (
-                    <IonSkeletonText
-                      key={'skel-' + index}
-                      animated={true}
-                      style={{ width: '100%' }}
-                    ></IonSkeletonText>
-                  );
-                })}
+                return (
+                  <IonSkeletonText
+                    key={'skel-' + index}
+                    animated={true}
+                    style={{ width: '100%' }}
+                  ></IonSkeletonText>
+                );
+              })}
             <Copyright />
             <div
               id="topics"
@@ -844,7 +903,7 @@ const EpisodePage: React.FC = () => {
                   fill="clear"
                   disabled={
                     adjacentEpisodes[1]?.publishedAt &&
-                    adjacentEpisodes[1]?.publishedAt > Date.now()
+                      adjacentEpisodes[1]?.publishedAt > Date.now()
                       ? true
                       : false
                   }
@@ -857,7 +916,7 @@ const EpisodePage: React.FC = () => {
                   <IonIcon
                     icon={
                       adjacentEpisodes[1]?.publishedAt &&
-                      adjacentEpisodes[1]?.publishedAt > Date.now()
+                        adjacentEpisodes[1]?.publishedAt > Date.now()
                         ? timeOutline
                         : arrowForward
                     }
@@ -883,7 +942,7 @@ const EpisodePage: React.FC = () => {
                           router.push(`/search?topic=${topic.slug}&init=0`);
                         }}
                       >
-                        {resolveLangString(topic.name, lang)}
+                        {resolveLangString(topic.name, lang)[0]}
                       </IonChip>
                     );
                   })}
@@ -892,6 +951,18 @@ const EpisodePage: React.FC = () => {
             ) : (
               <></>
             )}
+            <Notes
+              episode={episode}
+              isTitleHidden
+              userNotes={userNotes || []}
+              publicNotes={publicNotes || []}
+              isPublicNoteLoading={isNoteLoading}
+              isUserNoteLoading={isUserNoteLoading}
+              userNoteError={userNoteError}
+              publicNoteError={publicNoteError}
+              onSaveNote={handleSaveNote}
+              onDeleteNote={handleDeleteNote}
+            />
           </div>
         </div>
       </IonContent>
@@ -902,7 +973,18 @@ const EpisodePage: React.FC = () => {
   );
 };
 
-const EpisodeNotes = ({ onDismiss, notes, episode }) => {
+const EpisodeNotes = ({
+  onDismiss,
+  episode,
+  userNotes,
+  publicNotes,
+  isNoteLoading,
+  isUserNoteLoading,
+  userNoteError,
+  publicNoteError,
+  handleSaveNote,
+  handleDeleteNote,
+}) => {
   return (
     <IonPage>
       <IonHeader>
@@ -918,7 +1000,19 @@ const EpisodeNotes = ({ onDismiss, notes, episode }) => {
         </IonToolbar>
       </IonHeader>
       <IonContent class="ion-padding">
-        <Notes isTitleHidden episode={episode} />
+        <Notes
+          episode={episode}
+          isTitleHidden
+          autoFocus
+          userNotes={userNotes || []}
+          publicNotes={publicNotes || []}
+          isPublicNoteLoading={isNoteLoading}
+          isUserNoteLoading={isUserNoteLoading}
+          userNoteError={userNoteError}
+          publicNoteError={publicNoteError}
+          onSaveNote={handleSaveNote}
+          onDeleteNote={handleDeleteNote}
+        />
         <div className="pb-40"></div>
       </IonContent>
     </IonPage>

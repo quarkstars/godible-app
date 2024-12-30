@@ -1,16 +1,7 @@
 import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonNote, IonPage, IonRange, IonReorder, IonReorderGroup, IonSelect, IonSelectOption, IonSpinner, IonText, IonThumbnail, IonTitle, IonToggle, IonToolbar, ItemReorderEventDetail, UseIonRouterResult, useIonPopover } from '@ionic/react'
-import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
-import { Player, Theme } from 'components/AppShell';
-import { IEpisode, IList, IUser } from 'data/types';
 import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send, sync, camera, logOutOutline, closeCircle } from 'ionicons/icons';
-import React, {useRef, useContext, useEffect, useState} from 'react'
-import TextDivider from './TextDivider';
-import InitialsAvatar from 'react-initials-avatar';
+import React, {useContext, useEffect} from 'react'
 import { UserState } from 'components/UserStateProvider';
-import usePhoto from 'hooks/usePhoto';
-import { nextSendTime } from 'utils/nextSendTime';
-import { countryCodes } from 'data/countryCodes';
-import Pricing from './Pricing';
 import { SwiperSlide } from 'swiper/react';
 import SlideList from './SlideList';
 import { App } from '@capacitor/app';
@@ -60,8 +51,6 @@ const TrailerModal = (props: ISettingsModalProps) => {
           <div className="pr-10">
           <IonTitle>Watch Trailers</IonTitle>
           </div>
-            {/* <IonIcon icon={isLoading ? sync : checkmarkCircle} slot="end" className="ion-padding" /> */}
-            {/* <IonSpinner name="dots" slot="end" className="ion-padding" /> */}
         </IonToolbar>
       </IonHeader>
       <IonContent>

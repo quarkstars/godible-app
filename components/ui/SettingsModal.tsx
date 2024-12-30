@@ -2,7 +2,7 @@ import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, I
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
 import { Player, Theme } from 'components/AppShell';
 import { IEpisode, IList, IUser } from 'data/types';
-import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send, sync, camera, logOutOutline, closeCircle } from 'ionicons/icons';
+import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send, sync, camera, logOutOutline, closeCircle, leaf } from 'ionicons/icons';
 import React, {useRef, useContext, useEffect, useState} from 'react'
 import TextDivider from './TextDivider';
 import InitialsAvatar from 'react-initials-avatar';
@@ -160,7 +160,13 @@ const SettingsModal = (props: ISettingsModalProps) => {
     isEmailOn.current.checked = user.isEmailOn||false;
   }, [user?.objectId, isEmailOn.current]);
 
-  
+  const isGamificationOn = useRef<HTMLIonToggleElement>(null);
+  useEffect(() => {
+    if (!isGamificationOn.current) return;
+    if (!user?.objectId) return isGamificationOn.current.value = undefined;
+    isGamificationOn.current.checked = user.isGamificationOn||false;
+  }, [user?.objectId, isGamificationOn.current]);
+
   const [imageUrl, setImageUrl] = useState<string|undefined>();
   const [countryCode, setCountryCode] = useState<string|undefined>("+1 US");
   useEffect(() => {
@@ -430,7 +436,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                       placeholder="First" 
                       debounce={1000}
                       onFocus={()=>setFirstNameNote(undefined)}
-                      onIonChange={(event) => {
+                      onIonInput={(event) => {
                         if (typeof firstNameInput.current?.value === "string" && firstNameInput.current.value.length > 0) {
                           
                           handleInputChange({firstName: firstNameInput.current?.value.slice(0,100)})
@@ -450,7 +456,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                       placeholder="Last" 
                       debounce={1000}
                       onFocus={()=>setLastNameNote(undefined)}
-                      onIonChange={(event) => {
+                      onIonInput={(event) => {
                         if (typeof lastNameInput.current?.value === "string" && lastNameInput.current.value.length > 0) {
                           
                           handleInputChange({lastName: lastNameInput.current?.value.slice(0,100)})
@@ -471,7 +477,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                   placeholder="Email" 
                   debounce={1000}
                   onFocus={()=>setEmailNote(undefined)}
-                  onIonChange={(event) => {
+                  onIonInput={(event) => {
                     if (typeof emailInput.current?.value === "string" && emailInput.current.value.length > 0) {
                       
                       handleInputChange({email: emailInput.current?.value.slice(0,500), username: emailInput.current?.value.slice(0,500), emailErrorCount: 0, lastEmailResponse: null})
@@ -483,6 +489,19 @@ const SettingsModal = (props: ISettingsModalProps) => {
                     <IonNote slot="helper"><span className="text-xs text-primary">{emailNote}</span></IonNote>
               </IonItem>
             </div>
+            <IonItem lines="none"></IonItem>
+            <IonItem> 
+                <IonIcon icon={leaf} slot="start" />
+                <IonLabel>{`Gamification`}</IonLabel>
+                <IonToggle
+                  name="gamification"
+                  ref={isGamificationOn}
+                  // checked={theme.isDark}
+                  onIonChange={(e) => {
+                    if (user?.objectId) updateUser({isGamificationOn: e.detail.checked})
+                  }}
+                />
+            </IonItem>
             <IonItem lines="none"></IonItem>
             </>}
         <IonList>
@@ -601,7 +620,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
         </IonItem>
         <IonItem> 
             <IonIcon icon={mail} slot="start" />
-            <IonLabel>{`Email ${user?.isEmailOn ? "on": "off"}`}</IonLabel>
+            <IonLabel>{`Email Reminders`}</IonLabel>
             {user.lastEmailResponse && 
               <IonIcon 
                 size="small" 
@@ -636,7 +655,8 @@ const SettingsModal = (props: ISettingsModalProps) => {
             />
         </IonItem>
         }
-        <IonItem> 
+        {/* TODO: Text Message service is currently disabled */}
+        {/* <IonItem> 
             <IonIcon icon={chatbox} slot="start" />
             
             <IonLabel>{`Text message ${user?.isTextOn ? "on": "off"}`}</IonLabel>
@@ -659,9 +679,9 @@ const SettingsModal = (props: ISettingsModalProps) => {
                 if (user?.objectId) updateUser({isTextOn: e.detail.checked})
               }}
             />
-        </IonItem>
-        <IonItem > 
-            {/* <IonLabel slot="start">Mobile</IonLabel> */}
+        </IonItem> */}
+        {/* <IonItem > 
+            <IonLabel slot="start">Mobile</IonLabel> 
             <div className="flex justify-start w-full ml-10">
               <IonSelect 
                 slot="start" 
@@ -688,7 +708,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                   placeholder='Enter your mobile #'
                   debounce={1000}
                   onFocus={()=>setPhoneNote(undefined)}
-                  onIonChange={(event) => {
+                  onIonInput={(event) => {
                     if (typeof phoneInput.current?.value === "string" && phoneInput.current.value.length > 0) {
                       const phone = phoneInput.current?.value .replace(/[^0-9]/g,"");
                       handleInputChange({phone: Number(phone), textErrorCount: 0, lastTextResponse: null});
@@ -698,7 +718,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
             </div>
 
               <IonNote slot="helper"><span className="text-xs text-primary">{phoneNote}</span></IonNote>
-          </IonItem>
+          </IonItem> */}
         </>
         }
         <IonItem lines="none"></IonItem>

@@ -92,7 +92,7 @@ const SignInResetPage: React.FC = () => {
               <div className="mb-6 form-group">
                     <IonItem>
                       <IonLabel position='floating'>Enter Email</IonLabel>
-                      <IonInput placeholder="Your Account Email" onIonChange={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
+                      <IonInput placeholder="Your Account Email" onIonInput={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                     </IonItem>
               </div>
               <IonButton 

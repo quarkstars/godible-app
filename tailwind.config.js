@@ -38,6 +38,7 @@ module.exports = {
         light: '#222428',
         'light-shade': '#1e2023',
         'light-tint': '#383a3e',
+
       },
     },
     fontFamily: {

@@ -1,7 +1,8 @@
-import { IExactQuery } from './../data/types';
-import React from 'react'
 
 const useParse = () => {
+    /**
+     * Updates a parse object
+     */
     const addParseObjectProperties = (parseObject: Parse.Object, updates: any) => {
         let updatedObject = parseObject;
         for (const key in updates) {
@@ -12,10 +13,6 @@ const useParse = () => {
             }
         }
         return updatedObject;
-    }
-
-    const getParseAndQuery = (query: IExactQuery) => {
-        
     }
 
     return {

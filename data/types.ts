@@ -28,11 +28,13 @@ export interface IUser extends ParseObjectToJson {
     lastName?: string,
     phone?: number,
     countryCode?: string,
+    points?: number,
     sendHour?: number,
     timeZone?: string,
     isPushOn?: boolean,
     isTextOn?: boolean,
     isEmailOn?: boolean,
+    isGamificationOn?: boolean,
     sendType?: string, // "next" "neweset"
     nextEpisode?: IEpisode,
 
@@ -136,8 +138,8 @@ export interface IEpisode extends ParseObjectToJson {
     _speechTitle?: string,
     _quote?: string,
     _audioPath?: string,
-
-
+    hasLangAudio?: boolean,
+    hasLangText?: boolean,
 }
 
 export interface ILangString {
@@ -244,4 +246,13 @@ export interface IDateMap {
 export interface IDate {
     listenings?: IListening[],
     notes?: INote[],
+}
+
+export interface IPoint extends ParseObjectToJson  {
+    userId?: string,
+    action?: string,
+    actionId?: string,
+    points?: number,
+    createdTime?: number,
+    updatedTime?: number
 }

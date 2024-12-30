@@ -31,11 +31,13 @@ import {
   useIonModal,
   useIonPopover,
   useIonRouter,
+  useIonToast,
   useIonViewDidEnter,
   useIonViewWillEnter,
 } from '@ionic/react';
 import { Player } from 'components/AppShell';
 import { UserState } from 'components/UserStateProvider';
+import GamificationModal from 'components/ui/GamificationModal';
 import Hero from 'components/ui/Hero';
 import ListListItem from 'components/ui/ListListItem';
 import ListModal from 'components/ui/ListModal';
@@ -46,11 +48,14 @@ import SettingsModal from 'components/ui/SettingsModal';
 import TextDivider from 'components/ui/TextDivider';
 import Toolbar from 'components/ui/Toolbar';
 import TrailerModal from 'components/ui/TrailerModal';
+import TutorialVideoModal from 'components/ui/TutorialVideoModal';
+import { levels } from 'data/gamification';
 import { sampleEpisodes } from 'data/sampleEpisodes';
 import { userDefaultLanguage } from 'data/translations';
 import { IList } from 'data/types';
 import useDonation from 'hooks/useDonation';
 import useLists from 'hooks/useLists';
+import { INotice } from 'hooks/useUser';
 import {
   arrowForward,
   calendar,
@@ -73,6 +78,7 @@ import {
   logOutOutline,
   playCircle,
   close,
+  leaf,
 } from 'ionicons/icons';
 import { list } from 'postcss';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -107,6 +113,7 @@ const ProfilePage: React.FC = () => {
     getCurrentUser,
     isModalOpen,
     router: userRouter,
+    postPoint,
   } = useContext(UserState);
 
   const lang = user?.language ? user.language : userDefaultLanguage;
@@ -116,11 +123,31 @@ const ProfilePage: React.FC = () => {
     if (user?.objectId) getCurrentUser();
   }, [user?.objectId]);
 
-  //Modal
-  const [presentStreak, dismissStreak] = useIonPopover(StreakDetails, {
-    onDismiss: (data: string, role: string) => dismissStreak(data, role),
+
+  const points = user?.points || 0;
+  const level = useMemo(() => {
+    if (!user?.points) return;
+    const levelIndex = levels.findIndex((level, index) => { 
+      const nextLevel = levels[index + 1];
+      return points >= level.points && (points < nextLevel?.points || !nextLevel);   ;
+    });
+    const level = levels[levelIndex] || {};
+    const nextLevel = levels[levelIndex + 1];
+    level.pointsRemaining = nextLevel ? nextLevel.points - points : 0;
+    const pointDifference = nextLevel ? nextLevel.points - level.points : 0;
+    level.percent = Math.floor(((points - level.points) / pointDifference) * 100);
+    if (isNaN(level.percent)) level.percent = Math.floor((points / 3) * 100);
+    level.nextLevelName = nextLevel?.name;
+    return level;
+  }, [user?.points]);
+
+  //Modals and popovers
+  const [presentGamification, dismissGamification] = useIonModal(GamificationModal, {
+    onDismiss: (data: string, role: string) => dismissGamification(data, role),
     currentStreak: user.currentStreak || 0,
     maxStreak: user.maxStreak || 0,
+    level,
+    points, 
   });
 
   const [isScrollToReminders, setIsScrollToReminders] = useState(false);
@@ -136,6 +163,7 @@ const ProfilePage: React.FC = () => {
     router,
   });
 
+
   const [presentPayInBrowser, dismissPayInBrowser] = useIonModal(PayInBrowserModal, {
     onDismiss: (data: string, role: string) => {
       dismissPayInBrowser(data, role);
@@ -143,6 +171,8 @@ const ProfilePage: React.FC = () => {
     },
     router,
   });
+
+
 
   //Handle unsubsribe or reminder in url params
   const urlParams = new URLSearchParams(router.routeInfo.search);
@@ -221,8 +251,8 @@ const ProfilePage: React.FC = () => {
 
   let playerIndex =
     typeof player.index === 'number' &&
-    player.list?.episodes?.[player.index] &&
-    lists?.[inspectedListIndex || 0]?.episodes?.[player.index]?.objectId ===
+      player.list?.episodes?.[player.index] &&
+      lists?.[inspectedListIndex || 0]?.episodes?.[player.index]?.objectId ===
       player.list?.episodes?.[player.index]?.objectId
       ? player.index
       : undefined;
@@ -283,6 +313,16 @@ const ProfilePage: React.FC = () => {
     if (!player.isPlaying) player.togglePlayPause(true);
     if (router) router.push(episode._path!);
   }
+
+  // Show Welcome if not logged in and not visited before
+  const [presentWelcomeModal, dismissWelcomeModal] = useIonModal(TutorialVideoModal, {
+    onDismiss: (data: string, role: string) => {
+      dismissWelcomeModal(data, role);
+      if (isModalOpen) isModalOpen.current = false;
+    },
+    router,
+
+  });
 
   //Handle reordering
   const [isReordering, setIsReordering] = useState(false);
@@ -420,21 +460,25 @@ const ProfilePage: React.FC = () => {
                       size="small"
                       color="secondary"
                       slot="start"
-                      onClick={e => {}}
+                      onClick={e => { }}
                     />
-                    {`Listened to Episode${
-                      typeof position?.episode?.number === 'number'
+                    {`Listened to Episode${typeof position?.episode?.number === 'number'
                         ? ' ' + position?.episode?.number
                         : ''
-                    }`}
-                    <IonIcon icon={chevronForward} size="small" color="medium" slot="end" />
+                      }`}
+                      <IonIcon
+                        icon={chevronForward}
+                        size="small"
+                        color="medium"
+                        slot="end"
+                        className={isPlatform('ios') ? 'hidden' : ''}
+                      />
                   </IonItem>
                 );
             })}
           {listening?.positions && listening?.positions.length > 3 && (
-            <span className="flex justify-center w-full text-sm text-medium">{`and ${
-              listening.positions.length - 3
-            } more`}</span>
+            <span className="flex justify-center w-full text-sm text-medium">{`and ${listening.positions.length - 3
+              } more`}</span>
           )}
           {notes &&
             notes.map((note, index) => {
@@ -453,15 +497,20 @@ const ProfilePage: React.FC = () => {
                     <span className="italic text-medium">{note?.text}</span>
                   </span>
                   {note.episode?.slug && (
-                    <IonIcon icon={chevronForward} size="small" color="medium" slot="end" />
+                    <IonIcon
+                      icon={chevronForward}
+                      size="small"
+                      color="medium"
+                      slot="end"
+                      className={isPlatform('ios') ? 'hidden' : ''}
+                    />
                   )}
                 </IonItem>
               );
             })}
           {notes && notes.length > 3 && (
-            <span className="flex justify-center w-full text-sm text-medium">{`and ${
-              notes.length - 3
-            } more`}</span>
+            <span className="flex justify-center w-full text-sm text-medium">{`and ${notes.length - 3
+              } more`}</span>
           )}
         </IonList>
       </div>
@@ -484,9 +533,8 @@ const ProfilePage: React.FC = () => {
     recordRange.current = recordRange.current + 1;
   }
 
-  let userName = `${user?.firstName ? user?.firstName : ''}${
-    user?.lastName ? ' ' + user?.lastName : ''
-  }`;
+  let userName = `${user?.firstName ? user?.firstName : ''}${user?.lastName ? ' ' + user?.lastName : ''
+    }`;
   if (userName.length === 0 && !user?.objectId) userName = 'Your Hoon Dok Hae Profile!';
   if (userName.length === 0 && user?.objectId) userName = 'Set up your name';
 
@@ -516,7 +564,7 @@ const ProfilePage: React.FC = () => {
                     size="small"
                     onClick={(e: any) => {
                       presentLogoutMenu({
-                        onDidDismiss: (e: CustomEvent) => {},
+                        onDidDismiss: (e: CustomEvent) => { },
                         event: e,
                       });
                     }}
@@ -574,10 +622,10 @@ const ProfilePage: React.FC = () => {
                     player.togglePlayPause(false);
                     router.push('/signup');
                   }}
-                  subButtonText={'Trailers'}
+                  subButtonText={'Whats New?'}
                   subButtonIcon={playCircle}
                   onClickSub={() => {
-                    presentTrailer({ initialBreakpoint: 0.65 });
+                    presentWelcomeModal();
                   }}
                   overlayColor={
                     'linear-gradient(90deg, rgba(97,219,146,.4) 0%, rgba(0,165,196,.2) 100%)'
@@ -592,26 +640,38 @@ const ProfilePage: React.FC = () => {
             )}
             <div className="flex items-center justify-between w-full p-4 rounded-lg bg-dark dark:bg-light">
               <div className="flex items-center">
-                <IonAvatar
-                  onClick={() => {
-                    setIsScrollToReminders(false);
-                    if (user?.objectId) presentSettings();
-                    else {
-                      player.togglePlayPause(false);
-                      router.push('/signin');
-                    }
-                  }}
-                >
-                  {user.imageUrl ? (
-                    <img src={user.imageUrl} alt="My Profile" />
-                  ) : (
-                    <div className="flex items-center h-full pr-2">
-                      <InitialsAvatar
-                        name={user?.objectId ? (userName.length === 0 ? 'M E' : userName) : '→'}
-                      />
+                <div className="flex flex-col items-center justify-start">
+                  <IonAvatar
+                    onClick={() => {
+                      setIsScrollToReminders(false);
+                      if (user?.objectId) presentSettings();
+                      else {
+                        player.togglePlayPause(false);
+                        router.push('/signin');
+                      }
+                    }}
+                    class="flex items-center justify-center"
+                  >
+                    {user.imageUrl ? (
+                      <img src={user.imageUrl} alt="My Profile" />
+                    ) : (
+                      <div className="flex items-center h-full pr-2">
+                        <InitialsAvatar
+                          name={user?.objectId ? (userName.length === 0 ? 'M E' : userName) : '→'}
+                        />
+                      </div>
+                    )}
+                  </IonAvatar>
+                  {level && user?.isGamificationOn ? <span className="text-xs pr-2 cursor-pointer" onClick={() => presentGamification()}>{level.name}</span> : <></>}
+                  {typeof level?.percent === "number" && user?.isGamificationOn ? (
+                    <div className="w-full h-2 mt-2 ml-2 mr-3 cursor-pointer bg-gray-200 rounded-lg dark:bg-gray-600 overflow-hidden" onClick={() => presentGamification()}>
+                      <div
+                        className="bg-primary h-full rounded-md"
+                        style={{ width: `${level.percent}%` }}
+                      ></div>
                     </div>
-                  )}
-                </IonAvatar>
+                  ) : <></>}                
+                </div>
                 <div className="flex flex-col justify-start">
                   <div className="flex items-center justify-start">
                     <span className="w-full pl-3 font-bold text-md mobile:text-xl">{userName}</span>
@@ -620,9 +680,7 @@ const ProfilePage: React.FC = () => {
                         color="primary"
                         onClick={(e: any) => {
                           if (user?.objectId) {
-                            presentStreak({
-                              onDidDismiss: (e: CustomEvent) => {},
-                            });
+                            presentGamification();
                           } else {
                             player.togglePlayPause(false);
                             router.push('/signin');
@@ -638,7 +696,8 @@ const ProfilePage: React.FC = () => {
                       </IonChip>
                     </div>
                   </div>
-                  {user.nextEpisode && (
+                  {user.nextEpisode ? (
+
                     <IonButton
                       fill="clear"
                       disabled={
@@ -648,9 +707,11 @@ const ProfilePage: React.FC = () => {
                       }
                       onClick={e => {
                         if (user.nextEpisode?._path) router.push(user.nextEpisode._path);
+
                       }}
+                      className="w-48 sm:w-96 lg:w-full overflow-hidden text-ellipsis whitespace-nowrap h-12 -ml-1"
                     >
-                      <div className="flex flex-col justify-start w-full -ml-2 text-sm tracking-tight normal-case gap-y-1">
+                      <div className="flex flex-col justify-start w-full text-sm tracking-tight normal-case gap-y-1 max-w-3/4 pl-0">
                         <div className="flex items-center gap-x-1">
                           My Next Episode
                           <IonIcon
@@ -664,14 +725,24 @@ const ProfilePage: React.FC = () => {
                             slot="end"
                           />
                         </div>
-                        <div className="flex items-center pb-1 text-xs text-medium">
-                          {`${resolveLangString(user.nextEpisode.book?.title, lang)} Ep ${
-                            user.nextEpisode.number
-                          }`}
-                        </div>
+                          <div className="flex items-center pb-1 text-sm break-words">
+                            {`${resolveLangString(user.nextEpisode.book?.title, lang)[0]} Ep ${user.nextEpisode.number}`}
+                          </div>
                       </div>
                     </IonButton>
-                  )}
+                  ) :
+                  <IonButton
+                    fill="clear"
+                    onClick={e => {
+                      presentWelcomeModal();
+                    }}
+                    className={user?.objectId ? "" : "hidden" }
+                  >
+                    <IonIcon icon={play} slot="start" color="primary" />
+                      New Features!
+                    </IonButton>
+
+                  }
                 </div>
               </div>
               <div className="hidden mobile:block">
@@ -679,8 +750,8 @@ const ProfilePage: React.FC = () => {
                   color="primary"
                   onClick={(e: any) => {
                     if (user?.objectId) {
-                      presentStreak({
-                        onDidDismiss: (e: CustomEvent) => {},
+                      presentGamification({
+                        onDidDismiss: (e: CustomEvent) => { },
                       });
                     } else {
                       player.togglePlayPause(false);
@@ -787,13 +858,12 @@ const ProfilePage: React.FC = () => {
                     {user?.isPushOn || user?.isTextOn || user?.isEmailOn ? (
                       <span className="text-lg text-center">
                         {`${reminderText} daily reminder at `}
-                        <span className="font-bold">{`${
-                          (user.sendHour || 8) > 13
+                        <span className="font-bold">{`${(user.sendHour || 8) > 13
                             ? user.sendHour! - 12 + 'PM'
                             : user?.sendHour == 0
-                            ? '12AM'
-                            : user.sendHour + 'AM'
-                        }`}</span>
+                              ? '12AM'
+                              : user.sendHour + 'AM'
+                          }`}</span>
                       </span>
                     ) : (
                       <span className="text-lg text-center">
@@ -804,6 +874,10 @@ const ProfilePage: React.FC = () => {
                     )}
                     <IonIcon size="small" icon={pencil} slot="icon-only" />
                   </button>
+                  <IonButton fill="clear" className="mt-2" onClick={() => presentGamification()} > 
+                  <IonIcon size="small" icon={leaf} slot="start" />
+                    My Vitality
+                  </IonButton>
                 </div>
               </SwiperSlide>
               <SwiperSlide>
@@ -976,7 +1050,7 @@ const ProfilePage: React.FC = () => {
                       Upgrade to Godible Pro
                     </h2>
                   )}
-                  {/* <div className='flex items-center justify-between w-full'>
+                  <div className='flex items-center justify-between w-full'>
                     <div className='flex items-center justify-between w-full'>
                       <div className='flex items-center justify-center space-x-2 text-lg font-medium'>
                         <span className='text-2xl font-bold'>{`$${Math.floor(donations[0]/100)}`}</span>
@@ -986,12 +1060,12 @@ const ProfilePage: React.FC = () => {
                         {`$${Math.floor(goal/100)/10}k ${thisMonth} goal `}<span className="hidden xs:inline">covers expenses</span>
                       </span>
                     </div>
-                  </div> */}
+                  </div>
                   <div className="w-full h-8 p-1 overflow-hidden bg-gray-200 border rounded-lg dark:bg-gray-600">
                     <div
                       className="bg-primary flex justify-center items-center p-0.5 h-6 rounded-md text-xs font-medium leading-none overflow-hidden text-dark"
-                      // style={{ width: `${meter}%` }}
-                      style={{ width: `33%` }}
+                      style={{ width: `${meter}%` }}
+                      // style={{ width: `33%` }}
                     ></div>
                   </div>
                   <h5 className="w-full text-left">
@@ -1037,20 +1111,6 @@ const ProfilePage: React.FC = () => {
         <PlayerControls />
       </IonFooter>
     </IonPage>
-  );
-};
-
-const StreakDetails = ({ currentStreak, maxStreak }) => {
-  return (
-    <IonContent className="ion-padding">
-      <div className="flex flex-col items-center space-x-1">
-        <div className="flex items-center space-x-2 font-bold">
-          <IonIcon size="small" icon={flame} color="primary" />
-          {`${currentStreak}-day Streak`}
-        </div>
-        <div className="flex items-center space-x-1 text-bold">{`${maxStreak}-day max streak`}</div>
-      </div>
-    </IonContent>
   );
 };
 
@@ -1101,9 +1161,8 @@ const unsubscribePopOver = ({ onDismiss, email, isSuccess }) => {
         {isSuccess ? (
           <IonText>{`You have successfully unsubscribed${email ? ' ' + email : ''}`}</IonText>
         ) : (
-          <IonText>{`Sorry, something went wrong unsubscribing${
-            email ? ' ' + email : ''
-          }. Try unsubcribing in your account settings or contact support.`}</IonText>
+          <IonText>{`Sorry, something went wrong unsubscribing${email ? ' ' + email : ''
+            }. Try unsubcribing in your account settings or contact support.`}</IonText>
         )}
         <IonButton onClick={onDismiss}>Close</IonButton>
       </div>

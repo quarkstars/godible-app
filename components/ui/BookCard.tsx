@@ -33,7 +33,7 @@ export const BookCard = (props: IBookCardProps) => {
       } = useContext(UserState);
     const lang = (user.language) ? user.language : userDefaultLanguage;
     const book = props.book;
-    const buyLink = resolveLangString(book?.buyLink, lang)
+    const buyLink = resolveLangString(book?.buyLink, lang)[0]
 
     const [hovering, setHovering] = useState<boolean>(false)
     const [showMore, setShowMore] = useState<boolean>(false)
@@ -70,21 +70,21 @@ export const BookCard = (props: IBookCardProps) => {
                 <div 
                     className={`pt-2 pb-0 block font-bold leading-tight ${(props?.size||768) > 500 ? "text-xl xs:text-2xl md:text-3xl lg:text:4xl" : "text-md line-clamp-2"}`}
                 >
-                    {resolveLangString(book?.title, lang)}
+                    {resolveLangString(book?.title, lang)[0]}
                 </div>
-                {(props.showTagline && resolveLangString(book.tagline, lang)) && 
+                {(props.showTagline && resolveLangString(book.tagline, lang)[0]) && 
                 <div 
                     className={`pt-2 pb-0 block font-medium leading-tight text-light dark:text-dark line-clamp-2 ${(props?.size||768) > 500 ? "text-xl" : "text-sm"}`}
                 >
-                    {resolveLangString(book.tagline, lang)}
+                    {resolveLangString(book.tagline, lang)[0]}
                 </div>
                 }
-                {(props.showDescription && resolveLangString(book.description, lang)) && 
+                {(props.showDescription && resolveLangString(book.description, lang)[0]) && 
                 <div className="flex flex-col items-start w-full">
                     <div 
                         className={`pt-2 pb-0 block text-light dark:text-dark ${(props?.size||768) > 500 ? "text-md" : "text-sm"} ${showMore ? "" : "line-clamp-4"}`}
                     >
-                        {resolveLangString(book.description, lang)}
+                        {resolveLangString(book.description, lang)[0]}
                     </div>
                     {!props.onClick &&
                     <div className="-ml-2">
@@ -96,11 +96,11 @@ export const BookCard = (props: IBookCardProps) => {
                     }
                 </div>
                 }
-                {(props.showMetaData && resolveLangString(book.metaData, lang)) && 
+                {(props.showMetaData && resolveLangString(book.metaData, lang)[0]) && 
                 <div 
                     className={'pt-2 pb-0 block text-medium text-sm'}
                 >
-                    {resolveLangString(book.metaData, lang)}
+                    {resolveLangString(book.metaData, lang)[0]}
                 </div>
                 }
                 <div className="flex flex-wrap items-center justify-between">
@@ -109,7 +109,7 @@ export const BookCard = (props: IBookCardProps) => {
                             <div className="flex items-center justify-center w-12 h-12 pr-0 overflow-hidden rounded-full min-w-12 min-h-12">
                             <Thumbnail size={48} imageUrl={book.authorImageUrl} />
                             </div>
-                            {(book.author && resolveLangString(book.author, lang) && resolveLangString(book.author, lang)!.length > 0) && <span className="font-medium text-light dark:text-dark" style={{maxWidth: "85%"}}>{"by "+resolveLangString(book.author, lang)}</span>}
+                            {(book.author && resolveLangString(book.author, lang)[0] && resolveLangString(book.author, lang)[0]!.length > 0) && <span className="font-medium text-light dark:text-dark" style={{maxWidth: "85%"}}>{"by "+resolveLangString(book.author, lang)[0]}</span>}
                     </div>
                     }
                     {props.showEpisodesLink && 

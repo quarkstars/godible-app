@@ -31,7 +31,7 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
   const imageUrl = episode?.book?.thumbUrl || episode?.thumbUrl;
   const firstEpisode = episode;
   const lastEpisode = list.episodes[list.episodes.length-1] as IEpisode;
-  const metaData = resolveLangString(list?.metaData, lang);
+  const metaData = resolveLangString(list?.metaData, lang)[0];
   const metaDataBlocks:string[]|undefined = (metaData) ? metaData.split("\\n") : undefined;
 
   const [presentDetails, dismissDetails] = useIonPopover(SpeechDetails, {
@@ -48,7 +48,7 @@ const SpeechListItem = (props: ISpeechListItemProps) => {
       if (isModalOpen) isModalOpen.current = false;
     },
       list: {
-        name: resolveLangString(list?.title, lang),
+        name: resolveLangString(list?.title, lang)[0],
         episodes: list.episodes,
         description: list.description,
       },

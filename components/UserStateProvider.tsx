@@ -13,6 +13,8 @@ export const UserStateDefault = {
   getCurrentUser: () => null,
   isOnboarding: false,
   setIsOnboarding: () => null,
+  isFirstTimeVisitor: false,
+  setIsFirstTimeVisitor: () => null,
 
   //SIGN UP 
   signUpError: undefined,
@@ -35,6 +37,8 @@ export const UserStateDefault = {
 
   updateUser: async (update: IUser) => { return update},
   getStreak: async () => null,
+  postPoint: async () => null,
+  pointNotice: () => null,
   updateError: undefined,
   setUpdateError: () => null,
 
