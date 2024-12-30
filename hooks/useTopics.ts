@@ -56,7 +56,7 @@ const useTopics = () => {
     const appendTopicStrings = (topic: ITopic): ITopic => {
         const _lang = (user?.language) ? user?.language : userDefaultLanguage;
 
-        const _name = resolveLangString(topic?.name, _lang);
+        const _name = resolveLangString(topic?.name, _lang)[0];
 
         return {
             ...topic,
