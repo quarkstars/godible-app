@@ -290,8 +290,8 @@ const usePlayer = ():IPlayer => {
             savedSeconds.current = currentSeconds;
             postListening({listening, position});
             const completedBefore = completedEpisodeIds.includes(episode.objectId);
-            if (isComplete && !completedBefore && episode?.objectId) {
-                setCompletedEpisodeIds(prevEpisodeIds => [...prevEpisodeIds, episode.objectId]);
+            if (isComplete && !completedBefore) {
+                setCompletedEpisodeIds(prevEpisodeIds => [...prevEpisodeIds, episode!.objectId]);
                 postPoint("Listen");
             }
             //Invalidate position of episode when first fetched because the user has listened to another position
