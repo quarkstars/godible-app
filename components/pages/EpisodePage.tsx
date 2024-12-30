@@ -540,7 +540,7 @@ const EpisodePage: React.FC = () => {
       });
     } else { 
     setUserNotes(prev => {
-      return [newNote, ...(prev || [])];
+      return [newNote!, ...(prev || [])];
     });}
   }
 
