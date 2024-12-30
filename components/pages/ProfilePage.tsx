@@ -31,11 +31,13 @@ import {
   useIonModal,
   useIonPopover,
   useIonRouter,
+  useIonToast,
   useIonViewDidEnter,
   useIonViewWillEnter,
 } from '@ionic/react';
 import { Player } from 'components/AppShell';
 import { UserState } from 'components/UserStateProvider';
+import GamificationModal from 'components/ui/GamificationModal';
 import Hero from 'components/ui/Hero';
 import ListListItem from 'components/ui/ListListItem';
 import ListModal from 'components/ui/ListModal';
@@ -47,11 +49,13 @@ import TextDivider from 'components/ui/TextDivider';
 import Toolbar from 'components/ui/Toolbar';
 import TrailerModal from 'components/ui/TrailerModal';
 import TutorialVideoModal from 'components/ui/TutorialVideoModal';
+import { levels } from 'data/gamification';
 import { sampleEpisodes } from 'data/sampleEpisodes';
 import { userDefaultLanguage } from 'data/translations';
 import { IList } from 'data/types';
 import useDonation from 'hooks/useDonation';
 import useLists from 'hooks/useLists';
+import { INotice } from 'hooks/useUser';
 import {
   arrowForward,
   calendar,
@@ -74,6 +78,7 @@ import {
   logOutOutline,
   playCircle,
   close,
+  leaf,
 } from 'ionicons/icons';
 import { list } from 'postcss';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -108,6 +113,7 @@ const ProfilePage: React.FC = () => {
     getCurrentUser,
     isModalOpen,
     router: userRouter,
+    postPoint,
   } = useContext(UserState);
 
   const lang = user?.language ? user.language : userDefaultLanguage;
@@ -117,11 +123,31 @@ const ProfilePage: React.FC = () => {
     if (user?.objectId) getCurrentUser();
   }, [user?.objectId]);
 
-  //Modal
-  const [presentStreak, dismissStreak] = useIonPopover(StreakDetails, {
-    onDismiss: (data: string, role: string) => dismissStreak(data, role),
+
+  const points = user?.points || 0;
+  const level = useMemo(() => {
+    if (!user?.points) return;
+    const levelIndex = levels.findIndex((level, index) => { 
+      const nextLevel = levels[index + 1];
+      return points >= level.points && (points < nextLevel?.points || !nextLevel);   ;
+    });
+    const level = levels[levelIndex] || {};
+    const nextLevel = levels[levelIndex + 1];
+    level.pointsRemaining = nextLevel ? nextLevel.points - points : 0;
+    const pointDifference = nextLevel ? nextLevel.points - level.points : 0;
+    level.percent = Math.floor(((points - level.points) / pointDifference) * 100);
+    if (isNaN(level.percent)) level.percent = Math.floor((points / 3) * 100);
+    level.nextLevelName = nextLevel?.name;
+    return level;
+  }, [user?.points]);
+
+  //Modals and popovers
+  const [presentGamification, dismissGamification] = useIonModal(GamificationModal, {
+    onDismiss: (data: string, role: string) => dismissGamification(data, role),
     currentStreak: user.currentStreak || 0,
     maxStreak: user.maxStreak || 0,
+    level,
+    points, 
   });
 
   const [isScrollToReminders, setIsScrollToReminders] = useState(false);
@@ -137,6 +163,7 @@ const ProfilePage: React.FC = () => {
     router,
   });
 
+
   const [presentPayInBrowser, dismissPayInBrowser] = useIonModal(PayInBrowserModal, {
     onDismiss: (data: string, role: string) => {
       dismissPayInBrowser(data, role);
@@ -144,6 +171,8 @@ const ProfilePage: React.FC = () => {
     },
     router,
   });
+
+
 
   //Handle unsubsribe or reminder in url params
   const urlParams = new URLSearchParams(router.routeInfo.search);
@@ -437,7 +466,13 @@ const ProfilePage: React.FC = () => {
                         ? ' ' + position?.episode?.number
                         : ''
                       }`}
-                    <IonIcon icon={chevronForward} size="small" color="medium" slot="end" />
+                      <IonIcon
+                        icon={chevronForward}
+                        size="small"
+                        color="medium"
+                        slot="end"
+                        className={isPlatform('ios') ? 'hidden' : ''}
+                      />
                   </IonItem>
                 );
             })}
@@ -462,7 +497,13 @@ const ProfilePage: React.FC = () => {
                     <span className="italic text-medium">{note?.text}</span>
                   </span>
                   {note.episode?.slug && (
-                    <IonIcon icon={chevronForward} size="small" color="medium" slot="end" />
+                    <IonIcon
+                      icon={chevronForward}
+                      size="small"
+                      color="medium"
+                      slot="end"
+                      className={isPlatform('ios') ? 'hidden' : ''}
+                    />
                   )}
                 </IonItem>
               );
@@ -581,10 +622,10 @@ const ProfilePage: React.FC = () => {
                     player.togglePlayPause(false);
                     router.push('/signup');
                   }}
-                  subButtonText={'Trailers'}
+                  subButtonText={'Whats New?'}
                   subButtonIcon={playCircle}
                   onClickSub={() => {
-                    presentTrailer({ initialBreakpoint: 0.65 });
+                    presentWelcomeModal();
                   }}
                   overlayColor={
                     'linear-gradient(90deg, rgba(97,219,146,.4) 0%, rgba(0,165,196,.2) 100%)'
@@ -599,26 +640,38 @@ const ProfilePage: React.FC = () => {
             )}
             <div className="flex items-center justify-between w-full p-4 rounded-lg bg-dark dark:bg-light">
               <div className="flex items-center">
-                <IonAvatar
-                  onClick={() => {
-                    setIsScrollToReminders(false);
-                    if (user?.objectId) presentSettings();
-                    else {
-                      player.togglePlayPause(false);
-                      router.push('/signin');
-                    }
-                  }}
-                >
-                  {user.imageUrl ? (
-                    <img src={user.imageUrl} alt="My Profile" />
-                  ) : (
-                    <div className="flex items-center h-full pr-2">
-                      <InitialsAvatar
-                        name={user?.objectId ? (userName.length === 0 ? 'M E' : userName) : '→'}
-                      />
+                <div className="flex flex-col items-center justify-start">
+                  <IonAvatar
+                    onClick={() => {
+                      setIsScrollToReminders(false);
+                      if (user?.objectId) presentSettings();
+                      else {
+                        player.togglePlayPause(false);
+                        router.push('/signin');
+                      }
+                    }}
+                    class="flex items-center justify-center"
+                  >
+                    {user.imageUrl ? (
+                      <img src={user.imageUrl} alt="My Profile" />
+                    ) : (
+                      <div className="flex items-center h-full pr-2">
+                        <InitialsAvatar
+                          name={user?.objectId ? (userName.length === 0 ? 'M E' : userName) : '→'}
+                        />
+                      </div>
+                    )}
+                  </IonAvatar>
+                  {level && user?.isGamificationOn ? <span className="text-xs pr-2 cursor-pointer" onClick={() => presentGamification()}>{level.name}</span> : <></>}
+                  {typeof level?.percent === "number" && user?.isGamificationOn ? (
+                    <div className="w-full h-2 mt-2 ml-2 mr-3 cursor-pointer bg-gray-200 rounded-lg dark:bg-gray-600 overflow-hidden" onClick={() => presentGamification()}>
+                      <div
+                        className="bg-primary h-full rounded-md"
+                        style={{ width: `${level.percent}%` }}
+                      ></div>
                     </div>
-                  )}
-                </IonAvatar>
+                  ) : <></>}                
+                </div>
                 <div className="flex flex-col justify-start">
                   <div className="flex items-center justify-start">
                     <span className="w-full pl-3 font-bold text-md mobile:text-xl">{userName}</span>
@@ -627,9 +680,7 @@ const ProfilePage: React.FC = () => {
                         color="primary"
                         onClick={(e: any) => {
                           if (user?.objectId) {
-                            presentStreak({
-                              onDidDismiss: (e: CustomEvent) => { },
-                            });
+                            presentGamification();
                           } else {
                             player.togglePlayPause(false);
                             router.push('/signin');
@@ -681,14 +732,15 @@ const ProfilePage: React.FC = () => {
                     </IonButton>
                   ) :
                   <IonButton
-                  fill="clear"
+                    fill="clear"
                     onClick={e => {
                       presentWelcomeModal();
                     }}
+                    className={user?.objectId ? "" : "hidden" }
                   >
                     <IonIcon icon={play} slot="start" color="primary" />
-                    New Features!
-                  </IonButton>
+                      New Features!
+                    </IonButton>
 
                   }
                 </div>
@@ -698,7 +750,7 @@ const ProfilePage: React.FC = () => {
                   color="primary"
                   onClick={(e: any) => {
                     if (user?.objectId) {
-                      presentStreak({
+                      presentGamification({
                         onDidDismiss: (e: CustomEvent) => { },
                       });
                     } else {
@@ -1055,20 +1107,6 @@ const ProfilePage: React.FC = () => {
         <PlayerControls />
       </IonFooter>
     </IonPage>
-  );
-};
-
-const StreakDetails = ({ currentStreak, maxStreak }) => {
-  return (
-    <IonContent className="ion-padding">
-      <div className="flex flex-col items-center space-x-1">
-        <div className="flex items-center space-x-2 font-bold">
-          <IonIcon size="small" icon={flame} color="primary" />
-          {`${currentStreak}-day Streak`}
-        </div>
-        <div className="flex items-center space-x-1 text-bold">{`${maxStreak}-day max streak`}</div>
-      </div>
-    </IonContent>
   );
 };
 

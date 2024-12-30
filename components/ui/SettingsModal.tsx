@@ -2,7 +2,7 @@ import { IonAvatar, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, I
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces'
 import { Player, Theme } from 'components/AppShell';
 import { IEpisode, IList, IUser } from 'data/types';
-import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send, sync, camera, logOutOutline, closeCircle } from 'ionicons/icons';
+import { checkmarkCircle, ellipseOutline, moonOutline, sunnyOutline, volumeHigh, volumeLow, volumeMedium, volumeOff, contrast, language as languageIcon, information, text, trendingUp, refresh, close, mail, chatbox, notifications, chatboxOutline, phonePortraitOutline, alarm, send, sync, camera, logOutOutline, closeCircle, leaf } from 'ionicons/icons';
 import React, {useRef, useContext, useEffect, useState} from 'react'
 import TextDivider from './TextDivider';
 import InitialsAvatar from 'react-initials-avatar';
@@ -160,7 +160,13 @@ const SettingsModal = (props: ISettingsModalProps) => {
     isEmailOn.current.checked = user.isEmailOn||false;
   }, [user?.objectId, isEmailOn.current]);
 
-  
+  const isGamificationOn = useRef<HTMLIonToggleElement>(null);
+  useEffect(() => {
+    if (!isGamificationOn.current) return;
+    if (!user?.objectId) return isGamificationOn.current.value = undefined;
+    isGamificationOn.current.checked = user.isGamificationOn||false;
+  }, [user?.objectId, isGamificationOn.current]);
+
   const [imageUrl, setImageUrl] = useState<string|undefined>();
   const [countryCode, setCountryCode] = useState<string|undefined>("+1 US");
   useEffect(() => {
@@ -484,6 +490,19 @@ const SettingsModal = (props: ISettingsModalProps) => {
               </IonItem>
             </div>
             <IonItem lines="none"></IonItem>
+            <IonItem> 
+                <IonIcon icon={leaf} slot="start" />
+                <IonLabel>{`Gamification`}</IonLabel>
+                <IonToggle
+                  name="gamification"
+                  ref={isGamificationOn}
+                  // checked={theme.isDark}
+                  onIonChange={(e) => {
+                    if (user?.objectId) updateUser({isGamificationOn: e.detail.checked})
+                  }}
+                />
+            </IonItem>
+            <IonItem lines="none"></IonItem>
             </>}
         <IonList>
           {(!props.isProfile && !props.isOnboarding) &&
@@ -636,7 +655,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
             />
         </IonItem>
         }
-        {/* Text messages are disabled until further notice */}
+        {/* TODO: Text Message service is currently disabled */}
         {/* <IonItem> 
             <IonIcon icon={chatbox} slot="start" />
             
@@ -661,8 +680,8 @@ const SettingsModal = (props: ISettingsModalProps) => {
               }}
             />
         </IonItem> */}
-        <IonItem > 
-            {/* <IonLabel slot="start">Mobile</IonLabel> */}
+        {/* <IonItem > 
+            <IonLabel slot="start">Mobile</IonLabel> 
             <div className="flex justify-start w-full ml-10">
               <IonSelect 
                 slot="start" 
@@ -699,7 +718,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
             </div>
 
               <IonNote slot="helper"><span className="text-xs text-primary">{phoneNote}</span></IonNote>
-          </IonItem>
+          </IonItem> */}
         </>
         }
         <IonItem lines="none"></IonItem>
