@@ -535,7 +535,7 @@ const EpisodePage: React.FC = () => {
     if (typeof index === 'number') {
       setUserNotes(prev => {
         const newNotes = [...(prev || [])];
-        newNotes[index] = newNote;
+        newNotes[index] = newNote!;
         return newNotes;
       });
     } else { 
