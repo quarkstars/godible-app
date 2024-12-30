@@ -436,7 +436,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                       placeholder="First" 
                       debounce={1000}
                       onFocus={()=>setFirstNameNote(undefined)}
-                      onIonChange={(event) => {
+                      onIonInput={(event) => {
                         if (typeof firstNameInput.current?.value === "string" && firstNameInput.current.value.length > 0) {
                           
                           handleInputChange({firstName: firstNameInput.current?.value.slice(0,100)})
@@ -456,7 +456,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                       placeholder="Last" 
                       debounce={1000}
                       onFocus={()=>setLastNameNote(undefined)}
-                      onIonChange={(event) => {
+                      onIonInput={(event) => {
                         if (typeof lastNameInput.current?.value === "string" && lastNameInput.current.value.length > 0) {
                           
                           handleInputChange({lastName: lastNameInput.current?.value.slice(0,100)})
@@ -477,7 +477,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                   placeholder="Email" 
                   debounce={1000}
                   onFocus={()=>setEmailNote(undefined)}
-                  onIonChange={(event) => {
+                  onIonInput={(event) => {
                     if (typeof emailInput.current?.value === "string" && emailInput.current.value.length > 0) {
                       
                       handleInputChange({email: emailInput.current?.value.slice(0,500), username: emailInput.current?.value.slice(0,500), emailErrorCount: 0, lastEmailResponse: null})
@@ -708,7 +708,7 @@ const SettingsModal = (props: ISettingsModalProps) => {
                   placeholder='Enter your mobile #'
                   debounce={1000}
                   onFocus={()=>setPhoneNote(undefined)}
-                  onIonChange={(event) => {
+                  onIonInput={(event) => {
                     if (typeof phoneInput.current?.value === "string" && phoneInput.current.value.length > 0) {
                       const phone = phoneInput.current?.value .replace(/[^0-9]/g,"");
                       handleInputChange({phone: Number(phone), textErrorCount: 0, lastTextResponse: null});

@@ -115,9 +115,12 @@ const Pricing = ({onClick}) => {
             </div>
 
             <div className="mt-8">
-            <IonButton color="primary" expand="block" onClick={(e) => onClick(e)}>
-                {`${user?.subscriptionId ? "Manage Subscription" : "Subscribe Now"}`}
-            </IonButton>
+                <IonButton color="primary" expand="block" onClick={(e) => onClick(e)}>
+                    {`${user?.subscriptionId ? "Manage Subscription" : "Subscribe Now"}`}
+                </IonButton>
+            </div>
+            <div className="w-full flex justify-center">
+                <span className="text-xs font-normal text-center w-full">for any amount $3 or more</span>
             </div>
         </div>
 

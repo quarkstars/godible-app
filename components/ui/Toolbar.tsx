@@ -46,10 +46,12 @@ const Toolbar = ({children}) => {
                                     src={user.imageUrl} 
                                     alt="My Profile" 
                                     className='p-2'
+                                    style={{transform: isPlatform("ios") ? "scale(.85)" : "scale(.95)"}}
                                 />
                             :
                                 <div
-                                    className={!isPlatform("ios") ? "p-2" : ""}
+                                    className={`${!isPlatform("ios") ? "p-2" : ""}`}
+                                    style={{transform: isPlatform("ios") ? "scale(.85)" : "scale(.95)"}}
                                 >
                                     <InitialsAvatar name={userName}  />
                                 </div>

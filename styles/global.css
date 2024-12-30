@@ -575,7 +575,8 @@ ion-breadcrumbs {
 /* REPONSIVE VIDEOS */
 
 .video-wrapper {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 9 / 16;
+  max-height: 65vh;
 }
 
 .video-wrapper iframe {

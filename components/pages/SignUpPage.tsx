@@ -133,26 +133,26 @@ const SignUpPage: React.FC = () => {
                 <div className="mb-6 form-group">
                     <IonItem>
                       <IonLabel position='floating'>First name</IonLabel>
-                      <IonInput placeholder="First" onIonChange={(event) => setFirst(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
+                      <IonInput placeholder="First" onIonInput={(event) => setFirst(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                     </IonItem>
                 </div>
                 <div className="mb-6 form-group">
                     <IonItem>
                       <IonLabel position='floating'>Last name</IonLabel>
-                      <IonInput placeholder="Last" onIonChange={(event) => setLast(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
+                      <IonInput placeholder="Last" onIonInput={(event) => setLast(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                     </IonItem>
                 </div>
               </div>
               <div className="mb-6 form-group">
                     <IonItem>
                       <IonLabel position='floating'>Email Address</IonLabel>
-                      <IonInput placeholder="Email" onIonChange={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
+                      <IonInput placeholder="Email" onIonInput={(event) => setEmail(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                     </IonItem>
               </div>
               <div className="mb-6 form-group">
                     <IonItem>
                       <IonLabel position='floating'>Create Password</IonLabel>
-                      <IonInput type={showPass ? "text" : "password"} onIonChange={(event) => setPassword(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
+                      <IonInput type={showPass ? "text" : "password"} onIonInput={(event) => setPassword(typeof event.target.value === "string" ? event.target.value : "")}></IonInput>
                       <IonButton slot="end" fill='clear' size="large" color="medium" onClick={()=>{setShowPass(!showPass)}}>
                         <div className="p-2 pr-0">
                           <IonIcon icon={!showPass ? eyeOff : eye } />
@@ -196,7 +196,7 @@ const SignUpPage: React.FC = () => {
                   onClick={()=>{router.push("/signin", undefined, "pop")}}
                   className='text-xs border-b-2 cursor-pointer'
                 >
-                  Sign up
+                  Log In
                 </span>
               </div>
           </div>
