@@ -15,17 +15,15 @@
     "ionic:serve": "npm run start"
   },
   "dependencies": {
-    "@capacitor-community/apple-sign-in": "^6.0.0",
     "@capacitor-community/keep-awake": "^5.0.1",
     "@capacitor/android": "6.1.2",
     "@capacitor/app": "^6.0.1",
     "@capacitor/camera": "^6.1.0",
-    "@capacitor/core": 
-    "^6.1.2",
+    "@capacitor/core": "^6.1.2",
     "@capacitor/ios": "^6.1.2",
     "@capacitor/push-notifications": "^6.0.2",
     "@capacitor/status-bar": "^6.0.1",
-    "@codetrix-studio/capacitor-google-auth": "^3.4.0-rc.4",
+    "@capgo/capacitor-social-login": "^0.0.81",
     "@ionic/pwa-elements": "^3.3.0",
     "@ionic/react": "^6.6.2",
     "@ionic/react-router": "^6.6.2",

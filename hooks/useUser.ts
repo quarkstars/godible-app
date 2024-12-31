@@ -7,19 +7,21 @@ import { checkmarkCircle, leaf, rose, starSharp, trendingUpOutline } from 'ionic
 import Parse, { Error } from 'parse';
 import React, { SetStateAction, useState } from "react";
 import { isPlatform, useIonRouter, UseIonRouterResult, useIonToast } from '@ionic/react';
-import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
+// TODO: Remove
+// import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import useParse from './useParse';
 import useLists from './useLists';
 import { nextSendTime } from 'utils/nextSendTime';
 
 import { PushNotifications } from '@capacitor/push-notifications';
 
-import {
-    SignInWithApple,
-    SignInWithAppleResponse,
-    SignInWithAppleOptions,
-} from '@capacitor-community/apple-sign-in';
+// import {
+//     SignInWithApple,
+//     SignInWithAppleResponse,
+//     SignInWithAppleOptions,
+// } from '@capacitor-community/apple-sign-in';
 import { App } from '@capacitor/app';
+import { SocialLogin } from '@capgo/capacitor-social-login';
 
 // This is also where a non logged in user will store Language Preference, Volume and logically resolve when logging in 
 // where existing user language takes precedemce
@@ -158,6 +160,7 @@ const useUser = () => {
     // Onboarding state
     const [isOnboarding, setIsOnboarding] = useState<boolean>(false);
     const [isFirstTimeVisitor, setIsFirstTimeVisitor] = useState<boolean>(true);
+    const [loginType, setLoginType] = useState<"email"|"google"|"apple"|null>(null);
 
     const router = useRef<UseIonRouterResult | undefined>();
 
@@ -199,16 +202,18 @@ const useUser = () => {
 
 
     useEffect(() => {
-        if (isPlatform('capacitor')) return;
+        // if (isPlatform('capacitor')) return;
         try {
-            GoogleAuth.initialize({
-                clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-                scopes: ['profile', 'email'],
-                grantOfflineAccess: true,
+            SocialLogin.initialize({
+                google: {
+                    webClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+                    // grantOfflineAccess: true, // TODO: REMOVE
+                },
+
             })
         }
         catch (err) { console.error(err) }
-    }, [isPlatform]);
+    }, []);
 
     //Clear user if no user
     // useEffect(() => {
@@ -241,7 +246,7 @@ const useUser = () => {
                 setIsLoading(false);
                 setIsFirstTimeVisitor(false);
                 // Lazy get streak, updates when user opens next
-                getStreak(); 
+                getStreak();
                 return currentUserJSON;
             }
         } catch (err) {
@@ -360,7 +365,14 @@ const useUser = () => {
         let googleUser: any;
         let currentUser: any;
         try {
-            googleUser = await GoogleAuth.signIn();
+            const response = await SocialLogin.login({
+                provider: 'google',
+                options: {
+                    scopes: ['email', 'profile'],
+                },
+            })
+            googleUser = response.result;
+            console.log("GOOGLE USER", googleUser)
             currentUser = new Parse.User()
         }
         catch (error) {
@@ -372,26 +384,25 @@ const useUser = () => {
             return;
         }
 
-        currentUser.set('username', googleUser.email);
-        currentUser.set('email', googleUser.email);
+        currentUser.set('username', googleUser.profile.email);
+        currentUser.set('email', googleUser.profile.email);
         currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
         currentUser.set('sendHour', "8");
         currentUser.set('nextSendTime', nextSendTime(8));
-        if (googleUser.givenName) currentUser.set('firstName', googleUser.givenName);
-        if (googleUser.familyName) currentUser.set('lastName', googleUser.familyName);
-        if (googleUser.imageUrl) currentUser.set('imageUrl', googleUser.imageUrl);
+        if (googleUser.profile.givenName) currentUser.set('firstName', googleUser.profile.givenName);
+        if (googleUser.profile.familyName) currentUser.set('lastName', googleUser.profile.familyName);
+        if (googleUser.profile.imageUrl) currentUser.set('imageUrl', googleUser.profile.imageUrl);
 
 
 
         //  if a user exists already with the same email, it will not allow a new user
-        let idToken = googleUser.authentication.idToken;
-        // if (idToken.split(".").length > 1) idToken = idToken.split(".")[0];
+        let idToken = googleUser.idToken;
 
         try {
             setIsLoading(true);
             currentUser = await currentUser.linkWith('google', {
                 authData: {
-                    id: googleUser.id,
+                    id: googleUser.profile.id,
                     id_token: idToken,
                 }
             });
@@ -399,14 +410,16 @@ const useUser = () => {
         catch (error) {
             setLogInError(error);
             setIsLoading(false);
-            GoogleAuth.signOut().catch();
+            // TODO: Check this logic
+            SocialLogin.logout({ provider: 'google' });
             return error;
 
         }
 
         if (!currentUser) {
             setLogOutError({ message: "Failed to Log In" });
-            GoogleAuth.signOut().catch();
+            // TODO: Check this logic
+            SocialLogin.logout({ provider: 'google' });
             return;
         }
         // setNotice({
@@ -426,19 +439,32 @@ const useUser = () => {
     };
 
     // Function to log into Apple sign
-    let options: SignInWithAppleOptions = {
-        clientId: 'com.hsa.godible',
-        redirectURI: 'https://app.godible.org/signin',
-        scopes: 'email name',
-        state: '12345',
-        nonce: 'nonce',
-    };
+    // let options: SignInWithAppleOptions = {
+    //     clientId: 'com.hsa.godible',
+    //     redirectURI: 'https://app.godible.org/signin',
+    //     scopes: 'email name',
+    //     state: '12345',
+    //     nonce: 'nonce',
+    // };
+
     const logInWithApple = async function () {
         let appleUser: any;
         let currentUser: any;
         try {
-            appleUser = await SignInWithApple.authorize(options);
-            appleUser = appleUser.response;
+            await SocialLogin.initialize({
+                apple: {
+                    clientId: 'com.hsa.godible',
+                    redirectUrl: 'https://app.godible.org/signin',
+                },
+            });
+            const response = await SocialLogin.login({
+                provider: 'apple',
+                options: {
+                        scopes: ['email', 'profile'],
+                    }
+                });
+                console.log("RESPONSE", response)
+                appleUser = response.result;
             currentUser = new Parse.User();
         }
         catch (error) {
@@ -487,7 +513,7 @@ const useUser = () => {
         catch (error) {
             setLogInError(error);
             setIsLoading(false);
-            GoogleAuth.signOut().catch();
+            SocialLogin.logout({ provider: 'apple' });
             return error;
 
         }
@@ -508,15 +534,23 @@ const useUser = () => {
     };
 
     const [logOutError, setLogOutError] = useState<any>();
-    //Log out Function
+    /**
+     * Log out of Socials and Parse
+     */
     const logOut = async function (): Promise<IUser | Error> {
 
         setIsLoading(true);
-        //Try to sign out gooogle user if exists
-        if (GoogleAuth.signOut) GoogleAuth.signOut().catch();
 
-        // if (SignInWithApple.authorize) GoogleAuth.signOut().catch();
+        //Try to revoke tokens on social logins
+        const authData = user.authData;
+        if (authData?.google) {
+            await SocialLogin.logout({ provider: "google" })
+        }
+        if (authData?.apple) {
+            await SocialLogin.logout({ provider: "apple" })
+        }
 
+        // Actual log out from parse user
         try {
             await Parse.User.logOut();
             // To verify that current user is now empty, currentAsync can be used
@@ -705,7 +739,7 @@ const useUser = () => {
 
     const [notificationData, setNotificationData] = useState<any>(null);
     useEffect(() => {
-        if (!user?.objectId || isPlatform("capacitor") === false) return;
+        if (!user?.objectId || isPlatform("capacitor") === false || !user?.isPushOn) return;
         const addListeners = async () => {
             await PushNotifications.addListener('registration', token => {
                 // Create a new Parse Installation for this device

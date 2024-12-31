@@ -51,6 +51,9 @@ export interface IUser extends ParseObjectToJson {
     isCoveringFee?: boolean,
     hasAddress?: boolean,
 
+    // SOCIAL AUTH
+    authData?: any,
+
     //Responses
     nextSendTime?: number,
     lastNotificationTime?: number,
@@ -62,13 +65,9 @@ export interface IUser extends ParseObjectToJson {
     pushErrorCount?: number,
     textErrorCount?: number,
 
-    // //
-    // heartCount?: number,
-    // flagCount?: number,
-
-    
     currentStreak?: number,
     maxStreak?: number,
+    
 }
 
 export interface IList extends ParseObjectToJson {
