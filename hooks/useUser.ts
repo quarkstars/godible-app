@@ -451,7 +451,7 @@ const useUser = () => {
             const response = await SocialLogin.login({
                 provider: 'apple',
                 options: {
-                        scopes: ['email', 'profile'],
+                        scopes: ['email', 'name'],
                     }
                 });
                 appleUser = response.result;
