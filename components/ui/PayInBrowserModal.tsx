@@ -45,7 +45,7 @@ const PayInBrowserModal = ({onDismiss, router, reroutePath}) => {
         </IonHeader>
         <IonContent className="ion-padding">
           <IonButton
-              href={"https://app.godible.org/subscription"}
+              href={`https://${process.env.APP_DOMAIN}/subscription`}
               expand="block"
               color="primary"
             >

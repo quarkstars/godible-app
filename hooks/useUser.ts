@@ -438,15 +438,6 @@ const useUser = () => {
 
     };
 
-    // Function to log into Apple sign
-    // let options: SignInWithAppleOptions = {
-    //     clientId: 'com.hsa.godible',
-    //     redirectURI: 'https://app.godible.org/signin',
-    //     scopes: 'email name',
-    //     state: '12345',
-    //     nonce: 'nonce',
-    // };
-
     const logInWithApple = async function () {
         let appleUser: any;
         let currentUser: any;
@@ -454,7 +445,7 @@ const useUser = () => {
             await SocialLogin.initialize({
                 apple: {
                     clientId: 'com.hsa.godible',
-                    redirectUrl: 'https://app.godible.org/signin',
+                    redirectUrl: `https://${process.env.APP_DOMAIN}/signin`,
                 },
             });
             const response = await SocialLogin.login({
@@ -463,7 +454,6 @@ const useUser = () => {
                         scopes: ['email', 'profile'],
                     }
                 });
-                console.log("RESPONSE", response)
                 appleUser = response.result;
             currentUser = new Parse.User();
         }
