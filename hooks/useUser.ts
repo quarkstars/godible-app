@@ -7,13 +7,18 @@ import { checkmarkCircle, leaf, rose, starSharp, trendingUpOutline } from 'ionic
 import Parse, { Error } from 'parse';
 import React, { SetStateAction, useState } from "react";
 import { isPlatform, useIonRouter, UseIonRouterResult, useIonToast } from '@ionic/react';
-// TODO: Remove
-// import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import useParse from './useParse';
 import useLists from './useLists';
 import { nextSendTime } from 'utils/nextSendTime';
 
 import { PushNotifications } from '@capacitor/push-notifications';
+
+import {
+    SignInWithApple,
+    SignInWithAppleResponse,
+    SignInWithAppleOptions,
+} from '@capacitor-community/apple-sign-in';
 import { App } from '@capacitor/app';
 import { SocialLogin } from '@capgo/capacitor-social-login';
 
@@ -154,7 +159,6 @@ const useUser = () => {
     // Onboarding state
     const [isOnboarding, setIsOnboarding] = useState<boolean>(false);
     const [isFirstTimeVisitor, setIsFirstTimeVisitor] = useState<boolean>(true);
-    const [loginType, setLoginType] = useState<"email"|"google"|"apple"|null>(null);
 
     const router = useRef<UseIonRouterResult | undefined>();
 
@@ -170,8 +174,19 @@ const useUser = () => {
         const addListenerAsync = async () => {
             backButtonListener = await App.addListener('backButton', (data) => {
                 if (isModalOpen && isModalOpen.current) return;
+
+                // if (router.current?.canGoBack()) {
+                //     router.current?.goBack();
+
+                //    backButtonListener.remove();
+                // }
             });
         };
+
+        // const resetBackButtonListener = async () => {
+        //     backButtonListener.remove();
+        //     addListenerAsync();
+        // }
 
         addListenerAsync();
 
@@ -182,6 +197,36 @@ const useUser = () => {
             }
         };
     }, []);
+
+
+    // useEffect(() => {
+    //     if (isPlatform('capacitor')) return;
+    //     try {
+    //         GoogleAuth.initialize({
+    //             clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    //             scopes: ['profile', 'email'],
+    //             grantOfflineAccess: true,
+    //         })
+    //     }
+    //     catch (err) { console.error(err) }
+    // }, [isPlatform]);
+
+    //Clear user if no user
+    // useEffect(() => {
+    //     console.log("CHECK SESSION")
+    //     const checkAndClearSession = async () => {
+    //     const currentUser = Parse.User.current();
+    //     console.log("Parse", JSON.stringify(currentUser))
+    //     if (currentUser === null) {
+    //         console.log("CLEAR SESSION")
+    //         // If no user is logged in, clear the session token
+    //         await Parse.User.logOut();
+    //     }
+    //     }
+
+    //     // Call this function when the app starts
+    //     checkAndClearSession();
+    // }, []);
 
 
 
@@ -226,7 +271,6 @@ const useUser = () => {
 
     // Update Points
     const postPoint = async function (action: String): Promise<any> {
-        if (!user?.objectId) return;
         let result: any;
         try {
             result = await Parse.Cloud.run("postPoint", { action });
@@ -317,24 +361,12 @@ const useUser = () => {
         let googleUser: any;
         let currentUser: any;
         try {
-            await SocialLogin.initialize({
-                google: {
-                    webClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-                    // iosClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID_IOS, // not sure if this is needed (in cap go shows)
-                },
-
-            });
-            const response = await SocialLogin.login({
-                provider: 'google',
-                options: {
-                    scopes: ['email', 'profile'],
-                    // grantOfflineAccess: true,
-                    // nonce: 'nonce',
-                    // state: 12345
-                },
+            await GoogleAuth.initialize({
+                clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+                scopes: ['profile', 'email'],
+                grantOfflineAccess: true,
             })
-            googleUser = response.result;
-            console.log("GOOGLE USER", googleUser)
+            googleUser = await GoogleAuth.signIn();
             currentUser = new Parse.User()
         }
         catch (error) {
@@ -346,25 +378,26 @@ const useUser = () => {
             return;
         }
 
-        currentUser.set('username', googleUser.profile.email);
-        currentUser.set('email', googleUser.profile.email);
+        currentUser.set('username', googleUser.email);
+        currentUser.set('email', googleUser.email);
         currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
         currentUser.set('sendHour', "8");
         currentUser.set('nextSendTime', nextSendTime(8));
-        if (googleUser.profile.givenName) currentUser.set('firstName', googleUser.profile.givenName);
-        if (googleUser.profile.familyName) currentUser.set('lastName', googleUser.profile.familyName);
-        if (googleUser.profile.imageUrl) currentUser.set('imageUrl', googleUser.profile.imageUrl);
+        if (googleUser.givenName) currentUser.set('firstName', googleUser.givenName);
+        if (googleUser.familyName) currentUser.set('lastName', googleUser.familyName);
+        if (googleUser.imageUrl) currentUser.set('imageUrl', googleUser.imageUrl);
 
 
 
         //  if a user exists already with the same email, it will not allow a new user
-        let idToken = googleUser.idToken;
+        let idToken = googleUser.authentication.idToken;
+        // if (idToken.split(".").length > 1) idToken = idToken.split(".")[0];
 
         try {
             setIsLoading(true);
             currentUser = await currentUser.linkWith('google', {
                 authData: {
-                    id: googleUser.profile.id,
+                    id: googleUser.id,
                     id_token: idToken,
                 }
             });
@@ -372,16 +405,14 @@ const useUser = () => {
         catch (error) {
             setLogInError(error);
             setIsLoading(false);
-            // TODO: Check this logic
-            SocialLogin.logout({ provider: 'google' });
+            GoogleAuth.signOut().catch();
             return error;
 
         }
 
         if (!currentUser) {
             setLogOutError({ message: "Failed to Log In" });
-            // TODO: Check this logic
-            SocialLogin.logout({ provider: 'google' });
+            GoogleAuth.signOut().catch();
             return;
         }
         // setNotice({
@@ -400,25 +431,53 @@ const useUser = () => {
 
     };
 
+    // Function to log into Apple sign
+    let options: SignInWithAppleOptions = {
+        clientId: 'com.hsa.godible',
+        redirectURI: 'https://app.godible.org/signin',
+        scopes: 'email name',
+        state: '12345',
+        nonce: 'nonce',
+    };
     const logInWithApple = async function () {
         let appleUser: any;
         let currentUser: any;
+        let idToken: string;
+        let user: any;
         try {
-            await SocialLogin.initialize({
-                apple: {
-                    clientId: 'com.hsa.godible',
-                    redirectUrl: `https://${process.env.APP_DOMAIN}/signin`,
-                },
-            });
-            const response = await SocialLogin.login({
-                provider: 'apple',
-                options: {
+            if (!(isPlatform('android') && isPlatform('capacitor'))) {
+                // Android is not supported by community plugin, use capgo
+                await SocialLogin.initialize({
+                    apple: {
+                        clientId: 'com.hsa.godible',
+                        redirectUrl: `https://${process.env.APP_DOMAIN}/signin`,
+                    },
+                });
+                const response = await SocialLogin.login({
+                    provider: 'apple',
+                    options: {
                         scopes: ['email', 'name'],
                     }
                 });
                 appleUser = response.result;
                 console.log("APPLE USER", appleUser)
-            currentUser = new Parse.User();
+                currentUser = new Parse.User();
+                appleUser = { ...response.result, ...response.result.profile }
+                idToken = appleUser.idToken;
+
+            } else {
+                // Web / ios login for apple (community plugin)
+                appleUser = await SignInWithApple.authorize(options);
+                appleUser = appleUser.response;
+                currentUser = new Parse.User();
+
+                idToken = appleUser.identityToken;
+                user = appleUser.user;
+
+
+                if (appleUser.givenName) currentUser.set('firstName', appleUser.givenName);
+                if (appleUser.familyName) currentUser.set('lastName', appleUser.familyName);
+            }
         }
         catch (error) {
             setLogInError(error);
@@ -429,26 +488,21 @@ const useUser = () => {
             return;
         }
 
-        let idToken = appleUser.idToken;
-        let user = appleUser.profile.user;
-
-        
-        if (appleUser.profile.givenName) currentUser.set('firstName', appleUser.profile.givenName);
-        if (appleUser.profile.familyName) currentUser.set('lastName', appleUser.profile.familyName);
         try {
-            if (!user) appleUser.profile = await Parse.Cloud.run('decodeAppleJWT', { identityToken: idToken });
-            if (!appleUser.profile.user) appleUser.profile.user = appleUser.profile.sub //.split('.')[1];
+            if (!user) appleUser = await Parse.Cloud.run('decodeAppleJWT', { identityToken: idToken });
+            if (!appleUser.user) appleUser.user = appleUser.sub //.split('.')[1];
         } catch (err) {
             console.log("Failed to get response from Apple", err);
             setLogInError({ message: "Failed to log in with Apple" });
         }
 
-        currentUser.set('username', appleUser.profile.email);
-        currentUser.set('email', appleUser.profile.email);
+        currentUser.set('username', appleUser.email);
+        currentUser.set('email', appleUser.email);
 
         currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
         currentUser.set('sendHour', "8");
         currentUser.set('nextSendTime', nextSendTime(8));
+
 
         try {
             setIsLoading(true);
@@ -456,7 +510,7 @@ const useUser = () => {
                 {
                     authData: {
                         clientId: 'com.hsa.godible',
-                        id: appleUser.profile.user,
+                        id: appleUser.user,
                         token: idToken,
                     }
                 }
@@ -465,7 +519,7 @@ const useUser = () => {
         catch (error) {
             setLogInError(error);
             setIsLoading(false);
-            SocialLogin.logout({ provider: 'apple' });
+            GoogleAuth.signOut().catch();
             return error;
 
         }
@@ -486,23 +540,15 @@ const useUser = () => {
     };
 
     const [logOutError, setLogOutError] = useState<any>();
-    /**
-     * Log out of Socials and Parse
-     */
+    //Log out Function
     const logOut = async function (): Promise<IUser | Error> {
 
         setIsLoading(true);
+        //Try to sign out gooogle user if exists
+        if (GoogleAuth.signOut) GoogleAuth.signOut().catch();
 
-        //Try to revoke tokens on social logins
-        const authData = user.authData;
-        if (authData?.google) {
-            await SocialLogin.logout({ provider: "google" })
-        }
-        if (authData?.apple) {
-            await SocialLogin.logout({ provider: "apple" })
-        }
+        // if (SignInWithApple.authorize) GoogleAuth.signOut().catch();
 
-        // Actual log out from parse user
         try {
             await Parse.User.logOut();
             // To verify that current user is now empty, currentAsync can be used
@@ -876,4 +922,3 @@ const useUser = () => {
 }
 
 export default useUser
-
