@@ -184,20 +184,6 @@ const useUser = () => {
     }, []);
 
 
-    useEffect(() => {
-        // if (isPlatform('capacitor')) return;
-        try {
-            SocialLogin.initialize({
-                google: {
-                    webClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-                    // grantOfflineAccess: true, // TODO: REMOVE
-                },
-
-            })
-        }
-        catch (err) { console.error(err) }
-    }, []);
-
 
     //Get Current User
     const getCurrentUser = async function (): Promise<IUser> {
@@ -331,10 +317,20 @@ const useUser = () => {
         let googleUser: any;
         let currentUser: any;
         try {
+            SocialLogin.initialize({
+                google: {
+                    webClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+                    // iosClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID_IOS, // not sure if this is needed (in cap go shows)
+                },
+
+            });
             const response = await SocialLogin.login({
                 provider: 'google',
                 options: {
                     scopes: ['email', 'profile'],
+                    grantOfflineAccess: true,
+                    // nonce: 'nonce',
+                    // state: 12345
                 },
             })
             googleUser = response.result;
