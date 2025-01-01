@@ -328,8 +328,8 @@ const useUser = () => {
                 provider: 'google',
                 options: {
                     // scopes: ['email', 'profile'],
-                    // grantOfflineAccess: true,
-                    // nonce: 'nonce',
+                    grantOfflineAccess: true,
+                    nonce: 'nonce',
                     // state: 12345
                 },
             })
