@@ -536,7 +536,7 @@ const ProfilePage: React.FC = () => {
   let userName = `${user?.firstName ? user?.firstName : ''}${user?.lastName ? ' ' + user?.lastName : ''
     }`;
   if (userName.length === 0 && !user?.objectId) userName = 'Your Hoon Dok Hae Profile!';
-  if (userName.length === 0 && user?.objectId) userName = 'Set up your name';
+  if (userName.length === 0 && user?.objectId) userName = user?.email || "New User";
 
   //Construct Reminder Button Text
   const reminderTextArray = [] as string[];

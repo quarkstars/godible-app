@@ -14,12 +14,6 @@ import useLists from './useLists';
 import { nextSendTime } from 'utils/nextSendTime';
 
 import { PushNotifications } from '@capacitor/push-notifications';
-
-// import {
-//     SignInWithApple,
-//     SignInWithAppleResponse,
-//     SignInWithAppleOptions,
-// } from '@capacitor-community/apple-sign-in';
 import { App } from '@capacitor/app';
 import { SocialLogin } from '@capgo/capacitor-social-login';
 
@@ -176,19 +170,8 @@ const useUser = () => {
         const addListenerAsync = async () => {
             backButtonListener = await App.addListener('backButton', (data) => {
                 if (isModalOpen && isModalOpen.current) return;
-
-                // if (router.current?.canGoBack()) {
-                //     router.current?.goBack();
-
-                //    backButtonListener.remove();
-                // }
             });
         };
-
-        // const resetBackButtonListener = async () => {
-        //     backButtonListener.remove();
-        //     addListenerAsync();
-        // }
 
         addListenerAsync();
 
@@ -214,24 +197,6 @@ const useUser = () => {
         }
         catch (err) { console.error(err) }
     }, []);
-
-    //Clear user if no user
-    // useEffect(() => {
-    //     console.log("CHECK SESSION")
-    //     const checkAndClearSession = async () => {
-    //     const currentUser = Parse.User.current();
-    //     console.log("Parse", JSON.stringify(currentUser))
-    //     if (currentUser === null) {
-    //         console.log("CLEAR SESSION")
-    //         // If no user is logged in, clear the session token
-    //         await Parse.User.logOut();
-    //     }
-    //     }
-
-    //     // Call this function when the app starts
-    //     checkAndClearSession();
-    // }, []);
-
 
 
     //Get Current User
@@ -275,6 +240,7 @@ const useUser = () => {
 
     // Update Points
     const postPoint = async function (action: String): Promise<any> {
+        if (!user?.objectId) return;
         let result: any;
         try {
             result = await Parse.Cloud.run("postPoint", { action });

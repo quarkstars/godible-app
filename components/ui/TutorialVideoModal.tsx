@@ -56,7 +56,7 @@ const TutorialVideoModal = (props: TutorialVideoModalProps) => {
             </IonButton>
           </IonButtons>
           <div className="pr-10">
-            <IonTitle><strong>Welcome to the NEW Godible!</strong></IonTitle>
+            <IonTitle><strong>Welcome to the Godible in 2025!</strong></IonTitle>
           </div>
           {onClick &&
               <IonButton fill="solid" color="primary" className="mr-2" slot="end" onClick={(e) => {
