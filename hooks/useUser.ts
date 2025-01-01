@@ -468,14 +468,14 @@ const useUser = () => {
         }
 
         let idToken = appleUser.idToken;
-        let user = appleUser.user;
+        let user = appleUser.profile.user;
 
         
         if (appleUser.profile.givenName) currentUser.set('firstName', appleUser.profile.givenName);
         if (appleUser.profile.familyName) currentUser.set('lastName', appleUser.profile.familyName);
         try {
-            if (!user) appleUser = await Parse.Cloud.run('decodeAppleJWT', { identityToken: idToken });
-            // if (!appleUser.profile.user) appleUser.profile.user = appleUser.sub //.split('.')[1];
+            if (!user) appleUser.profile = await Parse.Cloud.run('decodeAppleJWT', { identityToken: idToken });
+            if (!appleUser.profile.user) appleUser.profile.user = appleUser.profile.sub //.split('.')[1];
         } catch (err) {
             console.log("Failed to get response from Apple", err);
             setLogInError({ message: "Failed to log in with Apple" });
@@ -487,7 +487,6 @@ const useUser = () => {
         currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
         currentUser.set('sendHour', "8");
         currentUser.set('nextSendTime', nextSendTime(8));
-
 
         try {
             setIsLoading(true);
