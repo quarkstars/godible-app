@@ -327,8 +327,8 @@ const useUser = () => {
             const response = await SocialLogin.login({
                 provider: 'google',
                 options: {
-                    scopes: ['email', 'profile'],
-                    grantOfflineAccess: true,
+                    // scopes: ['email', 'profile'],
+                    // grantOfflineAccess: true,
                     // nonce: 'nonce',
                     // state: 12345
                 },
