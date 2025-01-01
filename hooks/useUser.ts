@@ -467,7 +467,7 @@ const useUser = () => {
             return;
         }
 
-        let idToken = appleUser.identityToken;
+        let idToken = appleUser.idToken;
         let user = appleUser.user;
 
         
