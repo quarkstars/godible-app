@@ -317,7 +317,7 @@ const useUser = () => {
         let googleUser: any;
         let currentUser: any;
         try {
-            SocialLogin.initialize({
+            await SocialLogin.initialize({
                 google: {
                     webClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
                     // iosClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID_IOS, // not sure if this is needed (in cap go shows)
