@@ -821,7 +821,7 @@ const EpisodePage: React.FC = () => {
                   </IonButton>
                 </IonButtons>
               </div>
-              {episode && user.language && (!episode?.hasLangAudio || !episode?.hasLangText) && <span className="text-medium text-xs">{`${user.language.charAt(0).toUpperCase() + user.language.slice(1)} ${!episode.hasLangText ? "text" : ""}${!episode.hasLangAudio && !episode.hasLangText ? " and " : ""}${!episode.hasLangAudio ? "audio" : ""} are not available`}</span>}
+              {episode && user.language && (!episode?.hasLangAudio || !episode?.hasLangText) && <span className="text-medium text-xs">{`${user.language.charAt(0).toUpperCase() + user.language.slice(1)} ${!episode.hasLangText ? "text" : ""}${!episode.hasLangAudio && !episode.hasLangText ? " and " : ""}${!episode.hasLangAudio ? "audio" : ""} ${!episode.hasLangAudio && !episode.hasLangText ? "are" : "is"} not available`}</span>}
             </div>
             {episode?.isFirstSpeechEpisode && episode?._speechTitle && (
               <h1 className="w-full pb-2 font-bold text-left text-light dark:text-dark">
