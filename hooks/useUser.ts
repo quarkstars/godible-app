@@ -455,6 +455,7 @@ const useUser = () => {
                     }
                 });
                 appleUser = response.result;
+                console.log("APPLE USER", appleUser)
             currentUser = new Parse.User();
         }
         catch (error) {
@@ -469,19 +470,19 @@ const useUser = () => {
         let idToken = appleUser.identityToken;
         let user = appleUser.user;
 
-
-        if (appleUser.givenName) currentUser.set('firstName', appleUser.givenName);
-        if (appleUser.familyName) currentUser.set('lastName', appleUser.familyName);
+        
+        if (appleUser.profile.givenName) currentUser.set('firstName', appleUser.profile.givenName);
+        if (appleUser.profile.familyName) currentUser.set('lastName', appleUser.profile.familyName);
         try {
             if (!user) appleUser = await Parse.Cloud.run('decodeAppleJWT', { identityToken: idToken });
-            if (!appleUser.user) appleUser.user = appleUser.sub //.split('.')[1];
+            // if (!appleUser.profile.user) appleUser.profile.user = appleUser.sub //.split('.')[1];
         } catch (err) {
             console.log("Failed to get response from Apple", err);
             setLogInError({ message: "Failed to log in with Apple" });
         }
 
-        currentUser.set('username', appleUser.email);
-        currentUser.set('email', appleUser.email);
+        currentUser.set('username', appleUser.profile.email);
+        currentUser.set('email', appleUser.profile.email);
 
         currentUser.set('timeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
         currentUser.set('sendHour', "8");
@@ -494,7 +495,7 @@ const useUser = () => {
                 {
                     authData: {
                         clientId: 'com.hsa.godible',
-                        id: appleUser.user,
+                        id: appleUser.profile.user,
                         token: idToken,
                     }
                 }
