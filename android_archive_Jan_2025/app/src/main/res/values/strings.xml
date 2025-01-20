@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Godible</string>
+    <string name="title_activity_main">Godible</string>
+    <string name="package_name">com.godible.app</string>
+    <string name="custom_url_scheme">com.godible.app</string>
+</resources>
